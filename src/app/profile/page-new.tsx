@@ -17,9 +17,12 @@ import {
   EyeOff,
   Save,
   Calendar,
+  MapPin,
+  Globe,
   Award,
   BookOpen,
   Users,
+  Check,
   X,
 } from "lucide-react";
 
