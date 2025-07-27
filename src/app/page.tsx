@@ -21,77 +21,20 @@ const samplePosts = [
   {
     id: "1",
     author: {
-      name: "Rahul Sharma",
-      entryNo: "2021CSB1234",
+      name: "IIT Connect",
+      entryNo: "Official",
       image:
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
       isVerified: true,
     },
     content:
-      "Looking for someone to share a cab to Chandigarh this Friday evening! Split costs. DM me if interested 🚗",
+      "Welcome to IIT Connect! 🎉 Your campus community platform to connect, share, and discover. Share your experiences, find study partners, organize events, and stay connected with your fellow IIT Ropar students.",
     image:
-      "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=800&fit=crop",
-    likes: 24,
-    comments: 8,
-    createdAt: "2024-01-26T14:30:00Z",
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&h=800&fit=crop",
+    likes: 128,
+    comments: 45,
+    createdAt: "2025-01-27T12:00:00Z",
     isLiked: false,
-    isSaved: false,
-  },
-  {
-    id: "2",
-    author: {
-      name: "Priya Patel",
-      entryNo: "2022EEB5678",
-      image:
-        "https://images.unsplash.com/photo-1494790108755-2616b332e234?w=150&h=150&fit=crop&crop=face",
-      isVerified: false,
-    },
-    content:
-      "Selling my MacBook Pro 2020 in excellent condition. Perfect for coding and design work. Price negotiable! 💻",
-    image:
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&h=800&fit=crop",
-    likes: 156,
-    comments: 23,
-    createdAt: "2024-01-26T11:30:00Z",
-    isLiked: true,
-    isSaved: false,
-  },
-  {
-    id: "3",
-    author: {
-      name: "Arjun Singh",
-      entryNo: "2023MEB9101",
-      image:
-        "https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=150&h=150&fit=crop&crop=face",
-      isVerified: true,
-    },
-    content:
-      "Game night this Friday at 8 PM! Bringing FIFA, Call of Duty, and board games. Room 204, Hostel B. Everyone welcome! 🎮",
-    image:
-      "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&h=800&fit=crop",
-    likes: 89,
-    comments: 42,
-    createdAt: "2024-01-25T20:00:00Z",
-    isLiked: false,
-    isSaved: true,
-  },
-  {
-    id: "4",
-    author: {
-      name: "Sneha Patel",
-      entryNo: "2021EEB2345",
-      image:
-        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
-      isVerified: true,
-    },
-    content:
-      "Beautiful sunset from the campus library! Perfect study ambiance 🌅📖 Sometimes you need to take a break and appreciate the little things.",
-    image:
-      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=800&fit=crop",
-    likes: 89,
-    comments: 24,
-    createdAt: "2024-01-25T18:30:00Z",
-    isLiked: true,
     isSaved: false,
   },
 ];
@@ -198,47 +141,6 @@ export default function Timeline() {
                 <MessageCircle className="h-6 w-6 text-gray-900" />
               </button>
             </div>
-          </div>
-        </div>
-
-        {/* Stories Section */}
-        <div className="border-b border-white/30 p-4 bg-white/20 backdrop-blur-xl">
-          <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
-            {/* Your Story */}
-            <div className="flex flex-col items-center space-y-1 flex-shrink-0">
-              <div className="relative">
-                <Avatar className="h-16 w-16 ring-2 ring-white/50 ring-offset-2 ring-offset-transparent">
-                  <AvatarImage src={session.user?.image || ""} />
-                  <AvatarFallback className="bg-gradient-to-br from-blue-400 to-purple-500 text-white">
-                    {session.user?.name?.charAt(0)?.toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1">
-                  <Plus className="h-3 w-3 text-white" />
-                </div>
-              </div>
-              <span className="text-xs text-gray-900 font-medium poppins-medium">
-                Your story
-              </span>
-            </div>
-
-            {/* Other Stories */}
-            {samplePosts.slice(0, 6).map((post, index) => (
-              <div
-                key={index}
-                className="flex flex-col items-center space-y-1 flex-shrink-0"
-              >
-                <Avatar className="h-16 w-16 ring-2 ring-white/50 ring-offset-2 ring-offset-transparent">
-                  <AvatarImage src={post.author.image || ""} />
-                  <AvatarFallback className="bg-gradient-to-br from-purple-400 to-pink-500 text-white">
-                    {post.author.name.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-xs text-gray-600 text-center max-w-[60px] truncate font-medium">
-                  {post.author.name.split(" ")[0]}
-                </span>
-              </div>
-            ))}
           </div>
         </div>
 
