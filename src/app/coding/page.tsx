@@ -14,7 +14,6 @@ import {
   Star,
   Clock,
   Award,
-  BookOpen,
   Target,
   Zap,
 } from "lucide-react";

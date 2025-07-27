@@ -7,15 +7,11 @@ import {
   FolderOpen,
   Users,
   Star,
-  GitBranch,
-  ExternalLink,
   Search,
   Plus,
-  Code,
   Globe,
   Github,
   Calendar,
-  Tag,
   User,
   BookOpen,
 } from "lucide-react";
@@ -299,7 +295,7 @@ export default function ProjectsPage() {
           <div className="flex gap-2 flex-wrap">
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as any)}
+              onChange={(e) => setSelectedCategory(e.target.value as "all" | "web" | "mobile" | "ai-ml" | "iot" | "research" | "other")}
               className="px-3 py-2 border border-gray-300 rounded-md text-sm"
             >
               <option value="all">All Categories</option>
@@ -313,7 +309,7 @@ export default function ProjectsPage() {
 
             <select
               value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value as any)}
+              onChange={(e) => setSelectedStatus(e.target.value as "all" | "planning" | "development" | "completed" | "seeking-members")}
               className="px-3 py-2 border border-gray-300 rounded-md text-sm"
             >
               <option value="all">All Status</option>

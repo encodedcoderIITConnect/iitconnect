@@ -13,8 +13,6 @@ import {
   Smile,
   Paperclip,
   Users,
-  Hash,
-  Settings,
   UserPlus,
 } from "lucide-react";
 
