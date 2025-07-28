@@ -1,21 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Code,
   Trophy,
   Calendar,
   Users,
   ExternalLink,
-  Search,
-  Plus,
   Star,
   Clock,
   Award,
   Target,
-  Zap,
 } from "lucide-react";
 
 interface Contest {
@@ -57,10 +54,10 @@ interface StudyGroup {
 }
 
 export default function CodingPage() {
+  const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<
     "contests" | "practice" | "groups"
   >("contests");
-  const [searchTerm, setSearchTerm] = useState("");
 
   // Sample contests data
   const [contests] = useState<Contest[]>([
@@ -260,99 +257,54 @@ export default function CodingPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                <Code className="h-8 w-8 mr-3 text-purple-600" />
-                Coding & Programming
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Practice problems, join contests, and collaborate with fellow
-                programmers
-              </p>
-            </div>
-
-            <Button className="shrink-0">
-              <Plus className="h-4 w-4 mr-2" />
-              Create Study Group
-            </Button>
-          </div>
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 flex items-center justify-center p-8">
+        <div className="text-center text-white max-w-md">
+          <Code className="h-16 w-16 mx-auto mb-4 opacity-80" />
+          <h1 className="text-2xl font-bold mb-4">Coding & Programming</h1>
+          <p className="mb-6">
+            Sign in with your @iitrpr.ac.in email to access coding contests,
+            practice problems, and study groups
+          </p>
+          <Button
+            onClick={() => (window.location.href = "/auth/signin")}
+            className="bg-white text-blue-600 hover:bg-gray-100"
+          >
+            Sign In to Continue
+          </Button>
         </div>
       </div>
+    );
+  }
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Trophy className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Contests</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {contests.length}
-                </p>
-              </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center mb-6">
+            <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-4">
+              <Code className="h-12 w-12 text-white" />
             </div>
           </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Target className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Problems Solved</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {problems.filter((p) => p.solved).length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Study Groups</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {studyGroups.length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Zap className="h-6 w-6 text-orange-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Active Members</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {studyGroups.reduce((sum, group) => sum + group.members, 0)}
-                </p>
-              </div>
-            </div>
-          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Coding & Programming
+          </h1>
+          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+            Practice problems, join contests, and collaborate with fellow
+            programmers
+          </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-8 w-fit">
+        <div className="flex justify-center space-x-1 bg-white/20 backdrop-blur-xl border border-white/30 p-1 rounded-2xl mb-8 w-fit mx-auto">
           <button
             onClick={() => setActiveTab("contests")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
               activeTab === "contests"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white/60 text-gray-900 shadow-sm"
+                : "text-white/80 hover:text-white"
             }`}
           >
             <Trophy className="h-4 w-4 mr-2 inline" />
@@ -360,10 +312,10 @@ export default function CodingPage() {
           </button>
           <button
             onClick={() => setActiveTab("practice")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
               activeTab === "practice"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white/60 text-gray-900 shadow-sm"
+                : "text-white/80 hover:text-white"
             }`}
           >
             <Target className="h-4 w-4 mr-2 inline" />
@@ -371,10 +323,10 @@ export default function CodingPage() {
           </button>
           <button
             onClick={() => setActiveTab("groups")}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
               activeTab === "groups"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
+                ? "bg-white/60 text-gray-900 shadow-sm"
+                : "text-white/80 hover:text-white"
             }`}
           >
             <Users className="h-4 w-4 mr-2 inline" />
@@ -382,231 +334,288 @@ export default function CodingPage() {
           </button>
         </div>
 
-        {/* Search */}
-        <div className="mb-6">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input
-              placeholder={`Search ${activeTab}...`}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-        </div>
-
         {/* Content based on active tab */}
-        {activeTab === "contests" && (
-          <div className="space-y-6">
-            {contests.map((contest) => (
-              <div
-                key={contest.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-              >
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {activeTab === "contests" && (
+            <>
+              {contests.map((contest) => (
+                <div
+                  key={contest.id}
+                  className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                >
+                  <div className="space-y-6">
+                    {/* Contest Header */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Trophy className="h-8 w-8 text-yellow-600" />
+                        <div className="flex gap-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                              contest.status
+                            )}`}
+                          >
+                            {contest.status}
+                          </span>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
+                              contest.difficulty
+                            )}`}
+                          >
+                            {contest.difficulty}
+                          </span>
+                        </div>
+                      </div>
+
+                      <h3 className="text-xl font-bold text-gray-900 leading-tight">
                         {contest.title}
                       </h3>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                          contest.status
-                        )}`}
-                      >
-                        {contest.status}
-                      </span>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
-                          contest.difficulty
-                        )}`}
-                      >
-                        {contest.difficulty}
-                      </span>
+
+                      <p className="text-sm font-medium text-blue-600">
+                        Platform: {contest.platform}
+                      </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        {new Date(contest.date).toLocaleDateString()}
+                    {/* Contest Details */}
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="h-4 w-4 text-blue-500" />
+                          <span>
+                            {new Date(contest.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Clock className="h-4 w-4 text-green-500" />
+                          <span>{contest.duration}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Users className="h-4 w-4 text-purple-500" />
+                          <span>{contest.participants}</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Award className="h-4 w-4 text-orange-500" />
+                          <span className="truncate">{contest.prizes[0]}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-2" />
-                        {contest.duration}
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="h-4 w-4 mr-2" />
-                        {contest.participants} participants
-                      </div>
-                      <div className="flex items-center">
-                        <Award className="h-4 w-4 mr-2" />
-                        {contest.prizes.join(", ")}
+
+                      {/* Action Buttons */}
+                      <div className="flex flex-col gap-2 pt-2">
+                        {contest.isRegistered ? (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="bg-green-50 border-green-200 text-green-700 font-medium"
+                            disabled
+                          >
+                            ✓ Registered
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium"
+                          >
+                            Register Now
+                          </Button>
+                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(contest.url, "_blank")}
+                          className="border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          View Details
+                        </Button>
                       </div>
                     </div>
-
-                    <p className="text-sm text-blue-600 mt-2">
-                      Platform: {contest.platform}
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button
-                      variant={contest.isRegistered ? "outline" : "default"}
-                      size="sm"
-                    >
-                      {contest.isRegistered ? "Registered" : "Register"}
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <ExternalLink className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </>
+          )}
 
-        {activeTab === "practice" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {problems.map((problem) => (
-              <div
-                key={problem.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
-                          problem.difficulty
-                        )}`}
-                      >
-                        {problem.difficulty}
-                      </span>
-                      {problem.solved && (
-                        <span className="text-green-600 text-sm">✓ Solved</span>
+          {activeTab === "practice" && (
+            <>
+              {problems.map((problem) => (
+                <div
+                  key={problem.id}
+                  className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                >
+                  <div className="space-y-6">
+                    {/* Problem Header */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Target className="h-8 w-8 text-blue-600" />
+                        <div className="flex gap-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(
+                              problem.difficulty
+                            )}`}
+                          >
+                            {problem.difficulty}
+                          </span>
+                          {problem.solved && (
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600">
+                              ✓ Solved
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <h3 className="text-xl font-bold text-gray-900 leading-tight">
+                        {problem.title}
+                      </h3>
+
+                      <p className="text-sm font-medium text-blue-600">
+                        Platform: {problem.platform}
+                      </p>
+                    </div>
+
+                    {/* Problem Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {problem.tags.slice(0, 3).map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {problem.tags.length > 3 && (
+                        <span className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-medium">
+                          +{problem.tags.length - 3} more
+                        </span>
                       )}
                     </div>
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      {problem.title}
-                    </h3>
-                  </div>
 
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Star className="h-4 w-4 mr-1" />
-                    {problem.likes}
-                  </div>
-                </div>
+                    {/* Problem Stats */}
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                      <div className="flex items-center space-x-2">
+                        <Star className="h-4 w-4 text-yellow-500" />
+                        <span className="font-medium">
+                          {problem.likes} likes
+                        </span>
+                      </div>
+                      <div className="text-xs text-gray-500 uppercase font-medium tracking-wide">
+                        {problem.category}
+                      </div>
+                    </div>
 
-                <div className="mb-4">
-                  <p className="text-sm text-blue-600 mb-2">
-                    Platform: {problem.platform}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Category: {problem.category}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1">
-                    {problem.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                    {/* Action Button */}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(problem.url, "_blank")}
+                      className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      {problem.solved ? "Review Solution" : "Solve Problem"}
+                    </Button>
                   </div>
                 </div>
+              ))}
+            </>
+          )}
 
-                <div className="flex gap-2">
-                  <Button size="sm" className="flex-1">
-                    {problem.solved ? "View Solution" : "Solve"}
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+          {activeTab === "groups" && (
+            <>
+              {studyGroups.map((group) => (
+                <div
+                  key={group.id}
+                  className="bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl shadow-xl p-8 hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                >
+                  <div className="space-y-6">
+                    {/* Group Header */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <Users className="h-8 w-8 text-purple-600" />
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-medium ${getLevelColor(
+                            group.level
+                          )}`}
+                        >
+                          {group.level}
+                        </span>
+                      </div>
 
-        {activeTab === "groups" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {studyGroups.map((group) => (
-              <div
-                key={group.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="text-xl font-bold text-gray-900 leading-tight">
                         {group.name}
                       </h3>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${getLevelColor(
-                          group.level
-                        )}`}
-                      >
-                        {group.level}
-                      </span>
+
+                      <p className="text-gray-600 text-sm leading-relaxed">
+                        {group.description}
+                      </p>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      {group.description}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Users className="h-4 w-4 mr-2" />
-                    {group.members}/{group.maxMembers} members
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="h-4 w-4 mr-2" />
-                    {group.meetingTime}
-                  </div>
-                </div>
+                    {/* Focus Areas */}
+                    <div className="space-y-3">
+                      <p className="text-sm font-medium text-gray-700">
+                        Focus Areas:
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {group.focus.slice(0, 3).map((topic) => (
+                          <span
+                            key={topic}
+                            className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium"
+                          >
+                            {topic}
+                          </span>
+                        ))}
+                        {group.focus.length > 3 && (
+                          <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">
+                            +{group.focus.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
 
-                <div className="mb-4">
-                  <p className="text-sm font-medium text-gray-700 mb-2">
-                    Focus Areas:
-                  </p>
-                  <div className="flex flex-wrap gap-1">
-                    {group.focus.map((area) => (
-                      <span
-                        key={area}
-                        className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded"
+                    {/* Group Stats */}
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="flex items-center space-x-2 text-gray-600">
+                        <Users className="h-4 w-4 text-purple-500" />
+                        <span className="font-medium">
+                          {group.members}/{group.maxMembers} members
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-gray-600">
+                        <Clock className="h-4 w-4 text-green-500" />
+                        <span className="font-medium text-xs">
+                          {group.meetingTime}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col gap-2 pt-2">
+                      <Button
+                        size="sm"
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-medium"
+                        disabled={group.members >= group.maxMembers}
                       >
-                        {area}
-                      </span>
-                    ))}
+                        {group.members >= group.maxMembers
+                          ? "Group Full"
+                          : "Join Group"}
+                      </Button>
+                      {group.whatsappUrl && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            window.open(group.whatsappUrl, "_blank")
+                          }
+                          className="border-gray-300 text-gray-700 hover:bg-gray-50 font-medium"
+                        >
+                          <ExternalLink className="h-4 w-4 mr-2" />
+                          WhatsApp Group
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    className="flex-1"
-                    disabled={group.members >= group.maxMembers}
-                  >
-                    {group.members >= group.maxMembers
-                      ? "Group Full"
-                      : "Join Group"}
-                  </Button>
-                  {group.whatsappUrl && (
-                    <Button variant="outline" size="sm">
-                      <ExternalLink className="h-4 w-4 mr-1" />
-                      WhatsApp
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

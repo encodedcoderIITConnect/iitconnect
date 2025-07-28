@@ -24,6 +24,8 @@ import {
   Users,
   Check,
   X,
+  Heart,
+  MessageSquare,
 } from "lucide-react";
 
 interface UserProfile {

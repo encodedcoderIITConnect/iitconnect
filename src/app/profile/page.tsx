@@ -7,18 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Edit3,
-  Mail,
   Phone,
-  GraduationCap,
-  Building2,
-  Hash,
   ExternalLink,
-  Eye,
-  EyeOff,
   Save,
   Calendar,
-  Award,
-  BookOpen,
   Users,
   X,
 } from "lucide-react";
@@ -27,13 +19,14 @@ interface UserProfile {
   id: string;
   name: string;
   email: string;
+  username?: string;
   image?: string;
-  entryNo?: string;
   phone?: string;
-  department?: string;
-  course?: string;
   socialLink?: string;
   isPublicEmail: boolean;
+  entryNo?: string;
+  department?: string;
+  course?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -45,12 +38,12 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    entryNo: "",
+    username: "",
     phone: "",
+    socialLink: "",
+    entryNo: "",
     department: "",
     course: "",
-    socialLink: "",
-    isPublicEmail: true,
   });
 
   useEffect(() => {
@@ -66,12 +59,12 @@ export default function ProfilePage() {
         const userData = await response.json();
         setUser(userData);
         setFormData({
-          entryNo: userData.entryNo || "",
+          username: userData.username || userData.email.split("@")[0],
           phone: userData.phone || "",
+          socialLink: userData.socialLink || "",
+          entryNo: userData.entryNo || "",
           department: userData.department || "",
           course: userData.course || "",
-          socialLink: userData.socialLink || "",
-          isPublicEmail: userData.isPublicEmail ?? true,
         });
       }
     } catch (error) {
@@ -110,38 +103,6 @@ export default function ProfilePage() {
       month: "long",
       day: "numeric",
     });
-  };
-
-  const getDepartmentIcon = (department: string) => {
-    if (department.toLowerCase().includes("computer")) return "💻";
-    if (department.toLowerCase().includes("chemical")) return "⚗️";
-    if (department.toLowerCase().includes("civil")) return "🏗️";
-    if (department.toLowerCase().includes("electrical")) return "⚡";
-    if (department.toLowerCase().includes("mechanical")) return "⚙️";
-    return "🎓";
-  };
-
-  const getAcademicYear = (entryNo: string) => {
-    if (!entryNo) return "";
-    const year = entryNo.substring(0, 2);
-    return `20${year}`;
-  };
-
-  const getSemester = (entryNo: string) => {
-    if (!entryNo) return "";
-    const year = parseInt(entryNo.substring(0, 2));
-    const currentYear = new Date().getFullYear() % 100;
-    const yearsPassed = currentYear - year;
-    const currentMonth = new Date().getMonth() + 1;
-
-    let semester = yearsPassed * 2;
-    if (currentMonth >= 7) {
-      semester += 1;
-    } else {
-      semester += 2;
-    }
-
-    return Math.min(semester, 8);
   };
 
   if (loading) {
@@ -185,40 +146,34 @@ export default function ProfilePage() {
             </Avatar>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
             {user.name}
           </h1>
 
-          {user.entryNo && (
-            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-6 py-2 mb-6">
-              <Hash className="h-5 w-5 text-white/80 mr-2" />
-              <span className="text-white font-semibold">{user.entryNo}</span>
-            </div>
-          )}
+          <p className="text-xl text-white/80 mb-6 font-medium">{user.email}</p>
 
-          <div className="flex flex-wrap justify-center gap-4 text-white/90">
+          <div className="flex flex-wrap justify-center gap-4 text-white/90 mb-6">
+            {user.entryNo && (
+              <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
+                <span className="text-sm font-medium">
+                  Entry No: {user.entryNo}
+                </span>
+              </div>
+            )}
             {user.department && (
               <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                <span className="mr-2">
-                  {getDepartmentIcon(user.department)}
-                </span>
                 <span className="text-sm font-medium">{user.department}</span>
               </div>
             )}
-
             {user.course && (
               <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                <GraduationCap className="h-4 w-4 mr-2" />
                 <span className="text-sm font-medium">{user.course}</span>
               </div>
             )}
-
-            {user.entryNo && (
+            {user.socialLink && (
               <div className="flex items-center bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
-                <BookOpen className="h-4 w-4 mr-2" />
-                <span className="text-sm font-medium">
-                  Semester {getSemester(user.entryNo)}
-                </span>
+                <ExternalLink className="h-4 w-4 mr-2" />
+                <span className="text-sm font-medium">Social Profile</span>
               </div>
             )}
           </div>
@@ -299,46 +254,110 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Email */}
+                {/* Username */}
                 <div className="bg-gray-50/50 rounded-xl p-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email Address
+                    Username
                   </label>
-                  <div className="flex items-center justify-between">
+                  {isEditing ? (
+                    <Input
+                      type="text"
+                      value={formData.username}
+                      onChange={(e) =>
+                        setFormData({ ...formData, username: e.target.value })
+                      }
+                      placeholder="Enter your username"
+                      className="border-gray-300"
+                    />
+                  ) : (
                     <div className="flex items-center text-gray-900">
-                      <Mail className="h-4 w-4 mr-2 text-gray-500" />
-                      <span className="font-medium">{user.email}</span>
-                    </div>
-                    <div className="flex items-center">
-                      {user.isPublicEmail ? (
-                        <Eye className="h-4 w-4 text-green-500" />
-                      ) : (
-                        <EyeOff className="h-4 w-4 text-gray-400" />
-                      )}
-                      <span className="ml-1 text-xs text-gray-500">
-                        {user.isPublicEmail ? "Public" : "Private"}
+                      <span className="font-medium">
+                        {user.username || user.email.split("@")[0]}
                       </span>
                     </div>
-                  </div>
+                  )}
+                </div>
 
-                  {isEditing && (
-                    <div className="mt-3">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={formData.isPublicEmail}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              isPublicEmail: e.target.checked,
-                            })
-                          }
-                          className="rounded border-gray-300 mr-2"
-                        />
-                        <span className="text-sm text-gray-600">
-                          Make email visible to other students
-                        </span>
-                      </label>
+                {/* Entry Number */}
+                <div className="bg-gray-50/50 rounded-xl p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Entry Number
+                  </label>
+                  {isEditing ? (
+                    <Input
+                      type="text"
+                      value={formData.entryNo}
+                      onChange={(e) =>
+                        setFormData({ ...formData, entryNo: e.target.value })
+                      }
+                      placeholder="Enter your entry number"
+                      className="border-gray-300"
+                    />
+                  ) : (
+                    <div className="flex items-center text-gray-900">
+                      <span className="font-medium">
+                        {user.entryNo || (
+                          <span className="text-gray-400 italic">
+                            Not provided
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Department */}
+                <div className="bg-gray-50/50 rounded-xl p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Department
+                  </label>
+                  {isEditing ? (
+                    <Input
+                      type="text"
+                      value={formData.department}
+                      onChange={(e) =>
+                        setFormData({ ...formData, department: e.target.value })
+                      }
+                      placeholder="Enter your department"
+                      className="border-gray-300"
+                    />
+                  ) : (
+                    <div className="flex items-center text-gray-900">
+                      <span className="font-medium">
+                        {user.department || (
+                          <span className="text-gray-400 italic">
+                            Not provided
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Course */}
+                <div className="bg-gray-50/50 rounded-xl p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Course
+                  </label>
+                  {isEditing ? (
+                    <Input
+                      type="text"
+                      value={formData.course}
+                      onChange={(e) =>
+                        setFormData({ ...formData, course: e.target.value })
+                      }
+                      placeholder="Enter your course (e.g., B.Tech, M.Tech)"
+                      className="border-gray-300"
+                    />
+                  ) : (
+                    <div className="flex items-center text-gray-900">
+                      <span className="font-medium">
+                        {user.course || (
+                          <span className="text-gray-400 italic">
+                            Not provided
+                          </span>
+                        )}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -422,147 +441,13 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              {/* Academic Information */}
+              {/* Join Date */}
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <GraduationCap className="h-5 w-5 mr-2 text-blue-500" />
-                  Academic Information
+                  <Calendar className="h-5 w-5 mr-2 text-blue-500" />
+                  Membership Information
                 </h3>
 
-                {/* Entry Number */}
-                <div className="bg-gray-50/50 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Entry Number
-                  </label>
-                  {isEditing ? (
-                    <div className="flex items-center">
-                      <Hash className="h-4 w-4 mr-2 text-gray-500" />
-                      <Input
-                        type="text"
-                        value={formData.entryNo}
-                        onChange={(e) =>
-                          setFormData({ ...formData, entryNo: e.target.value })
-                        }
-                        placeholder="e.g., 24CSZ0009"
-                        className="border-gray-300"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center text-gray-900">
-                      <Hash className="h-4 w-4 mr-2 text-gray-500" />
-                      <span className="font-medium">
-                        {user.entryNo || (
-                          <span className="text-gray-400 italic">
-                            Not provided
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Department */}
-                <div className="bg-gray-50/50 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Department
-                  </label>
-                  {isEditing ? (
-                    <div className="flex items-center">
-                      <Building2 className="h-4 w-4 mr-2 text-gray-500" />
-                      <Input
-                        type="text"
-                        value={formData.department}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            department: e.target.value,
-                          })
-                        }
-                        placeholder="Your department"
-                        className="border-gray-300"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center text-gray-900">
-                      <Building2 className="h-4 w-4 mr-2 text-gray-500" />
-                      <div>
-                        <span className="font-medium">
-                          {user.department || (
-                            <span className="text-gray-400 italic">
-                              Not provided
-                            </span>
-                          )}
-                        </span>
-                        {user.department && (
-                          <span className="ml-2 text-2xl">
-                            {getDepartmentIcon(user.department)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Course */}
-                <div className="bg-gray-50/50 rounded-xl p-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Course
-                  </label>
-                  {isEditing ? (
-                    <div className="flex items-center">
-                      <Award className="h-4 w-4 mr-2 text-gray-500" />
-                      <Input
-                        type="text"
-                        value={formData.course}
-                        onChange={(e) =>
-                          setFormData({ ...formData, course: e.target.value })
-                        }
-                        placeholder="B.Tech, M.Tech, Ph.D, etc."
-                        className="border-gray-300"
-                      />
-                    </div>
-                  ) : (
-                    <div className="flex items-center text-gray-900">
-                      <Award className="h-4 w-4 mr-2 text-gray-500" />
-                      <span className="font-medium">
-                        {user.course || (
-                          <span className="text-gray-400 italic">
-                            Not provided
-                          </span>
-                        )}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Academic Stats */}
-                {user.entryNo && (
-                  <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">
-                      Academic Details
-                    </h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <span className="text-xs text-gray-500 block">
-                          Academic Year
-                        </span>
-                        <span className="font-semibold text-gray-900">
-                          {getAcademicYear(user.entryNo)}
-                        </span>
-                      </div>
-                      <div>
-                        <span className="text-xs text-gray-500 block">
-                          Current Semester
-                        </span>
-                        <span className="font-semibold text-gray-900">
-                          {getSemester(user.entryNo)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Join Date */}
                 <div className="bg-gray-50/50 rounded-xl p-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Member Since

@@ -14,12 +14,24 @@ import {
   Code,
   Home,
   LogOut,
-  Search,
-  PlusSquare,
   TrendingUp,
   Activity,
   ExternalLink,
+  BookOpen,
+  Menu,
+  X,
 } from "lucide-react";
+
+// Extended user type for session
+interface ExtendedUser {
+  id?: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  entryNo?: string;
+  department?: string;
+  academicYear?: string;
+}
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
@@ -27,9 +39,9 @@ const navigation = [
   { name: "Discussions", href: "/discussions", icon: MessageCircle },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
   { name: "Games", href: "/games", icon: Gamepad2 },
+  { name: "Library", href: "/library", icon: BookOpen },
   { name: "Chat", href: "/chat", icon: MessageCircle },
   { name: "Coding", href: "/coding", icon: Code },
-  { name: "Create", href: "/create", icon: PlusSquare },
 ];
 
 // Desktop Sidebar Component
@@ -153,9 +165,19 @@ export function DesktopSidebar() {
                       {session.user?.name?.charAt(0)?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="flex-1 text-left truncate">
-                    {session.user?.name || "User"}
-                  </span>
+                  <div className="flex-1 text-left">
+                    <div className="truncate text-white font-medium">
+                      {session.user?.name || "User"}
+                    </div>
+                    {(session.user as ExtendedUser)?.entryNo && (
+                      <div className="truncate text-white/60 text-xs">
+                        {(session.user as ExtendedUser).entryNo} •{" "}
+                        {(session.user as ExtendedUser).department?.split(
+                          " "
+                        )[0] || "Unknown"}
+                      </div>
+                    )}
+                  </div>
                 </button>
 
                 {/* Dropdown Menu - Positioned Above */}
@@ -391,6 +413,7 @@ export function MobileBottomNav() {
   const { data: session } = useSession();
   const [showMobileSignOutConfirm, setShowMobileSignOutConfirm] =
     useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   const handleMobileSignOut = async () => {
     if (showMobileSignOutConfirm) {
@@ -415,14 +438,69 @@ export function MobileBottomNav() {
 
   const mobileNavItems = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Search", href: "/search", icon: Search },
-    { name: "Create", href: "/create", icon: PlusSquare },
-    { name: "Activity", href: "/activity", icon: Activity },
+    { name: "Chat", href: "/chat", icon: MessageCircle },
     { name: "Profile", href: "/profile", icon: User },
   ];
 
   return (
     <>
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex lg:hidden">
+          <div className="bg-gradient-to-b from-blue-600 to-teal-500 w-64 h-full shadow-2xl">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-8">
+                <span className="text-2xl font-bold text-white">
+                  IIT Connect
+                </span>
+                <button
+                  onClick={() => setShowMobileMenu(false)}
+                  className="text-white/80 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <nav className="space-y-2">
+                {navigation.map((item) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setShowMobileMenu(false)}
+                    className={`flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      pathname === item.href
+                        ? "bg-white/30 text-white backdrop-blur-sm"
+                        : "text-white/90 hover:bg-white/20 hover:text-white"
+                    }`}
+                  >
+                    <item.icon className="h-6 w-6 mr-4" />
+                    {item.name}
+                  </Link>
+                ))}
+
+                {/* Sign Out Button in Menu */}
+                {session && (
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      setShowMobileSignOutConfirm(true);
+                    }}
+                    className="w-full flex items-center px-3 py-3 rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors"
+                  >
+                    <LogOut className="h-6 w-6 mr-4" />
+                    Sign Out
+                  </button>
+                )}
+              </nav>
+            </div>
+          </div>
+          <div
+            className="flex-1"
+            onClick={() => setShowMobileMenu(false)}
+          ></div>
+        </div>
+      )}
+
       {/* Sign out confirmation overlay */}
       {showMobileSignOutConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center lg:hidden">
@@ -467,15 +545,13 @@ export function MobileBottomNav() {
               <span className="text-xs mt-1">{item.name}</span>
             </Link>
           ))}
-          {session && (
-            <button
-              onClick={handleMobileSignOut}
-              className="flex-1 flex flex-col items-center py-2 px-1 text-white/70"
-            >
-              <LogOut className="h-6 w-6" />
-              <span className="text-xs mt-1">Sign Out</span>
-            </button>
-          )}
+          <button
+            onClick={() => setShowMobileMenu(true)}
+            className="flex-1 flex flex-col items-center py-2 px-1 text-white/70"
+          >
+            <Menu className="h-6 w-6" />
+            <span className="text-xs mt-1">Menu</span>
+          </button>
         </div>
       </div>
     </>

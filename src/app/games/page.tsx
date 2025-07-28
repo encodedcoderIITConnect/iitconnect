@@ -1,20 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Gamepad2,
-  Users,
-  MapPin,
-  Clock,
-  Star,
-  Plus,
-  Search,
-  Trophy,
-  Heart,
-  Share,
-} from "lucide-react";
+import { Gamepad2, Users, MapPin, Clock, Star } from "lucide-react";
 
 interface Game {
   id: string;
@@ -36,10 +25,7 @@ interface Game {
 }
 
 export default function GamesPage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState<
-    "all" | "physical" | "video"
-  >("all");
+  const { data: session } = useSession();
 
   // Sample games data
   const [games] = useState<Game[]>([
@@ -161,14 +147,6 @@ export default function GamesPage() {
     },
   ]);
 
-  const filteredGames = games.filter((game) => {
-    const matchesSearch =
-      game.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      game.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = selectedType === "all" || game.type === selectedType;
-    return matchesSearch && matchesType;
-  });
-
   const getAvailabilityColor = (availability: string) => {
     switch (availability) {
       case "available":
@@ -193,134 +171,51 @@ export default function GamesPage() {
     });
   };
 
-  return (
-    <div className="min-h-screen">
-      {/* Header */}
-      <div className="bg-white/20 backdrop-blur-xl border-b border-white/30">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center poppins-bold">
-                <Gamepad2 className="h-8 w-8 mr-3 text-blue-600" />
-                Gaming Hub
-              </h1>
-              <p className="text-gray-800 mt-1 poppins-regular">
-                Discover and join physical games and esports tournaments
-              </p>
-            </div>
-
-            <Button
-              onClick={() => console.log("Create game modal")}
-              className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Create Game
-            </Button>
-          </div>
+  if (!session) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 flex items-center justify-center p-8">
+        <div className="text-center text-white max-w-md">
+          <Gamepad2 className="h-16 w-16 mx-auto mb-4 opacity-80" />
+          <h1 className="text-2xl font-bold mb-4">Gaming Hub</h1>
+          <p className="mb-6">
+            Sign in with your @iitrpr.ac.in email to access games and
+            tournaments
+          </p>
+          <Button
+            onClick={() => (window.location.href = "/auth/signin")}
+            className="bg-white text-blue-600 hover:bg-gray-100"
+          >
+            Sign In to Continue
+          </Button>
         </div>
       </div>
+    );
+  }
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search games..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center mb-6">
+            <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-4">
+              <Gamepad2 className="h-12 w-12 text-white" />
             </div>
           </div>
-
-          <div className="flex gap-2">
-            <Button
-              variant={selectedType === "all" ? "default" : "outline"}
-              onClick={() => setSelectedType("all")}
-              size="sm"
-            >
-              All
-            </Button>
-            <Button
-              variant={selectedType === "physical" ? "default" : "outline"}
-              onClick={() => setSelectedType("physical")}
-              size="sm"
-            >
-              🏃‍♂️ Physical
-            </Button>
-            <Button
-              variant={selectedType === "video" ? "default" : "outline"}
-              onClick={() => setSelectedType("video")}
-              size="sm"
-            >
-              🎮 Video Games
-            </Button>
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Gamepad2 className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Total Games</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {games.length}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <Users className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Active Players</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {games.reduce((sum, game) => sum + game.currentPlayers, 0)}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Trophy className="h-6 w-6 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Tournaments</p>
-                <p className="text-2xl font-bold text-gray-900">3</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Star className="h-6 w-6 text-orange-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Avg Rating</p>
-                <p className="text-2xl font-bold text-gray-900">4.7</p>
-              </div>
-            </div>
-          </div>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Gaming Hub
+          </h1>
+          <p className="text-xl text-white/90 max-w-3xl mx-auto">
+            Discover and join physical games and esports tournaments
+          </p>
         </div>
 
         {/* Games Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredGames.map((game) => (
+          {games.map((game) => (
             <div
               key={game.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+              className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] group"
             >
               <div className="relative">
                 <img
@@ -344,7 +239,7 @@ export default function GamesPage() {
 
               <div className="p-6">
                 <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                     {game.name}
                   </h3>
                   <div className="flex items-center text-sm text-gray-600">
@@ -398,44 +293,22 @@ export default function GamesPage() {
                   ))}
                 </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    className="flex-1"
-                    disabled={
-                      game.availability === "occupied" ||
-                      game.availability === "maintenance"
-                    }
-                  >
-                    {game.availability === "available"
-                      ? "Join Game"
-                      : "Unavailable"}
-                  </Button>
-
-                  <Button variant="outline" size="sm">
-                    <Heart className="h-4 w-4" />
-                  </Button>
-
-                  <Button variant="outline" size="sm">
-                    <Share className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Button
+                  size="sm"
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
+                  disabled={
+                    game.availability === "occupied" ||
+                    game.availability === "maintenance"
+                  }
+                >
+                  {game.availability === "available"
+                    ? "Join Game"
+                    : "Unavailable"}
+                </Button>
               </div>
             </div>
           ))}
         </div>
-
-        {filteredGames.length === 0 && (
-          <div className="text-center py-12">
-            <Gamepad2 className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500 text-lg">
-              No games found matching your criteria
-            </p>
-            <p className="text-gray-400 text-sm mt-1">
-              Try adjusting your search or filters
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );

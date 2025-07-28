@@ -1,0 +1,27 @@
+# IIT Connect - Robots.txt
+# Campus community platform for IIT Ropar students
+
+User-agent: *
+Allow: /
+
+# Main pages
+Allow: /auth/signin
+Allow: /chat
+Allow: /discussions
+Allow: /profile
+Allow: /games
+Allow: /drivers
+Allow: /coding
+Allow: /projects
+
+# Disallow sensitive areas
+Disallow: /api/
+Disallow: /debug
+Disallow: /_next/
+Disallow: /private/
+
+# Sitemap location
+Sitemap: https://iitconnect.vercel.app/sitemap.xml
+
+# Crawl delay (be respectful)
+Crawl-delay: 1
