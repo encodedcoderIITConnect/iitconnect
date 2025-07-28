@@ -499,7 +499,7 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600">
-      <div className="h-[calc(100vh-4rem)] md:h-screen p-2 md:p-4 pb-16 md:pb-4">
+      <div className="h-[calc(100vh-60px)] md:h-screen p-2 md:p-4">
         {/* Chat Interface */}
         <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-xl overflow-hidden h-full flex">
           {/* Chat List Sidebar */}
@@ -885,7 +885,7 @@ export default function ChatPage() {
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto p-2 md:p-4 space-y-4">
                   {loadingMessages ? (
                     <div className="text-center text-gray-600">
                       Loading messages...
@@ -933,7 +933,7 @@ export default function ChatPage() {
                 </div>
 
                 {/* Message Input */}
-                <div className="p-2 md:p-4 border-t border-white/30">
+                <div className="p-2 md:p-4 border-t border-white/30 bg-white/70 backdrop-blur-xl">
                   <div className="flex items-center gap-1 md:gap-2">
                     <Button
                       variant="ghost"
