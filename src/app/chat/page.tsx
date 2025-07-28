@@ -499,10 +499,10 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600">
-      <div className="h-screen p-2 md:p-4">
+      <div className="h-[calc(100vh-4rem)] md:h-screen p-2 md:p-4 pb-16 md:pb-4">
         {/* Chat Interface */}
         <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-xl overflow-hidden h-full flex">
-          {/* Chat List Sidebar - Hidden on mobile when chat is selected */}
+          {/* Chat List Sidebar */}
           <div
             className={`${
               showChatList ? "flex" : "hidden"
@@ -773,11 +773,11 @@ export default function ChatPage() {
                         </div>
                       </div>
 
-                      {/* Delete button - appears on hover */}
+                      {/* Delete button - appears on hover on desktop, always visible on mobile */}
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-2 text-red-500 hover:text-red-700 hover:bg-red-50"
                         onClick={(e) => {
                           e.stopPropagation();
                           confirmDeleteChat(chat.id);
@@ -797,7 +797,7 @@ export default function ChatPage() {
             </div>
           </div>
 
-          {/* Chat Area - Full width on mobile when chat is selected */}
+          {/* Chat Area */}
           <div
             className={`${
               !showChatList ? "flex" : "hidden"
@@ -933,8 +933,8 @@ export default function ChatPage() {
                 </div>
 
                 {/* Message Input */}
-                <div className="p-3 md:p-4 border-t border-white/30">
-                  <div className="flex items-center gap-2">
+                <div className="p-2 md:p-4 border-t border-white/30">
+                  <div className="flex items-center gap-1 md:gap-2">
                     <Button
                       variant="ghost"
                       size="sm"
