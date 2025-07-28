@@ -1,10 +1,9 @@
-import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { getUsersCollection } from "./mongodb";
 // import { PrismaAdapter } from "@next-auth/prisma-adapter";
 // import { db } from "./db";
 
-export const authOptions: NextAuthOptions = {
+export const authOptions = {
   // adapter: PrismaAdapter(db), // Temporarily disabled to fix OAuth issue
   providers: [
     GoogleProvider({
@@ -13,7 +12,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async signIn({ user }: any) {
       console.log(`🔍 SignIn callback triggered for: ${user.email}`);
 
       // Check if the user's email domain is @iitrpr.ac.in
@@ -173,7 +173,8 @@ export const authOptions: NextAuthOptions = {
       console.log(`✅ User login completed: ${user.name} (${user.email})`);
       return true;
     },
-    async jwt({ token, user }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -232,7 +233,8 @@ export const authOptions: NextAuthOptions = {
       }
       return token;
     },
-    async session({ session, token }) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async session({ session, token }: any) {
       if (session.user && token) {
         session.user.id = token.id;
         session.user.name = token.name as string;
@@ -252,6 +254,6 @@ export const authOptions: NextAuthOptions = {
     error: "/auth/error",
   },
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
   },
 };

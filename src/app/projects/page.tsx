@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -295,7 +296,18 @@ export default function ProjectsPage() {
           <div className="flex gap-2 flex-wrap">
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as "all" | "web" | "mobile" | "ai-ml" | "iot" | "research" | "other")}
+              onChange={(e) =>
+                setSelectedCategory(
+                  e.target.value as
+                    | "all"
+                    | "web"
+                    | "mobile"
+                    | "ai-ml"
+                    | "iot"
+                    | "research"
+                    | "other"
+                )
+              }
               className="px-3 py-2 border border-gray-300 rounded-md text-sm"
             >
               <option value="all">All Categories</option>
@@ -309,7 +321,16 @@ export default function ProjectsPage() {
 
             <select
               value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value as "all" | "planning" | "development" | "completed" | "seeking-members")}
+              onChange={(e) =>
+                setSelectedStatus(
+                  e.target.value as
+                    | "all"
+                    | "planning"
+                    | "development"
+                    | "completed"
+                    | "seeking-members"
+                )
+              }
               className="px-3 py-2 border border-gray-300 rounded-md text-sm"
             >
               <option value="all">All Status</option>
@@ -450,9 +471,11 @@ export default function ProjectsPage() {
                 </div>
 
                 <div className="flex items-center">
-                  <img
+                  <Image
                     src={project.owner.avatar}
                     alt={project.owner.name}
+                    width={24}
+                    height={24}
                     className="w-6 h-6 rounded-full mr-2"
                   />
                   <span className="text-sm text-gray-600">

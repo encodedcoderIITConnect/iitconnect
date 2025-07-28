@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Gamepad2, Users, MapPin, Clock, Star } from "lucide-react";
 
@@ -218,9 +219,11 @@ export default function GamesPage() {
               className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] group"
             >
               <div className="relative">
-                <img
+                <Image
                   src={game.image}
                   alt={game.name}
+                  width={400}
+                  height={192}
                   className="w-full h-48 object-cover"
                 />
                 <div className="absolute top-4 left-4">
@@ -271,9 +274,11 @@ export default function GamesPage() {
 
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center">
-                    <img
+                    <Image
                       src={game.organizer.avatar}
                       alt={game.organizer.name}
+                      width={24}
+                      height={24}
                       className="w-6 h-6 rounded-full mr-2"
                     />
                     <span className="text-sm text-gray-600">

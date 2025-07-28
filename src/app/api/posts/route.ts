@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
+import { Session } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import {
   getPostsCollection,
@@ -76,7 +77,7 @@ export async function GET() {
 // POST - Create a new post
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = (await getServerSession(authOptions)) as Session | null;
 
     if (!session || !session.user?.email) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -160,7 +161,7 @@ export async function POST(request: Request) {
 // PUT - Update a specific post
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = (await getServerSession(authOptions)) as Session | null;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -252,7 +253,7 @@ export async function PUT(request: Request) {
 // DELETE - Delete a specific post
 export async function DELETE(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = (await getServerSession(authOptions)) as Session | null;
     if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
+import { Session } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getUsersCollection } from "@/lib/mongodb";
 // import { db } from "@/lib/db"; // Temporarily disabled
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = (await getServerSession(authOptions)) as Session | null;
 
     if (!session || !session.user?.email) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
@@ -54,7 +55,7 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = (await getServerSession(authOptions)) as Session | null;
 
     if (!session || !session.user?.email) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
