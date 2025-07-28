@@ -435,7 +435,7 @@ export default function Timeline() {
             posts.map((post) => (
               <div
                 key={post.id}
-                className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl overflow-hidden"
+                className="bg-white/40 backdrop-blur-xl border border-white/30 rounded-2xl overflow-hidden"
               >
                 {/* Post Header */}
                 <div className="p-4 border-b border-white/20">

@@ -24,6 +24,7 @@ export async function GET() {
     const userResponse = {
       id: user._id.toString(),
       name: user.name || "Unknown User",
+      username: user.username || "", // Return actual username field
       email: user.email,
       image: user.image || "",
       department: user.department || "",
@@ -60,13 +61,74 @@ export async function PUT(request: Request) {
     }
 
     const body = await request.json();
-    const { entryNo, phone, department, course, socialLink, isPublicEmail } =
-      body;
+    const {
+      username,
+      entryNo,
+      phone,
+      department,
+      course,
+      socialLink,
+      isPublicEmail,
+    } = body;
 
-    // Update user in MongoDB (excluding name as it comes from Google account)
     const usersCollection = await getUsersCollection();
 
-    const updateData = {
+    // Get current user to check if username is already set
+    const currentUser = await usersCollection.findOne({
+      email: session.user.email,
+    });
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Check if username is provided and validate
+    if (username && username.trim()) {
+      // If user already has a username, prevent changes
+      if (currentUser.username) {
+        return NextResponse.json(
+          { error: "Username cannot be changed once set" },
+          { status: 400 }
+        );
+      }
+
+      const trimmedUsername = username.trim().toLowerCase();
+
+      // Validate username format (alphanumeric and underscores only)
+      if (!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
+        return NextResponse.json(
+          {
+            error:
+              "Username can only contain letters, numbers, and underscores",
+          },
+          { status: 400 }
+        );
+      }
+
+      // Check if username is already taken by another user
+      const existingUser = await usersCollection.findOne({
+        username: trimmedUsername,
+      });
+
+      if (existingUser) {
+        return NextResponse.json(
+          { error: "Username is already taken" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Prepare update data - only include username if user doesn't have one yet
+    const updateData: {
+      username?: string;
+      entryNo: string | null;
+      phone: string;
+      department: string;
+      course: string;
+      socialLink: string;
+      isPublicEmail: boolean;
+      updatedAt: Date;
+    } = {
       entryNo: entryNo?.trim() || null, // Use null for empty entry numbers
       phone: phone?.trim() || "",
       department: department?.trim() || "",
@@ -75,6 +137,11 @@ export async function PUT(request: Request) {
       isPublicEmail: Boolean(isPublicEmail),
       updatedAt: new Date(),
     };
+
+    // Only set username if user doesn't have one already
+    if (username && username.trim() && !currentUser.username) {
+      updateData.username = username.trim().toLowerCase();
+    }
 
     const updateResult = await usersCollection.updateOne(
       { email: session.user.email },
@@ -100,6 +167,7 @@ export async function PUT(request: Request) {
     const userResponse = {
       id: updatedUser._id.toString(),
       name: updatedUser.name || "Unknown User",
+      username: updatedUser.username || "", // Return actual username field
       email: updatedUser.email,
       image: updatedUser.image || "",
       department: updatedUser.department || "",

@@ -37,6 +37,8 @@ export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     username: "",
     phone: "",
@@ -59,7 +61,7 @@ export default function ProfilePage() {
         const userData = await response.json();
         setUser(userData);
         setFormData({
-          username: userData.username || userData.email.split("@")[0],
+          username: userData.username || "",
           phone: userData.phone || "",
           socialLink: userData.socialLink || "",
           entryNo: userData.entryNo || "",
@@ -76,6 +78,9 @@ export default function ProfilePage() {
 
   const handleSave = async () => {
     setSaving(true);
+    setError(null);
+    setSuccess(null);
+
     try {
       const response = await fetch("/api/user/me", {
         method: "PUT",
@@ -89,9 +94,14 @@ export default function ProfilePage() {
         const updatedUser = await response.json();
         setUser(updatedUser);
         setIsEditing(false);
+        setSuccess("Profile updated successfully!");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to update profile");
       }
     } catch (error) {
       console.error("Error updating profile:", error);
+      setError("Failed to update profile. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -199,7 +209,11 @@ export default function ProfilePage() {
                 {isEditing ? (
                   <>
                     <Button
-                      onClick={() => setIsEditing(false)}
+                      onClick={() => {
+                        setIsEditing(false);
+                        setError(null);
+                        setSuccess(null);
+                      }}
                       variant="outline"
                       size="sm"
                       className="border-gray-300"
@@ -219,7 +233,11 @@ export default function ProfilePage() {
                   </>
                 ) : (
                   <Button
-                    onClick={() => setIsEditing(true)}
+                    onClick={() => {
+                      setIsEditing(true);
+                      setError(null);
+                      setSuccess(null);
+                    }}
                     size="sm"
                     className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
                   >
@@ -230,6 +248,25 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          {/* Error and Success Messages */}
+          {error && (
+            <div className="mx-8 bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center">
+                <div className="text-red-600 mr-3">⚠️</div>
+                <p className="text-red-700 font-medium">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {success && (
+            <div className="mx-8 bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center">
+                <div className="text-green-600 mr-3">✅</div>
+                <p className="text-green-700 font-medium">{success}</p>
+              </div>
+            </div>
+          )}
 
           {/* Profile Details */}
           <div className="p-8">
@@ -257,23 +294,37 @@ export default function ProfilePage() {
                 {/* Username */}
                 <div className="bg-gray-50/50 rounded-xl p-4">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Username
+                    Username (Unique identifier)
                   </label>
-                  {isEditing ? (
-                    <Input
-                      type="text"
-                      value={formData.username}
-                      onChange={(e) =>
-                        setFormData({ ...formData, username: e.target.value })
-                      }
-                      placeholder="Enter your username"
-                      className="border-gray-300"
-                    />
+                  {isEditing && !user.username ? (
+                    <div>
+                      <Input
+                        type="text"
+                        value={formData.username}
+                        onChange={(e) =>
+                          setFormData({ ...formData, username: e.target.value })
+                        }
+                        placeholder="e.g., john_doe123 (letters, numbers, underscores only)"
+                        className="border-gray-300"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        Username must be unique and can only contain letters,
+                        numbers, and underscores. Once set, it cannot be
+                        changed.
+                      </p>
+                    </div>
                   ) : (
                     <div className="flex items-center text-gray-900">
                       <span className="font-medium">
-                        {user.username || user.email.split("@")[0]}
+                        {user.username || (
+                          <span className="text-gray-500 italic">Not set</span>
+                        )}
                       </span>
+                      {user.username && (
+                        <span className="ml-2 text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded">
+                          Permanent
+                        </span>
+                      )}
                     </div>
                   )}
                 </div>
