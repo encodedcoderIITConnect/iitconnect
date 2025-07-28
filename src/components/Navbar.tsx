@@ -186,7 +186,7 @@ export function DesktopSidebar() {
                 {showSignOutConfirm && (
                   <div className="absolute bottom-full left-0 right-0 mb-2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 z-50">
                     <Link
-                      href="/profile"
+                      href={`/user/${session?.user?.email?.split("@")[0]}`}
                       onClick={() => setShowSignOutConfirm(false)}
                       className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
                     >
@@ -465,7 +465,11 @@ export function MobileBottomNav() {
   const mobileNavItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Chat", href: "/chat", icon: MessageCircle },
-    { name: "Profile", href: "/profile", icon: User },
+    {
+      name: "Profile",
+      href: `/user/${session?.user?.email?.split("@")[0]}`,
+      icon: User,
+    },
   ];
 
   return (

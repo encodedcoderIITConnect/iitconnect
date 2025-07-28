@@ -138,81 +138,8 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto relative">
-            {/* Back Arrow - Loading */}
-            <div className="absolute -top-2 -left-2 z-10 p-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
-              <ArrowLeft className="h-5 w-5 text-white/50" />
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden">
-              {/* Hero Section Skeleton */}
-              <div className="relative pt-20 pb-16 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-teal-600/20">
-                <div className="text-center">
-                  {/* Avatar Skeleton */}
-                  <div className="w-32 h-32 mx-auto mb-4 border-4 border-white/20 rounded-full bg-white/10 animate-pulse"></div>
-
-                  {/* Name Skeleton */}
-                  <div className="h-8 w-48 mx-auto mb-2 bg-white/20 rounded-lg animate-pulse shimmer"></div>
-
-                  {/* Username Skeleton */}
-                  <div className="h-6 w-32 mx-auto mb-1 bg-white/15 rounded-lg animate-pulse shimmer"></div>
-
-                  {/* Entry Number Skeleton */}
-                  <div className="h-5 w-40 mx-auto mb-4 bg-white/10 rounded-lg animate-pulse shimmer"></div>
-
-                  {/* Badges Skeleton */}
-                  <div className="flex justify-center gap-2 mt-4">
-                    <div className="h-8 w-20 bg-white/10 rounded-full animate-pulse shimmer"></div>
-                    <div className="h-8 w-16 bg-white/10 rounded-full animate-pulse shimmer"></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Main Content Skeleton */}
-              <div className="p-8">
-                {/* Header Skeleton */}
-                <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <div className="h-8 w-40 bg-white/20 rounded-lg mb-2 animate-pulse shimmer"></div>
-                    <div className="h-5 w-56 bg-white/15 rounded-lg animate-pulse shimmer"></div>
-                  </div>
-                  <div className="h-10 w-32 bg-white/15 rounded-lg animate-pulse shimmer"></div>
-                </div>
-
-                {/* Profile Information Grid Skeleton */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Academic Information Skeleton */}
-                  <div>
-                    <div className="h-7 w-48 bg-white/20 rounded-lg mb-4 animate-pulse shimmer"></div>
-                    <div className="space-y-4">
-                      {[1, 2, 3].map((i) => (
-                        <div key={i} className="bg-white/5 rounded-lg p-4">
-                          <div className="h-5 w-24 bg-white/15 rounded mb-1 animate-pulse shimmer"></div>
-                          <div className="h-6 w-32 bg-white/20 rounded animate-pulse shimmer"></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Contact Information Skeleton */}
-                  <div>
-                    <div className="h-7 w-44 bg-white/20 rounded-lg mb-4 animate-pulse shimmer"></div>
-                    <div className="space-y-4">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="bg-white/5 rounded-lg p-4">
-                          <div className="h-5 w-20 bg-white/15 rounded mb-1 animate-pulse shimmer"></div>
-                          <div className="h-6 w-36 bg-white/20 rounded animate-pulse shimmer"></div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
+        <div className="text-white text-lg">Loading user profile...</div>
       </div>
     );
   }
@@ -471,18 +398,17 @@ export default function UserProfilePage() {
 
                   <div className="space-y-4">
                     {/* Email */}
-                    {(isOwnProfile || userProfile.isPublicEmail) &&
-                      userProfile.email && (
-                        <div className="bg-white/5 rounded-lg p-4">
-                          <div className="flex items-center text-white/70 mb-1">
-                            <Mail className="h-4 w-4 mr-2" />
-                            Email
-                          </div>
-                          <div className="text-white font-medium">
-                            {userProfile.email}
-                          </div>
+                    {userProfile.isPublicEmail && userProfile.email && (
+                      <div className="bg-white/5 rounded-lg p-4">
+                        <div className="flex items-center text-white/70 mb-1">
+                          <Mail className="h-4 w-4 mr-2" />
+                          Email
                         </div>
-                      )}
+                        <div className="text-white font-medium">
+                          {userProfile.email}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Phone */}
                     {(userProfile.phone || (isOwnProfile && isEditing)) && (

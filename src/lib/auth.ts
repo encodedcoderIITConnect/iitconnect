@@ -139,8 +139,7 @@ export const authOptions = {
             updatedAt: new Date(),
           };
 
-          // Always update username from email
-          // This ensures database always has the current username derived from email
+          // Only update username if it has changed or is missing
           if (username && username !== existingUser.username) {
             updateData.username = username;
             console.log(
