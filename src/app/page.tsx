@@ -344,22 +344,37 @@ export default function Timeline() {
                       }
                       placeholder="What's on your mind?"
                       className="min-h-[100px] bg-white/50 border-white/30 text-gray-900 placeholder-gray-600"
+                      maxLength={1000}
                     />
 
-                    <div className="flex items-center justify-between">
-                      <select
-                        value={newPostCategory}
-                        onChange={(e) => setNewPostCategory(e.target.value)}
-                        className="bg-white/50 border border-white/30 rounded-lg px-3 py-2 text-gray-900"
-                      >
-                        <option value="general">General</option>
-                        <option value="cab">Cab Sharing</option>
-                        <option value="books">Books</option>
-                        <option value="electronics">Electronics</option>
-                        <option value="games">Games</option>
-                        <option value="cycling">Cycling</option>
-                        <option value="projects">Projects</option>
-                      </select>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center space-x-4">
+                        <select
+                          value={newPostCategory}
+                          onChange={(e) => setNewPostCategory(e.target.value)}
+                          className="bg-white/50 border border-white/30 rounded-lg px-3 py-2 text-gray-900"
+                        >
+                          <option value="general">General</option>
+                          <option value="cab">Cab Sharing</option>
+                          <option value="books">Books</option>
+                          <option value="electronics">Electronics</option>
+                          <option value="games">Games</option>
+                          <option value="cycling">Cycling</option>
+                          <option value="projects">Projects</option>
+                        </select>
+
+                        <span
+                          className={`text-sm ${
+                            newPostContent.length > 900
+                              ? "text-red-600 font-semibold"
+                              : newPostContent.length > 800
+                              ? "text-orange-600"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {newPostContent.length}/1000
+                        </span>
+                      </div>
 
                       <div className="flex space-x-2">
                         <Button
@@ -371,7 +386,11 @@ export default function Timeline() {
                         </Button>
                         <Button
                           onClick={handleCreatePost}
-                          disabled={creating || !newPostContent.trim()}
+                          disabled={
+                            creating ||
+                            !newPostContent.trim() ||
+                            newPostContent.length > 1000
+                          }
                           className="bg-blue-600 hover:bg-blue-700 text-white"
                         >
                           {creating ? "Posting..." : "Post"}
@@ -522,28 +541,43 @@ export default function Timeline() {
                         className="bg-white/10 border-white/20 text-white placeholder-white/50 resize-none"
                         rows={4}
                         placeholder="What's on your mind?"
+                        maxLength={1000}
                       />
-                      <div className="flex justify-end space-x-2">
-                        <Button
-                          onClick={handleCancelEdit}
-                          variant="outline"
-                          size="sm"
-                          className="border-white/20 text-white/70 hover:bg-white/10"
+                      <div className="flex justify-between items-center">
+                        <span
+                          className={`text-sm ${
+                            editContent.length > 900
+                              ? "text-red-300 font-semibold"
+                              : editContent.length > 800
+                              ? "text-orange-300"
+                              : "text-white/70"
+                          }`}
                         >
-                          <X className="h-4 w-4 mr-1" />
-                          Cancel
-                        </Button>
-                        <Button
-                          onClick={() => handleSaveEdit(post.id)}
-                          size="sm"
-                          className="bg-blue-500 hover:bg-blue-600 text-white"
-                        >
-                          Save
-                        </Button>
+                          {editContent.length}/1000
+                        </span>
+                        <div className="flex space-x-2">
+                          <Button
+                            onClick={handleCancelEdit}
+                            variant="outline"
+                            size="sm"
+                            className="border-white/20 text-white/70 hover:bg-white/10"
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={() => handleSaveEdit(post.id)}
+                            size="sm"
+                            disabled={editContent.length > 1000}
+                            className="bg-blue-500 hover:bg-blue-600 text-white"
+                          >
+                            Save
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ) : (
-                    <p className="text-white leading-relaxed mb-4">
+                    <p className="text-white leading-relaxed mb-4 whitespace-pre-wrap">
                       {post.content}
                     </p>
                   )}

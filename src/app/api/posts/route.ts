@@ -92,6 +92,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (content.length > 1000) {
+      return NextResponse.json(
+        { error: "Post content cannot exceed 1000 characters" },
+        { status: 400 }
+      );
+    }
+
     // Get user info
     const usersCollection = await getUsersCollection();
     const user = await usersCollection.findOne({ email: session.user.email });
@@ -177,7 +184,21 @@ export async function PUT(request: Request) {
       );
     }
 
+    if (content.length > 1000) {
+      return NextResponse.json(
+        { error: "Post content cannot exceed 1000 characters" },
+        { status: 400 }
+      );
+    }
+
     const postsCollection = await getPostsCollection();
+    const usersCollection = await getUsersCollection();
+
+    // Get the current user
+    const user = await usersCollection.findOne({ email: session.user.email });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
     // Check if the post exists and belongs to the user
     const existingPost = await postsCollection.findOne({
@@ -188,7 +209,7 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    if (existingPost.authorEmail !== session.user.email) {
+    if (existingPost.authorId !== user._id.toString()) {
       return NextResponse.json(
         { error: "You can only edit your own posts" },
         { status: 403 }
