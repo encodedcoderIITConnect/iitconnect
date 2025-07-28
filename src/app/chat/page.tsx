@@ -79,7 +79,11 @@ export default function ChatPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastMessageTime, setLastMessageTime] = useState<string | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -122,37 +126,107 @@ export default function ChatPage() {
 
   // Load messages when a chat is selected
   useEffect(() => {
-    const fetchMessages = async () => {
+    const fetchMessages = async (isPolling = false) => {
       if (!selectedChat) {
         setMessages([]);
+        setLastMessageTime(null);
         return;
       }
 
-      setLoadingMessages(true);
+      if (!isPolling) {
+        setLoadingMessages(true);
+      } else {
+        setIsPolling(true);
+      }
+
       try {
         const response = await fetch(`/api/chat/${selectedChat}`);
         if (response.ok) {
           const data = await response.json();
-          setMessages(data.messages || []);
+          const newMessages = data.messages || [];
+
+          // Update messages
+          setMessages(newMessages);
+
+          // Update last message time for polling comparison
+          if (newMessages.length > 0) {
+            setLastMessageTime(newMessages[newMessages.length - 1].createdAt);
+          }
         }
       } catch (error) {
         console.error("Error fetching messages:", error);
       } finally {
-        setLoadingMessages(false);
+        if (!isPolling) {
+          setLoadingMessages(false);
+        } else {
+          setIsPolling(false);
+        }
       }
     };
 
-    fetchMessages();
+    // Clear any existing polling interval
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+    }
+
+    if (selectedChat) {
+      // Initial fetch
+      fetchMessages();
+
+      // Set up real-time polling every 2 seconds
+      pollingIntervalRef.current = setInterval(() => {
+        fetchMessages(true);
+      }, 2000);
+    }
+
+    // Cleanup interval on unmount or chat change
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
   }, [selectedChat]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  // Cleanup polling on component unmount
+  useEffect(() => {
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
+    };
+  }, []);
+
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedChat || sending) return;
 
+    const messageContent = newMessage.trim();
+    const tempId = `temp-${Date.now()}`;
+
+    // Optimistic update - add message immediately to UI
+    const optimisticMessage: Message = {
+      id: tempId,
+      content: messageContent,
+      senderId: session?.user?.email || "",
+      senderName: session?.user?.name || "You",
+      senderImage: session?.user?.image || undefined,
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      type: "text",
+      isOwn: true,
+      createdAt: new Date().toISOString(),
+    };
+
+    // Add optimistic message to UI
+    setMessages((prev) => [...prev, optimisticMessage]);
+    setNewMessage("");
     setSending(true);
+
     try {
       const response = await fetch(`/api/chat/${selectedChat}`, {
         method: "POST",
@@ -160,21 +234,33 @@ export default function ChatPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          content: newMessage.trim(),
+          content: messageContent,
         }),
       });
 
       if (response.ok) {
-        setNewMessage("");
-        // Refresh messages
+        // Force immediate refresh to get the real message from server
         const messagesResponse = await fetch(`/api/chat/${selectedChat}`);
         if (messagesResponse.ok) {
           const data = await messagesResponse.json();
-          setMessages(data.messages || []);
+          const newMessages = data.messages || [];
+          setMessages(newMessages);
+
+          // Update last message time
+          if (newMessages.length > 0) {
+            setLastMessageTime(newMessages[newMessages.length - 1].createdAt);
+          }
         }
+      } else {
+        // Remove optimistic message on failure
+        setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
+        setNewMessage(messageContent); // Restore message content
       }
     } catch (error) {
       console.error("Error sending message:", error);
+      // Remove optimistic message on error
+      setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
+      setNewMessage(messageContent); // Restore message content
     } finally {
       setSending(false);
     }
@@ -227,6 +313,8 @@ export default function ChatPage() {
   // Open new chat modal
   const openNewChatModal = () => {
     setShowNewChatModal(true);
+    setError(null);
+    setSearchQuery("");
     loadUsers();
   };
 
@@ -235,6 +323,8 @@ export default function ChatPage() {
     if (!session?.user?.email || startingChat) return;
 
     setStartingChat(true);
+    setError(null);
+
     try {
       const response = await fetch("/api/chat/create", {
         method: "POST",
@@ -246,8 +336,9 @@ export default function ChatPage() {
         }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        const data = await response.json();
         // Refresh chats
         const chatsResponse = await fetch("/api/chat");
         if (chatsResponse.ok) {
@@ -258,8 +349,13 @@ export default function ChatPage() {
         setSelectedChat(data.chatId);
         setShowChatList(false);
         setShowNewChatModal(false);
+        setSearchQuery(""); // Clear search
+      } else {
+        setError(data.error || "Failed to start chat");
+        console.error("Error starting new chat:", data.error);
       }
     } catch (error) {
+      setError("Network error occurred");
       console.error("Error starting new chat:", error);
     } finally {
       setStartingChat(false);
@@ -323,131 +419,170 @@ export default function ChatPage() {
                     <Plus className="h-4 w-4" />
                   </Button>
 
-                  {/* New Chat Dropdown */}
+                  {/* New Chat Modal */}
                   {showNewChatModal && (
                     <>
                       {/* Backdrop */}
                       <div
-                        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in-0 duration-200"
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 animate-in fade-in-0 duration-200"
                         onClick={() => setShowNewChatModal(false)}
                       />
 
-                      {/* Dropdown */}
-                      <div className="absolute top-full left-0 mt-2 w-72 bg-white/90 backdrop-blur-xl border border-white/40 rounded-xl shadow-xl z-50 overflow-hidden animate-in slide-in-from-top-2 fade-in-0 duration-200 origin-top-left scale-in-95">
-                        {/* Modal Header */}
-                        <div className="p-4 border-b border-white/30 flex items-center justify-between">
-                          <h3 className="text-lg font-semibold text-gray-900">
-                            Start New Chat
-                          </h3>
-                          <Button
-                            onClick={() => setShowNewChatModal(false)}
-                            variant="ghost"
-                            size="sm"
-                            className="text-gray-600 hover:text-gray-900 p-1 h-8 w-8"
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-
-                        {/* Search */}
-                        <div className="p-4 border-b border-white/30">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                            <Input
-                              placeholder="Search users..."
-                              value={searchQuery}
-                              onChange={(e) => setSearchQuery(e.target.value)}
-                              className="pl-10 bg-white/50 border border-white/30"
-                            />
+                      {/* Modal Container - Centered */}
+                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="w-full max-w-md bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in-0 duration-300 scale-in-95">
+                          {/* Modal Header */}
+                          <div className="p-6 border-b border-white/30 flex items-center justify-between">
+                            <h3 className="text-xl font-semibold text-gray-900">
+                              Start New Chat
+                            </h3>
+                            <Button
+                              onClick={() => setShowNewChatModal(false)}
+                              variant="ghost"
+                              size="sm"
+                              className="text-gray-600 hover:text-gray-900 p-2 h-8 w-8 rounded-full"
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
                           </div>
-                        </div>
 
-                        {/* Users List */}
-                        <div className="max-h-64 overflow-y-auto">
-                          {loadingUsers ? (
-                            <div className="p-6">
-                              {/* Loading Animation */}
-                              <div className="space-y-4">
-                                {[...Array(3)].map((_, i) => (
+                          {/* Search */}
+                          <div className="p-6 border-b border-white/30">
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                              <Input
+                                placeholder="Search by name, username, or email..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-10 bg-white/70 border border-white/30 focus:bg-white focus:border-blue-300"
+                                autoFocus
+                              />
+                            </div>
+                            {filteredUsers.length > 0 && (
+                              <p className="text-xs text-gray-500 mt-2">
+                                Found {filteredUsers.length} user
+                                {filteredUsers.length !== 1 ? "s" : ""}
+                              </p>
+                            )}
+                            {error && (
+                              <div className="mt-3 p-3 bg-red-50/80 border border-red-200 rounded-lg">
+                                <p className="text-sm text-red-600">{error}</p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Users List */}
+                          <div className="max-h-80 overflow-y-auto">
+                            {loadingUsers ? (
+                              <div className="p-6">
+                                {/* Enhanced Loading Animation */}
+                                <div className="space-y-4">
+                                  {[...Array(4)].map((_, i) => (
+                                    <div
+                                      key={i}
+                                      className="flex items-center space-x-3 animate-pulse"
+                                      style={{ animationDelay: `${i * 100}ms` }}
+                                    >
+                                      <div className="w-12 h-12 bg-gray-300/50 rounded-full"></div>
+                                      <div className="flex-1">
+                                        <div className="h-4 bg-gray-300/50 rounded w-3/4 mb-2"></div>
+                                        <div className="h-3 bg-gray-300/30 rounded w-1/2 mb-1"></div>
+                                        <div className="h-3 bg-gray-300/20 rounded w-2/3"></div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                                <div className="text-center text-gray-600 mt-6">
+                                  <div className="inline-flex items-center">
+                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500 mr-3"></div>
+                                    <span className="text-sm">
+                                      Loading users...
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : filteredUsers.length === 0 ? (
+                              <div className="p-8 text-center text-gray-600">
+                                <Users className="h-12 w-12 mx-auto mb-3 opacity-40" />
+                                <p className="text-lg font-medium mb-2">
+                                  No users found
+                                </p>
+                                {searchQuery ? (
+                                  <div>
+                                    <p className="text-sm mb-3">
+                                      No users match &ldquo;{searchQuery}&rdquo;
+                                    </p>
+                                    <Button
+                                      onClick={() => setSearchQuery("")}
+                                      variant="outline"
+                                      size="sm"
+                                      className="text-blue-600 border-blue-200"
+                                    >
+                                      Clear search
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <p className="text-sm">
+                                    No other users available to chat with
+                                  </p>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="p-3">
+                                {filteredUsers.map((user) => (
                                   <div
-                                    key={i}
-                                    className="flex items-center space-x-3 animate-pulse"
+                                    key={user._id}
+                                    onClick={() => startNewChat(user)}
+                                    className={`p-4 rounded-xl cursor-pointer hover:bg-blue-50/70 transition-all duration-200 mb-2 group ${
+                                      startingChat
+                                        ? "opacity-50 pointer-events-none"
+                                        : "hover:shadow-sm"
+                                    }`}
                                   >
-                                    <div className="w-10 h-10 bg-gray-300/50 rounded-full"></div>
-                                    <div className="flex-1">
-                                      <div className="h-4 bg-gray-300/50 rounded w-3/4 mb-2"></div>
-                                      <div className="h-3 bg-gray-300/30 rounded w-1/2"></div>
+                                    <div className="flex items-center">
+                                      <div className="relative">
+                                        <Image
+                                          src={
+                                            user.image ||
+                                            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                              user.name
+                                            )}&background=3b82f6&color=ffffff&size=48`
+                                          }
+                                          alt={user.name}
+                                          width={48}
+                                          height={48}
+                                          className="w-12 h-12 rounded-full object-cover ring-2 ring-white shadow-sm"
+                                        />
+                                        {startingChat && (
+                                          <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full">
+                                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                          </div>
+                                        )}
+                                      </div>
+                                      <div className="ml-4 flex-1 min-w-0">
+                                        <p className="text-sm font-semibold text-gray-900 truncate group-hover:text-blue-700 transition-colors">
+                                          {user.name}
+                                        </p>
+                                        <p className="text-xs text-blue-600 truncate font-medium">
+                                          @{user.username}
+                                        </p>
+                                        {user.department && (
+                                          <p className="text-xs text-gray-500 truncate mt-1">
+                                            {user.department} • {user.course}
+                                          </p>
+                                        )}
+                                      </div>
+                                      <div className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                          <MessageCircle className="h-4 w-4 text-blue-600" />
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                 ))}
                               </div>
-                              <div className="text-center text-gray-600 mt-4">
-                                <div className="inline-flex items-center">
-                                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
-                                  Loading users...
-                                </div>
-                              </div>
-                            </div>
-                          ) : filteredUsers.length === 0 ? (
-                            <div className="p-6 text-center text-gray-600">
-                              <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                              <p>No users found</p>
-                              {searchQuery && (
-                                <p className="text-sm mt-1">
-                                  Try a different search term
-                                </p>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="p-2">
-                              {filteredUsers.map((user) => (
-                                <div
-                                  key={user._id}
-                                  onClick={() => startNewChat(user)}
-                                  className={`p-3 rounded-lg cursor-pointer hover:bg-white/50 transition-colors mb-2 ${
-                                    startingChat
-                                      ? "opacity-50 pointer-events-none"
-                                      : ""
-                                  }`}
-                                >
-                                  <div className="flex items-center">
-                                    <div className="relative">
-                                      <Image
-                                        src={
-                                          user.image ||
-                                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                            user.name
-                                          )}&background=3b82f6&color=ffffff&size=40`
-                                        }
-                                        alt={user.name}
-                                        width={40}
-                                        height={40}
-                                        className="w-10 h-10 rounded-full object-cover"
-                                      />
-                                      {startingChat && (
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-full">
-                                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                                        </div>
-                                      )}
-                                    </div>
-                                    <div className="ml-3 flex-1 min-w-0">
-                                      <p className="text-sm font-medium text-gray-900 truncate">
-                                        {user.name}
-                                      </p>
-                                      <p className="text-xs text-gray-500 truncate">
-                                        @{user.username}
-                                      </p>
-                                      {user.department && (
-                                        <p className="text-xs text-gray-400 truncate">
-                                          {user.department} • {user.course}
-                                        </p>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </div>
                       </div>
                     </>
@@ -570,12 +705,18 @@ export default function ChatPage() {
                       <p className="font-medium text-gray-900">
                         {selectedChatData.name}
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 flex items-center gap-2">
                         {selectedChatData.type === "group"
                           ? `${selectedChatData.participants?.length} members`
                           : selectedChatData.isOnline
                           ? "Online"
                           : "Last seen recently"}
+                        {isPolling && (
+                          <div className="flex items-center gap-1">
+                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
+                            <span className="text-xs text-blue-600">Live</span>
+                          </div>
+                        )}
                       </p>
                     </div>
                   </div>

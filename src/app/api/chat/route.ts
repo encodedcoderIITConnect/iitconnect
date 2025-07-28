@@ -42,18 +42,16 @@ export async function GET() {
             $match: { userId: currentUser._id.toString() },
           },
           {
+            $addFields: {
+              chatObjectId: { $toObjectId: "$chatId" },
+            },
+          },
+          {
             $lookup: {
               from: "chats",
-              localField: "chatId",
+              localField: "chatObjectId",
               foreignField: "_id",
               as: "chat",
-              pipeline: [
-                {
-                  $addFields: {
-                    _id: { $toString: "$_id" },
-                  },
-                },
-              ],
             },
           },
           {
@@ -70,15 +68,17 @@ export async function GET() {
           {
             $lookup: {
               from: "users",
-              localField: "allMembers.userId",
-              foreignField: "_id",
-              as: "memberUsers",
-              pipeline: [
-                {
-                  $addFields: {
-                    _id: { $toString: "$_id" },
+              let: {
+                memberIds: {
+                  $map: {
+                    input: "$allMembers",
+                    as: "member",
+                    in: { $toObjectId: "$$member.userId" },
                   },
                 },
+              },
+              pipeline: [
+                { $match: { $expr: { $in: ["$_id", "$$memberIds"] } } },
                 {
                   $project: {
                     _id: 1,
@@ -89,6 +89,7 @@ export async function GET() {
                   },
                 },
               ],
+              as: "memberUsers",
             },
           },
           {
@@ -101,17 +102,17 @@ export async function GET() {
                 { $sort: { createdAt: -1 } },
                 { $limit: 1 },
                 {
+                  $addFields: {
+                    senderObjectId: { $toObjectId: "$senderId" },
+                  },
+                },
+                {
                   $lookup: {
                     from: "users",
-                    localField: "senderId",
+                    localField: "senderObjectId",
                     foreignField: "_id",
                     as: "sender",
                     pipeline: [
-                      {
-                        $addFields: {
-                          _id: { $toString: "$_id" },
-                        },
-                      },
                       {
                         $project: {
                           _id: 1,
@@ -138,7 +139,8 @@ export async function GET() {
       const formattedChats = userChats.map((chatData) => {
         const chat = chatData.chat;
         const otherMembers = chatData.memberUsers.filter(
-          (member: { _id: string }) => member._id !== currentUser._id.toString()
+          (member: { _id: object }) =>
+            member._id.toString() !== currentUser._id.toString()
         );
 
         const lastMessage = chatData.lastMessage[0] || null;
@@ -154,11 +156,13 @@ export async function GET() {
           chatName = otherUser ? otherUser.name : "Unknown User";
           chatAvatar =
             otherUser?.image ||
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100";
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(
+              otherUser?.name || "Unknown"
+            )}&background=3b82f6&color=ffffff&size=100`;
         }
 
         return {
-          id: chat._id,
+          id: chat._id.toString(),
           name: chatName,
           type: chat.isGroup ? "group" : "direct",
           avatar: chatAvatar,

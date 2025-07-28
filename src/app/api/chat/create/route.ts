@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 // Helper function to get database collections
 async function getCollections() {
@@ -99,6 +99,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Check if a direct chat already exists between these users
+      // Optimized query: find chats where both users are members
       const existingChatMembers = await chatMembers
         .aggregate([
           {
@@ -123,7 +124,26 @@ export async function POST(request: NextRequest) {
                   currentUser._id.toString(),
                   recipientUser._id.toString(),
                 ],
+                $size: 2, // Ensure exactly 2 members (direct chat)
               },
+            },
+          },
+          {
+            $lookup: {
+              from: "chats",
+              localField: "_id",
+              foreignField: "_id",
+              as: "chatInfo",
+              pipeline: [
+                {
+                  $match: { isGroup: false }, // Only direct chats
+                },
+              ],
+            },
+          },
+          {
+            $match: {
+              "chatInfo.0": { $exists: true }, // Chat exists and is direct
             },
           },
         ])
@@ -136,32 +156,54 @@ export async function POST(request: NextRequest) {
         chatId = existingChatMembers[0]._id;
         console.log("Chat create - using existing chat:", chatId);
       } else {
-        // Create new chat
-        const newChat = {
-          name: null, // Direct chats don't have names
-          isGroup: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
+        // Create new chat with transaction-like behavior
+        try {
+          const newChat = {
+            name: null, // Direct chats don't have names
+            isGroup: false,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
 
-        const chatResult = await chats.insertOne(newChat);
-        chatId = chatResult.insertedId.toString();
-        console.log("Chat create - created new chat:", chatId);
+          const chatResult = await chats.insertOne(newChat);
+          chatId = chatResult.insertedId.toString();
+          console.log("Chat create - created new chat:", chatId);
 
-        // Add both users as chat members
-        await chatMembers.insertMany([
-          {
-            chatId: chatId,
-            userId: currentUser._id.toString(),
-            joinedAt: new Date(),
-          },
-          {
-            chatId: chatId,
-            userId: recipientUser._id.toString(),
-            joinedAt: new Date(),
-          },
-        ]);
-        console.log("Chat create - added chat members");
+          // Add both users as chat members in a single operation
+          const memberInsertResult = await chatMembers.insertMany([
+            {
+              chatId: chatId,
+              userId: currentUser._id.toString(),
+              joinedAt: new Date(),
+              role: "member",
+            },
+            {
+              chatId: chatId,
+              userId: recipientUser._id.toString(),
+              joinedAt: new Date(),
+              role: "member",
+            },
+          ]);
+
+          if (memberInsertResult.insertedCount !== 2) {
+            // Rollback: delete the chat if member insertion failed
+            await chats.deleteOne({ _id: chatResult.insertedId });
+            throw new Error("Failed to add chat members");
+          }
+
+          console.log("Chat create - added chat members successfully");
+        } catch (memberError) {
+          console.error("Error during chat creation:", memberError);
+          // If chat was created but members failed, try to clean up
+          if (chatId) {
+            try {
+              await chats.deleteOne({ _id: new ObjectId(chatId) });
+            } catch (cleanupError) {
+              console.error("Failed to cleanup incomplete chat:", cleanupError);
+            }
+          }
+          throw memberError;
+        }
       }
 
       return NextResponse.json({

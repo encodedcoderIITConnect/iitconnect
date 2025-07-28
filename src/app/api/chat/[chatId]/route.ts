@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 // Helper function to get database collections
 async function getCollections() {
@@ -67,9 +67,14 @@ export async function GET(
             $match: { chatId: chatId },
           },
           {
+            $addFields: {
+              senderObjectId: { $toObjectId: "$senderId" },
+            },
+          },
+          {
             $lookup: {
               from: "users",
-              localField: "senderId",
+              localField: "senderObjectId",
               foreignField: "_id",
               as: "sender",
               pipeline: [
