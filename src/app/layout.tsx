@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-scroll-behavior="smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${princessSofia.variable} antialiased bg-gradient-to-br from-blue-600 to-teal-500 min-h-screen`}
       >

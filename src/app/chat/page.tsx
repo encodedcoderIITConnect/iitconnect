@@ -88,25 +88,52 @@ export default function ChatPage() {
     null
   );
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const chatPollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Helper function to refresh chats manually
+  const refreshChats = async () => {
+    if (!session?.user?.email) return;
+
+    try {
+      const response = await fetch("/api/chat");
+      if (response.ok) {
+        const data = await response.json();
+        setChats(data.chats || []);
+      }
+    } catch (error) {
+      console.error("Error refreshing chats:", error);
+    }
+  };
+
   // Load user's chats
   useEffect(() => {
-    const fetchChats = async () => {
+    const fetchChats = async (isPolling = false) => {
       if (!session?.user?.email) return;
 
+      if (!isPolling) {
+        setLoading(true);
+      }
+
       try {
-        console.log("Fetching chats for user:", session.user.email);
+        if (!isPolling) {
+          console.log("Fetching chats for user:", session.user.email);
+        }
         const response = await fetch("/api/chat");
-        console.log("Chat API response status:", response.status);
+        if (!isPolling) {
+          console.log("Chat API response status:", response.status);
+        }
 
         if (response.ok) {
           const data = await response.json();
-          console.log("Chat API response data:", data);
+          if (!isPolling) {
+            console.log("Chat API response data:", data);
+          }
           setChats(data.chats || []);
         } else {
           const errorData = await response.json();
@@ -115,11 +142,33 @@ export default function ChatPage() {
       } catch (error) {
         console.error("Error fetching chats:", error);
       } finally {
-        setLoading(false);
+        if (!isPolling) {
+          setLoading(false);
+        }
       }
     };
 
-    fetchChats();
+    // Clear any existing chat polling interval
+    if (chatPollingIntervalRef.current) {
+      clearInterval(chatPollingIntervalRef.current);
+    }
+
+    if (session?.user?.email) {
+      // Initial fetch
+      fetchChats();
+
+      // Set up real-time polling for chats every 5 seconds
+      chatPollingIntervalRef.current = setInterval(() => {
+        fetchChats(true);
+      }, 5000);
+    }
+
+    // Cleanup interval on unmount or session change
+    return () => {
+      if (chatPollingIntervalRef.current) {
+        clearInterval(chatPollingIntervalRef.current);
+      }
+    };
   }, [session]); // Check for chatId in URL params and select that chat
   useEffect(() => {
     const chatId = searchParams.get("chatId");
@@ -202,6 +251,9 @@ export default function ChatPage() {
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
       }
+      if (chatPollingIntervalRef.current) {
+        clearInterval(chatPollingIntervalRef.current);
+      }
     };
   }, []);
 
@@ -256,6 +308,9 @@ export default function ChatPage() {
             setLastMessageTime(newMessages[newMessages.length - 1].createdAt);
           }
         }
+
+        // Refresh chat list to update last message info
+        await refreshChats();
       } else {
         // Remove optimistic message on failure
         setMessages((prev) => prev.filter((msg) => msg.id !== tempId));
@@ -268,6 +323,10 @@ export default function ChatPage() {
       setNewMessage(messageContent); // Restore message content
     } finally {
       setSending(false);
+      // Keep input focused after sending
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   };
 
@@ -287,8 +346,8 @@ export default function ChatPage() {
       });
 
       if (response.ok) {
-        // Remove chat from local state
-        setChats((prev) => prev.filter((chat) => chat.id !== chatId));
+        // Refresh chats to get updated list
+        await refreshChats();
 
         // If the deleted chat was selected, clear selection
         if (selectedChat === chatId) {
@@ -323,6 +382,10 @@ export default function ChatPage() {
   const handleChatSelect = (chatId: string) => {
     setSelectedChat(chatId);
     setShowChatList(false); // Hide chat list on mobile when chat is selected
+    // Focus input after a short delay to ensure chat is loaded
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 200);
   };
 
   const handleBackToChats = () => {
@@ -384,12 +447,9 @@ export default function ChatPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // Refresh chats
-        const chatsResponse = await fetch("/api/chat");
-        if (chatsResponse.ok) {
-          const chatsData = await chatsResponse.json();
-          setChats(chatsData.chats || []);
-        }
+        // Refresh chats using helper function
+        await refreshChats();
+
         // Select the new chat
         setSelectedChat(data.chatId);
         setShowChatList(false);
@@ -885,11 +945,17 @@ export default function ChatPage() {
 
                     <div className="flex-1 relative">
                       <Input
+                        ref={inputRef}
                         placeholder="Type a message..."
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        className="pr-10 bg-white/50 border border-white/30"
+                        className="pr-10 bg-white text-black !border-gray-300 focus:!border-gray-300 focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                        style={{
+                          borderColor: "#d1d5db !important",
+                          boxShadow: "none !important",
+                          outline: "none !important",
+                        }}
                         disabled={sending}
                       />
                       <Button
