@@ -20,6 +20,7 @@ import {
   BookOpen,
   Menu,
   X,
+  Search,
 } from "lucide-react";
 
 // Extended user type for session
@@ -39,6 +40,7 @@ const navigation = [
   { name: "Discussions", href: "/discussions", icon: MessageCircle },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
   { name: "Games", href: "/games", icon: Gamepad2 },
+  { name: "Lost & Found", href: "/lost-found", icon: Search },
   { name: "Library", href: "/library", icon: BookOpen },
   { name: "Chat", href: "/chat", icon: MessageCircle },
   { name: "Coding", href: "/coding", icon: Code },

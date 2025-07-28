@@ -19,6 +19,7 @@ import {
   X,
   AlertTriangle,
   CheckCircle,
+  ChevronDown,
 } from "lucide-react";
 
 interface Post {
@@ -56,6 +57,7 @@ export default function Timeline() {
   const [editContent, setEditContent] = useState("");
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [toasts, setToasts] = useState<
     Array<{
       id: string;
@@ -74,13 +76,19 @@ export default function Timeline() {
       if (openDropdownId && !(event.target as Element).closest(".relative")) {
         setOpenDropdownId(null);
       }
+      if (
+        showCategoryDropdown &&
+        !(event.target as Element).closest(".relative")
+      ) {
+        setShowCategoryDropdown(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [openDropdownId]);
+  }, [openDropdownId, showCategoryDropdown]);
 
   // Auto-remove toasts after 4 seconds
   useEffect(() => {
@@ -254,10 +262,24 @@ export default function Timeline() {
       electronics: "bg-purple-500/20 text-purple-700 border-purple-200/30",
       games: "bg-red-500/20 text-red-700 border-red-200/30",
       cycling: "bg-orange-500/20 text-orange-700 border-orange-200/30",
+      lost: "bg-red-500/20 text-red-700 border-red-200/30",
+      found: "bg-green-500/20 text-green-700 border-green-200/30",
       projects: "bg-indigo-500/20 text-indigo-700 border-indigo-200/30",
     };
     return colors[category as keyof typeof colors] || colors.general;
   };
+
+  const categories = [
+    { value: "general", label: "General", icon: "💬" },
+    { value: "cab", label: "Cab Sharing", icon: "🚗" },
+    { value: "books", label: "Books", icon: "📚" },
+    { value: "electronics", label: "Electronics", icon: "📱" },
+    { value: "games", label: "Games", icon: "🎮" },
+    { value: "cycling", label: "Cycling", icon: "🚴" },
+    { value: "lost", label: "Lost Items", icon: "😢" },
+    { value: "found", label: "Found Items", icon: "🎉" },
+    { value: "projects", label: "Projects", icon: "💻" },
+  ];
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -317,7 +339,7 @@ export default function Timeline() {
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600">
       <div className="max-w-2xl mx-auto">
         {/* Create Post Section */}
-        <div className="p-6 border-b border-white/20">
+        <div className="p-6 border-b border-white/20 relative z-50">
           <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-6">
             <div className="flex items-start space-x-4">
               <Avatar className="w-10 h-10">
@@ -331,7 +353,7 @@ export default function Timeline() {
                 {!showCreatePost ? (
                   <button
                     onClick={() => setShowCreatePost(true)}
-                    className="w-full text-left bg-white/50 border border-white/30 rounded-lg px-4 py-3 text-gray-600 hover:bg-white/60 transition-colors"
+                    className="w-full text-left bg-white/50 rounded-lg px-4 py-3 text-gray-600 hover:bg-white/60 transition-colors focus:outline-none focus:ring-0 border-0"
                   >
                     What&apos;s on your mind?
                   </button>
@@ -343,25 +365,98 @@ export default function Timeline() {
                         setNewPostContent(e.target.value)
                       }
                       placeholder="What's on your mind?"
-                      className="min-h-[100px] bg-white/50 border-white/30 text-gray-900 placeholder-gray-600"
+                      className="min-h-[100px] bg-white/50 text-gray-900 placeholder-gray-600 border-0 focus:ring-0 focus:outline-none resize-none rounded-lg !border-none"
+                      style={{
+                        border: "none",
+                        boxShadow: "none",
+                        outline: "none",
+                      }}
                       maxLength={1000}
                     />
 
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-4">
-                        <select
-                          value={newPostCategory}
-                          onChange={(e) => setNewPostCategory(e.target.value)}
-                          className="bg-white/50 border border-white/30 rounded-lg px-3 py-2 text-gray-900"
-                        >
-                          <option value="general">General</option>
-                          <option value="cab">Cab Sharing</option>
-                          <option value="books">Books</option>
-                          <option value="electronics">Electronics</option>
-                          <option value="games">Games</option>
-                          <option value="cycling">Cycling</option>
-                          <option value="projects">Projects</option>
-                        </select>
+                        {/* Custom Category Dropdown */}
+                        <div className="relative">
+                          <button
+                            onClick={() =>
+                              setShowCategoryDropdown(!showCategoryDropdown)
+                            }
+                            className="bg-white/60 hover:bg-white/70 border border-white/40 rounded-xl px-4 py-2.5 text-gray-800 flex items-center space-x-2 transition-all duration-200 backdrop-blur-sm shadow-lg min-w-[140px]"
+                          >
+                            <span className="text-lg">
+                              {
+                                categories.find(
+                                  (cat) => cat.value === newPostCategory
+                                )?.icon
+                              }
+                            </span>
+                            <span className="font-medium">
+                              {
+                                categories.find(
+                                  (cat) => cat.value === newPostCategory
+                                )?.label
+                              }
+                            </span>
+                            <ChevronDown
+                              className={`h-4 w-4 text-gray-600 transition-transform duration-200 ${
+                                showCategoryDropdown ? "rotate-180" : ""
+                              }`}
+                            />
+                          </button>
+
+                          {showCategoryDropdown && (
+                            <div className="absolute top-full left-0 mt-2 w-full min-w-[200px] border border-white/30 rounded-xl shadow-2xl z-[9999] overflow-hidden backdrop-blur-3xl bg-white/10">
+                              {/* Background blur layer */}
+                              <div
+                                className="absolute inset-0 backdrop-blur-3xl bg-gradient-to-br from-white/20 via-white/10 to-white/5 rounded-xl"
+                                style={{
+                                  filter: "blur(0.5px)",
+                                  backdropFilter: "saturate(180%) blur(20px)",
+                                  WebkitBackdropFilter:
+                                    "saturate(180%) blur(20px)",
+                                }}
+                              />
+                              {/* Frosted glass effect */}
+                              <div
+                                className="absolute inset-0 bg-white/5 rounded-xl"
+                                style={{
+                                  backdropFilter: "blur(40px) saturate(150%)",
+                                  WebkitBackdropFilter:
+                                    "blur(40px) saturate(150%)",
+                                  background:
+                                    "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 50%, rgba(255,255,255,0.02) 100%)",
+                                }}
+                              />
+                              <div className="relative z-10 bg-black/10 backdrop-blur-xl rounded-xl">
+                                {categories.map((category) => (
+                                  <button
+                                    key={category.value}
+                                    onClick={() => {
+                                      setNewPostCategory(category.value);
+                                      setShowCategoryDropdown(false);
+                                    }}
+                                    className={`w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-white/20 transition-all duration-200 border-b border-white/10 last:border-b-0 backdrop-blur-sm ${
+                                      newPostCategory === category.value
+                                        ? "bg-white/25 shadow-inner"
+                                        : ""
+                                    }`}
+                                  >
+                                    <span className="text-lg drop-shadow-lg filter contrast-125">
+                                      {category.icon}
+                                    </span>
+                                    <span className="font-medium text-black drop-shadow-lg filter contrast-125">
+                                      {category.label}
+                                    </span>
+                                    {newPostCategory === category.value && (
+                                      <CheckCircle className="h-4 w-4 text-blue-600 ml-auto drop-shadow-lg" />
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
 
                         <span
                           className={`text-sm ${

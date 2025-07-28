@@ -119,6 +119,43 @@ export const authOptions: NextAuthOptions = {
           console.log(
             `✅ Existing user logged in: ${user.name} (${user.email})`
           );
+
+          // Update existing user's profile picture and other info from Google
+          const updateData: {
+            updatedAt: Date;
+            image?: string;
+            name?: string;
+          } = {
+            updatedAt: new Date(),
+          };
+
+          // Always update profile image from Google if available
+          if (user.image && user.image !== existingUser.image) {
+            updateData.image = user.image;
+            console.log(
+              `🖼️ Updating profile image from Google for ${user.email}`
+            );
+          }
+
+          // Update name if it has changed in Google account
+          if (user.name && user.name !== existingUser.name) {
+            updateData.name = user.name;
+            console.log(
+              `📝 Updating name from Google for ${user.email}: ${existingUser.name} -> ${user.name}`
+            );
+          }
+
+          // Only update if there are changes
+          if (Object.keys(updateData).length > 1) {
+            // More than just updatedAt
+            await usersCollection.updateOne(
+              { email: user.email },
+              { $set: updateData }
+            );
+            console.log(
+              `✅ Updated user profile from Google for ${user.email}`
+            );
+          }
         }
       } catch (error) {
         console.error("❌ Error checking/creating user in database:", error);
@@ -197,18 +234,14 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user && token) {
-        // @ts-expect-error - Adding custom fields to session user
         session.user.id = token.id;
         session.user.name = token.name as string;
         session.user.email = token.email as string;
         session.user.image = token.picture as string;
 
         // Add extracted user info to session
-        // @ts-expect-error - Adding custom fields to session user
         session.user.entryNo = token.entryNo as string;
-        // @ts-expect-error - Adding custom fields to session user
         session.user.department = token.department as string;
-        // @ts-expect-error - Adding custom fields to session user
         session.user.academicYear = token.academicYear as string;
       }
       return session;
