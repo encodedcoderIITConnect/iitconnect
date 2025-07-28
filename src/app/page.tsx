@@ -7,11 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Heart,
   MessageCircle,
   MoreHorizontal,
-  Bookmark,
-  Send,
   Camera,
   Trash2,
   Plus,
@@ -688,31 +685,6 @@ export default function Timeline() {
                       />
                     </div>
                   )}
-                </div>
-
-                {/* Post Actions */}
-                <div className="px-4 pb-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-6">
-                      <button className="flex items-center space-x-2 text-white/70 hover:text-white">
-                        <Heart className="h-5 w-5" />
-                        <span className="text-sm">{post.likes}</span>
-                      </button>
-
-                      <button className="flex items-center space-x-2 text-white/70 hover:text-white">
-                        <MessageCircle className="h-5 w-5" />
-                        <span className="text-sm">{post.comments}</span>
-                      </button>
-
-                      <button className="text-white/70 hover:text-white">
-                        <Send className="h-5 w-5" />
-                      </button>
-                    </div>
-
-                    <button className="text-white/70 hover:text-white">
-                      <Bookmark className="h-5 w-5" />
-                    </button>
-                  </div>
                 </div>
               </div>
             ))

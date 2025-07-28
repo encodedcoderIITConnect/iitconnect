@@ -9,7 +9,6 @@ import { useState, useRef, useEffect } from "react";
 import {
   MessageCircle,
   Car,
-  Gamepad2,
   User,
   Code,
   Home,
@@ -21,6 +20,8 @@ import {
   Menu,
   X,
   Search,
+  Users,
+  Trophy,
 } from "lucide-react";
 
 // Extended user type for session
@@ -36,13 +37,12 @@ interface ExtendedUser {
 
 const navigation = [
   { name: "Home", href: "/", icon: Home },
-  //   { name: "Search", href: "/search", icon: Search },
-  { name: "Discussions", href: "/discussions", icon: MessageCircle },
-  { name: "Auto Drivers", href: "/drivers", icon: Car },
-  { name: "Games", href: "/games", icon: Gamepad2 },
-  { name: "Lost & Found", href: "/lost-found", icon: Search },
   { name: "Library", href: "/library", icon: BookOpen },
   { name: "Chat", href: "/chat", icon: MessageCircle },
+  { name: "Sports", href: "/games", icon: Trophy },
+  { name: "Auto Drivers", href: "/drivers", icon: Car },
+  { name: "Lost & Found", href: "/lost-found", icon: Search },
+  { name: "Discussions", href: "/discussions", icon: Users },
   { name: "Coding", href: "/coding", icon: Code },
 ];
 
