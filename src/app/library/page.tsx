@@ -228,6 +228,27 @@ const libraryResources: LibraryResource[] = [
     isPremium: true,
     provider: "Google",
   },
+  {
+    id: "pressreader",
+    name: "PressReader",
+    description:
+      "Access to 7,000+ newspapers and magazines from around the world",
+    category: "Academic Research",
+    icon: <FileText className="h-6 w-6" />,
+    features: [
+      "7,000+ publications",
+      "60+ languages",
+      "Current & back issues",
+      "Offline reading",
+      "Translation tools",
+    ],
+    normalPrice: "$30/month",
+    studentPrice: "Free on Campus",
+    instructions:
+      "Access free on campus WiFi network with student ID verification",
+    isPremium: true,
+    provider: "PressReader",
+  },
 ];
 
 const categories = [

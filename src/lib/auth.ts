@@ -130,10 +130,19 @@ export const authOptions = {
           };
 
           // Always update profile image from Google if available
-          if (user.image && user.image !== existingUser.image) {
+          // This ensures database always has the most current Google profile picture
+          if (user.image) {
             updateData.image = user.image;
             console.log(
-              `🖼️ Updating profile image from Google for ${user.email}`
+              `🖼️ Updating profile image from Google for ${user.email}: "${
+                existingUser.image || "no image"
+              }" -> "${user.image}"`
+            );
+          } else if (existingUser.image) {
+            // Handle case where Google account no longer has an image
+            updateData.image = "";
+            console.log(
+              `🖼️ Removing profile image for ${user.email} (no longer available on Google)`
             );
           }
 
