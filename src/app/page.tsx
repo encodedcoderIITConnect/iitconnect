@@ -15,6 +15,10 @@ import {
   Camera,
   Trash2,
   Plus,
+  Edit3,
+  X,
+  AlertTriangle,
+  CheckCircle,
 } from "lucide-react";
 
 interface Post {
@@ -47,10 +51,65 @@ export default function Timeline() {
   const [newPostContent, setNewPostContent] = useState("");
   const [newPostCategory, setNewPostCategory] = useState("general");
   const [creating, setCreating] = useState(false);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<
+    Array<{
+      id: string;
+      message: string;
+      type: "success" | "error" | "info";
+      timestamp: number;
+    }>
+  >([]);
 
   useEffect(() => {
     fetchPosts();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openDropdownId && !(event.target as Element).closest(".relative")) {
+        setOpenDropdownId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openDropdownId]);
+
+  // Auto-remove toasts after 4 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setToasts((prevToasts) =>
+        prevToasts.filter((toast) => Date.now() - toast.timestamp < 4000)
+      );
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [toasts]);
+
+  const showToast = (
+    message: string,
+    type: "success" | "error" | "info" = "info"
+  ) => {
+    const id = Math.random().toString(36).substr(2, 9);
+    const newToast = {
+      id,
+      message,
+      type,
+      timestamp: Date.now(),
+    };
+    setToasts((prev) => [...prev, newToast]);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  };
 
   const fetchPosts = async () => {
     try {
@@ -67,30 +126,89 @@ export default function Timeline() {
   };
 
   const handleDeletePost = async (postId: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) {
-      return;
-    }
+    setPostToDelete(postId);
+    setShowDeleteDialog(true);
+    setOpenDropdownId(null);
+  };
 
-    setDeletingPostId(postId);
+  const confirmDeletePost = async () => {
+    if (!postToDelete) return;
+
+    setDeletingPostId(postToDelete);
     try {
-      const response = await fetch(`/api/posts?id=${postId}`, {
+      const response = await fetch(`/api/posts?id=${postToDelete}`, {
         method: "DELETE",
       });
 
       if (response.ok) {
         // Remove the post from the local state
-        setPosts(posts.filter((post) => post.id !== postId));
+        setPosts(posts.filter((post) => post.id !== postToDelete));
+        showToast("Post deleted successfully", "success");
         console.log("Post deleted successfully");
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to delete post");
+        showToast(error.error || "Failed to delete post", "error");
       }
     } catch (error) {
       console.error("Error deleting post:", error);
-      alert("Failed to delete post");
+      showToast("Failed to delete post", "error");
     } finally {
       setDeletingPostId(null);
+      setShowDeleteDialog(false);
+      setPostToDelete(null);
     }
+  };
+
+  const cancelDeletePost = () => {
+    setShowDeleteDialog(false);
+    setPostToDelete(null);
+  };
+
+  const handleEditPost = (post: Post) => {
+    setEditingPostId(post.id);
+    setEditContent(post.content);
+    setOpenDropdownId(null);
+  };
+
+  const handleSaveEdit = async (postId: string) => {
+    try {
+      const response = await fetch(`/api/posts?id=${postId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ content: editContent }),
+      });
+
+      if (response.ok) {
+        const updatedPost = await response.json();
+        setPosts(
+          posts.map((post) =>
+            post.id === postId
+              ? { ...post, content: updatedPost.content }
+              : post
+          )
+        );
+        setEditingPostId(null);
+        setEditContent("");
+        showToast("Post updated successfully", "success");
+      } else {
+        const error = await response.json();
+        showToast(error.error || "Failed to update post", "error");
+      }
+    } catch (error) {
+      console.error("Error updating post:", error);
+      showToast("Failed to update post", "error");
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null);
+    setEditContent("");
+  };
+
+  const toggleDropdown = (postId: string) => {
+    setOpenDropdownId(openDropdownId === postId ? null : postId);
   };
 
   const handleCreatePost = async () => {
@@ -115,9 +233,14 @@ export default function Timeline() {
         setNewPostContent("");
         setNewPostCategory("general");
         setShowCreatePost(false);
+        showToast("Post created successfully", "success");
+      } else {
+        const error = await response.json();
+        showToast(error.error || "Failed to create post", "error");
       }
     } catch (error) {
       console.error("Error creating post:", error);
+      showToast("Failed to create post", "error");
     } finally {
       setCreating(false);
     }
@@ -348,33 +471,82 @@ export default function Timeline() {
                       >
                         {post.category}
                       </span>
-                      {/* Show delete button only if user owns the post */}
+                      {/* Show dropdown only if user owns the post */}
                       {session?.user?.email === post.author.email && (
-                        <button
-                          onClick={() => handleDeletePost(post.id)}
-                          disabled={deletingPostId === post.id}
-                          className="p-1 hover:bg-red-500/20 rounded text-red-400 hover:text-red-300 disabled:opacity-50 transition-colors"
-                          title="Delete post"
-                        >
-                          {deletingPostId === post.id ? (
-                            <div className="w-4 h-4 border border-red-400 border-t-transparent rounded-full animate-spin"></div>
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
+                        <div className="relative">
+                          <button
+                            onClick={() => toggleDropdown(post.id)}
+                            className="p-1 hover:bg-white/10 rounded transition-colors"
+                          >
+                            <MoreHorizontal className="h-5 w-5 text-white/70" />
+                          </button>
+
+                          {openDropdownId === post.id && (
+                            <div className="absolute right-0 top-8 bg-white/95 backdrop-blur-xl border border-white/20 rounded-lg shadow-xl z-10 min-w-[120px]">
+                              <div className="py-1">
+                                <button
+                                  onClick={() => handleEditPost(post)}
+                                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                >
+                                  <Edit3 className="h-4 w-4 mr-2" />
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => handleDeletePost(post.id)}
+                                  disabled={deletingPostId === post.id}
+                                  className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors disabled:opacity-50"
+                                >
+                                  {deletingPostId === post.id ? (
+                                    <div className="w-4 h-4 border border-red-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                                  ) : (
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                  )}
+                                  Delete
+                                </button>
+                              </div>
+                            </div>
                           )}
-                        </button>
+                        </div>
                       )}
-                      <button className="p-1 hover:bg-white/10 rounded">
-                        <MoreHorizontal className="h-5 w-5 text-white/70" />
-                      </button>
                     </div>
                   </div>
                 </div>
 
                 {/* Post Content */}
                 <div className="p-4">
-                  <p className="text-white leading-relaxed mb-4">
-                    {post.content}
-                  </p>
+                  {editingPostId === post.id ? (
+                    <div className="space-y-3">
+                      <Textarea
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="bg-white/10 border-white/20 text-white placeholder-white/50 resize-none"
+                        rows={4}
+                        placeholder="What's on your mind?"
+                      />
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          onClick={handleCancelEdit}
+                          variant="outline"
+                          size="sm"
+                          className="border-white/20 text-white/70 hover:bg-white/10"
+                        >
+                          <X className="h-4 w-4 mr-1" />
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() => handleSaveEdit(post.id)}
+                          size="sm"
+                          className="bg-blue-500 hover:bg-blue-600 text-white"
+                        >
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-white leading-relaxed mb-4">
+                      {post.content}
+                    </p>
+                  )}
 
                   {post.image && (
                     <div className="rounded-lg overflow-hidden mb-4">
@@ -417,6 +589,84 @@ export default function Timeline() {
             ))
           )}
         </div>
+      </div>
+
+      {/* Delete Confirmation Dialog */}
+      {showDeleteDialog && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="flex items-start space-x-4">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Delete Post
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Are you sure you want to delete this post? This action cannot
+                  be undone.
+                </p>
+                <div className="flex justify-end space-x-3">
+                  <Button
+                    onClick={cancelDeletePost}
+                    variant="outline"
+                    className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={confirmDeletePost}
+                    disabled={deletingPostId === postToDelete}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {deletingPostId === postToDelete ? (
+                      <>
+                        <div className="w-4 h-4 border border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Deleting...
+                      </>
+                    ) : (
+                      "Delete Post"
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notifications */}
+      <div className="fixed top-4 right-4 space-y-2 z-50">
+        {toasts.map((toast) => (
+          <div
+            key={toast.id}
+            className={`flex items-center space-x-3 px-4 py-3 rounded-lg shadow-lg backdrop-blur-xl border max-w-sm transform transition-all duration-300 ${
+              toast.type === "success"
+                ? "bg-green-500/90 border-green-400/50 text-white"
+                : toast.type === "error"
+                ? "bg-red-500/90 border-red-400/50 text-white"
+                : "bg-blue-500/90 border-blue-400/50 text-white"
+            }`}
+          >
+            <div className="flex-shrink-0">
+              {toast.type === "success" && <CheckCircle className="h-5 w-5" />}
+              {toast.type === "error" && <AlertTriangle className="h-5 w-5" />}
+              {toast.type === "info" && <AlertTriangle className="h-5 w-5" />}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium">{toast.message}</p>
+            </div>
+            <button
+              onClick={() => removeToast(toast.id)}
+              className="flex-shrink-0 text-white/70 hover:text-white"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ))}
       </div>
     </div>
   );

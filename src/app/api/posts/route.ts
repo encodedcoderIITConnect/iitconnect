@@ -150,6 +150,84 @@ export async function POST(request: Request) {
   }
 }
 
+// PUT - Update a specific post
+export async function PUT(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const postId = searchParams.get("id");
+
+    if (!postId) {
+      return NextResponse.json(
+        { error: "Post ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const { content } = await request.json();
+
+    if (!content || content.trim() === "") {
+      return NextResponse.json(
+        { error: "Content is required" },
+        { status: 400 }
+      );
+    }
+
+    const postsCollection = await getPostsCollection();
+
+    // Check if the post exists and belongs to the user
+    const existingPost = await postsCollection.findOne({
+      _id: new ObjectId(postId),
+    });
+
+    if (!existingPost) {
+      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+    }
+
+    if (existingPost.authorEmail !== session.user.email) {
+      return NextResponse.json(
+        { error: "You can only edit your own posts" },
+        { status: 403 }
+      );
+    }
+
+    // Update the post
+    const updateResult = await postsCollection.updateOne(
+      { _id: new ObjectId(postId) },
+      {
+        $set: {
+          content: content.trim(),
+          updatedAt: new Date(),
+        },
+      }
+    );
+
+    if (updateResult.modifiedCount === 0) {
+      return NextResponse.json(
+        { error: "Failed to update post" },
+        { status: 500 }
+      );
+    }
+
+    console.log(`✅ Post updated by ${session.user.name}: ${postId}`);
+
+    return NextResponse.json(
+      { message: "Post updated successfully", content: content.trim() },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error updating post:", error);
+    return NextResponse.json(
+      { error: "Failed to update post" },
+      { status: 500 }
+    );
+  }
+}
+
 // DELETE - Delete a specific post
 export async function DELETE(request: Request) {
   try {
