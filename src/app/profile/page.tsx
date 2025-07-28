@@ -117,10 +117,94 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
-          <p className="text-white text-lg">Loading your profile...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600">
+        {/* Hero Section Skeleton */}
+        <div className="relative pt-20 pb-32">
+          <div className="absolute inset-0 bg-black/20"></div>
+          <div className="relative max-w-6xl mx-auto px-4 text-center">
+            <div className="mb-8">
+              {/* Skeleton Avatar */}
+              <div className="w-32 h-32 mx-auto border-4 border-white/50 shadow-2xl rounded-full shimmer-dark"></div>
+            </div>
+
+            {/* Skeleton Name */}
+            <div className="h-12 w-64 mx-auto mb-2 shimmer-dark rounded"></div>
+
+            {/* Skeleton Email */}
+            <div className="h-6 w-48 mx-auto mb-6 shimmer-dark rounded"></div>
+
+            {/* Skeleton Badges */}
+            <div className="flex flex-wrap justify-center gap-4 mb-6">
+              <div className="h-8 w-32 bg-white/10 backdrop-blur-sm rounded-full shimmer-dark"></div>
+              <div className="h-8 w-40 bg-white/10 backdrop-blur-sm rounded-full shimmer-dark"></div>
+              <div className="h-8 w-24 bg-white/10 backdrop-blur-sm rounded-full shimmer-dark"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="relative -mt-20 max-w-4xl mx-auto px-4 pb-16">
+          <div className="bg-white/95 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl overflow-hidden">
+            {/* Header Skeleton */}
+            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 p-6 border-b border-gray-200/50">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="h-8 w-48 shimmer rounded mb-2"></div>
+                  <div className="h-4 w-64 shimmer rounded"></div>
+                </div>
+                <div className="h-10 w-24 shimmer rounded"></div>
+              </div>
+            </div>
+
+            {/* Content Skeleton */}
+            <div className="p-6 space-y-6">
+              {/* Personal Information Section */}
+              <div>
+                <div className="h-6 w-40 shimmer rounded mb-4"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[...Array(4)].map((_, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="h-4 w-24 shimmer rounded"></div>
+                      <div className="h-10 w-full shimmer rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Academic Information Section */}
+              <div>
+                <div className="h-6 w-48 shimmer rounded mb-4"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="h-4 w-32 shimmer rounded"></div>
+                      <div className="h-10 w-full shimmer rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Privacy Settings Section */}
+              <div>
+                <div className="h-6 w-36 shimmer rounded mb-4"></div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <div className="h-5 w-40 shimmer rounded mb-1"></div>
+                      <div className="h-4 w-64 shimmer rounded"></div>
+                    </div>
+                    <div className="h-6 w-12 shimmer rounded"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end space-x-4 pt-6">
+                <div className="h-10 w-20 shimmer rounded"></div>
+                <div className="h-10 w-28 shimmer rounded"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );

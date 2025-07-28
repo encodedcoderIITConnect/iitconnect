@@ -501,9 +501,55 @@ export default function Timeline() {
         {/* Posts Feed */}
         <div className="px-6 py-4 space-y-6">
           {loading ? (
-            <div className="text-center py-8">
-              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-white">Loading posts...</p>
+            // Skeleton Loading Cards
+            <div className="space-y-6">
+              {[...Array(3)].map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white/40 backdrop-blur-xl border border-white/30 rounded-2xl overflow-hidden"
+                >
+                  {/* Skeleton Post Header */}
+                  <div className="p-4 border-b border-white/20">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        {/* Skeleton Avatar */}
+                        <div className="w-10 h-10 rounded-full shimmer-dark"></div>
+
+                        <div>
+                          <div className="flex items-center space-x-2">
+                            {/* Skeleton Name */}
+                            <div className="h-4 w-24 rounded shimmer-dark"></div>
+                          </div>
+                          <div className="flex items-center space-x-2 mt-1">
+                            {/* Skeleton Entry No */}
+                            <div className="h-3 w-16 rounded shimmer-dark"></div>
+                            <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+                            {/* Skeleton Time */}
+                            <div className="h-3 w-12 rounded shimmer-dark"></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Skeleton Category Badge */}
+                      <div className="h-6 w-16 rounded-full shimmer-dark"></div>
+                    </div>
+                  </div>
+
+                  {/* Skeleton Post Content */}
+                  <div className="p-4">
+                    <div className="space-y-2">
+                      <div className="h-4 w-full rounded shimmer-dark"></div>
+                      <div className="h-4 w-4/5 rounded shimmer-dark"></div>
+                      <div className="h-4 w-3/5 rounded shimmer-dark"></div>
+                    </div>
+
+                    {/* Skeleton Image (sometimes) */}
+                    {index % 2 === 0 && (
+                      <div className="h-48 w-full rounded-lg shimmer-dark mt-4"></div>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           ) : posts.length === 0 ? (
             <div className="text-center py-12">
@@ -535,12 +581,14 @@ export default function Timeline() {
                 <div className="p-4 border-b border-white/20">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={post.author.image} />
-                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white">
-                          {post.author.name.charAt(0)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <Link href={`/user/${post.author.username}`}>
+                        <Avatar className="w-10 h-10 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all duration-200">
+                          <AvatarImage src={post.author.image} />
+                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white">
+                            {post.author.name.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                      </Link>
 
                       <div>
                         <div className="flex items-center space-x-2">

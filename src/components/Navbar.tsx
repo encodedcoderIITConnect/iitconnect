@@ -416,6 +416,30 @@ export function MobileBottomNav() {
   const [showMobileSignOutConfirm, setShowMobileSignOutConfirm] =
     useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Handle click outside to close mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showMobileMenu &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowMobileMenu(false);
+      }
+    };
+
+    if (showMobileMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden"; // Prevent background scrolling
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "unset";
+    };
+  }, [showMobileMenu]);
 
   const handleMobileSignOut = async () => {
     if (showMobileSignOutConfirm) {
@@ -448,35 +472,59 @@ export function MobileBottomNav() {
     <>
       {/* Mobile Menu Overlay */}
       {showMobileMenu && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex lg:hidden">
-          <div className="bg-gradient-to-b from-blue-600 to-teal-500 w-64 h-full shadow-2xl">
-            <div className="p-6">
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex lg:hidden animate-fadeIn"
+          style={{ animation: "fadeIn 0.3s ease-out" }}
+        >
+          {/* Clickable overlay to close menu */}
+          <div
+            className="flex-1"
+            onClick={() => setShowMobileMenu(false)}
+          ></div>
+
+          {/* Menu panel sliding from right */}
+          <div
+            ref={mobileMenuRef}
+            className="bg-gradient-to-b from-blue-600 to-teal-500 w-80 max-w-[85vw] h-full shadow-2xl transform transition-transform duration-300 ease-out"
+            style={{
+              animation: showMobileMenu
+                ? "slideInFromRight 0.3s ease-out"
+                : "slideOutToRight 0.3s ease-out",
+            }}
+          >
+            <div className="p-6 h-full overflow-y-auto">
               <div className="flex items-center justify-between mb-8">
                 <span className="text-2xl font-bold text-white">
                   IIT Connect
                 </span>
                 <button
                   onClick={() => setShowMobileMenu(false)}
-                  className="text-white/80 hover:text-white"
+                  className="text-white/80 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
 
               <nav className="space-y-2">
-                {navigation.map((item) => (
+                {navigation.map((item, index) => (
                   <Link
                     key={item.name}
                     href={item.href}
                     onClick={() => setShowMobileMenu(false)}
-                    className={`flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 transform ${
                       pathname === item.href
-                        ? "bg-white/30 text-white backdrop-blur-sm"
-                        : "text-white/90 hover:bg-white/20 hover:text-white"
+                        ? "bg-white/30 text-white backdrop-blur-sm scale-105 shadow-lg"
+                        : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
                     }`}
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                      animation: showMobileMenu
+                        ? "slideInRight 0.3s ease-out forwards"
+                        : "none",
+                    }}
                   >
-                    <item.icon className="h-6 w-6 mr-4" />
-                    {item.name}
+                    <item.icon className="h-6 w-6 mr-4 flex-shrink-0" />
+                    <span className="truncate">{item.name}</span>
                   </Link>
                 ))}
 
@@ -487,19 +535,21 @@ export function MobileBottomNav() {
                       setShowMobileMenu(false);
                       setShowMobileSignOutConfirm(true);
                     }}
-                    className="w-full flex items-center px-3 py-3 rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors"
+                    className="w-full flex items-center px-4 py-3 rounded-xl text-base font-medium text-white/90 hover:bg-red-500/20 hover:text-white transition-all duration-200 hover:scale-105 mt-4 border-t border-white/20 pt-6"
+                    style={{
+                      animationDelay: `${navigation.length * 50}ms`,
+                      animation: showMobileMenu
+                        ? "slideInRight 0.3s ease-out forwards"
+                        : "none",
+                    }}
                   >
-                    <LogOut className="h-6 w-6 mr-4" />
-                    Sign Out
+                    <LogOut className="h-6 w-6 mr-4 flex-shrink-0" />
+                    <span>Sign Out</span>
                   </button>
                 )}
               </nav>
             </div>
           </div>
-          <div
-            className="flex-1"
-            onClick={() => setShowMobileMenu(false)}
-          ></div>
         </div>
       )}
 
@@ -548,8 +598,10 @@ export function MobileBottomNav() {
             </Link>
           ))}
           <button
-            onClick={() => setShowMobileMenu(true)}
-            className="flex-1 flex flex-col items-center py-2 px-1 text-white/70"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className={`flex-1 flex flex-col items-center py-2 px-1 transition-colors ${
+              showMobileMenu ? "text-white" : "text-white/70"
+            }`}
           >
             <Menu className="h-6 w-6" />
             <span className="text-xs mt-1">Menu</span>

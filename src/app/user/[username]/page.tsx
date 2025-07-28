@@ -80,19 +80,17 @@ export default function UserProfilePage() {
   if (error || !userProfile) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center relative">
+          {/* Back Arrow - Top Left */}
+          <Link href="/">
+            <button className="absolute -top-8 -left-8 p-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-200 hover:scale-110">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          </Link>
+
           <div className="text-white text-lg mb-4">
             {error || "User not found"}
           </div>
-          <Link href="/">
-            <Button
-              variant="outline"
-              className="text-white border-white hover:bg-white hover:text-purple-900"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
         </div>
       </div>
     );
@@ -103,21 +101,15 @@ export default function UserProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
       <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <div className="mb-6">
-          <Link href="/">
-            <Button
-              variant="outline"
-              className="text-white border-white hover:bg-white hover:text-purple-900"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Timeline
-            </Button>
-          </Link>
-        </div>
-
         {/* Profile Card */}
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto relative">
+          {/* Back Arrow - Top Left Corner */}
+          <Link href="/">
+            <button className="absolute -top-2 -left-2 z-10 p-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-200 hover:scale-110">
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+          </Link>
+
           <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 p-8">
             {/* Profile Header */}
             <div className="text-center mb-8">
