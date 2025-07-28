@@ -19,6 +19,7 @@ import {
   Plus,
   Search,
   X,
+  Trash2,
 } from "lucide-react";
 
 interface Message {
@@ -82,6 +83,10 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null);
   const [lastMessageTime, setLastMessageTime] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
+  const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
+    null
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -271,6 +276,46 @@ export default function ChatPage() {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  // Delete chat functionality
+  const handleDeleteChat = async (chatId: string) => {
+    setDeletingChatId(chatId);
+    try {
+      const response = await fetch(`/api/chat/${chatId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Remove chat from local state
+        setChats((prev) => prev.filter((chat) => chat.id !== chatId));
+
+        // If the deleted chat was selected, clear selection
+        if (selectedChat === chatId) {
+          setSelectedChat(null);
+          setMessages([]);
+        }
+
+        setShowDeleteConfirm(null);
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to delete chat:", errorData.error);
+        alert("Failed to delete chat. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error deleting chat:", error);
+      alert("Error deleting chat. Please try again.");
+    } finally {
+      setDeletingChatId(null);
+    }
+  };
+
+  const confirmDeleteChat = (chatId: string) => {
+    setShowDeleteConfirm(chatId);
+  };
+
+  const cancelDeleteChat = () => {
+    setShowDeleteConfirm(null);
   };
 
   const selectedChatData = chats.find((chat) => chat.id === selectedChat);
@@ -607,62 +652,84 @@ export default function ChatPage() {
                 chats.map((chat) => (
                   <div
                     key={chat.id}
-                    onClick={() => handleChatSelect(chat.id)}
-                    className={`p-4 border-b border-white/20 cursor-pointer hover:bg-white/50 transition-colors ${
+                    className={`p-4 border-b border-white/20 hover:bg-white/50 transition-colors group ${
                       selectedChat === chat.id
                         ? "bg-white/60 border-r-2 border-r-blue-500"
                         : ""
                     }`}
                   >
                     <div className="flex items-center">
-                      <div className="relative">
-                        <Image
-                          src={chat.avatar}
-                          alt={chat.name}
-                          width={48}
-                          height={48}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                        {chat.isOnline && (
-                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                        )}
-                      </div>
-
-                      <div className="ml-3 flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {chat.name}
-                          </p>
-                          <div className="flex items-center gap-1">
-                            <span className="text-xs text-gray-500">
-                              {chat.lastMessageTime}
-                            </span>
-                            {chat.unreadCount > 0 && (
-                              <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-[18px] h-[18px] flex items-center justify-center">
-                                {chat.unreadCount}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <p className="text-sm text-gray-500 truncate">
-                            {chat.lastMessageSender &&
-                              chat.type === "group" &&
-                              `${chat.lastMessageSender}: `}
-                            {chat.lastMessage}
-                          </p>
-                          {chat.type === "group" && (
-                            <Users className="h-4 w-4 text-gray-400 shrink-0 ml-1" />
+                      <div
+                        className="flex items-center flex-1 cursor-pointer"
+                        onClick={() => handleChatSelect(chat.id)}
+                      >
+                        <div className="relative">
+                          <Image
+                            src={chat.avatar}
+                            alt={chat.name}
+                            width={48}
+                            height={48}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          {chat.isOnline && (
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                           )}
                         </div>
 
-                        {chat.type === "group" && chat.participants && (
-                          <p className="text-xs text-gray-400 mt-1 truncate">
-                            {chat.participants.slice(0, 3).join(", ")}
-                          </p>
-                        )}
+                        <div className="ml-3 flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {chat.name}
+                            </p>
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-gray-500">
+                                {chat.lastMessageTime}
+                              </span>
+                              {chat.unreadCount > 0 && (
+                                <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-[18px] h-[18px] flex items-center justify-center">
+                                  {chat.unreadCount}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm text-gray-500 truncate">
+                              {chat.lastMessageSender &&
+                                chat.type === "group" &&
+                                `${chat.lastMessageSender}: `}
+                              {chat.lastMessage}
+                            </p>
+                            {chat.type === "group" && (
+                              <Users className="h-4 w-4 text-gray-400 shrink-0 ml-1" />
+                            )}
+                          </div>
+
+                          {chat.type === "group" && chat.participants && (
+                            <p className="text-xs text-gray-400 mt-1 truncate">
+                              {chat.participants.slice(0, 3).join(", ")}
+                            </p>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Delete button - appears on hover */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity ml-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          confirmDeleteChat(chat.id);
+                        }}
+                        disabled={deletingChatId === chat.id}
+                      >
+                        {deletingChatId === chat.id ? (
+                          <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
                     </div>
                   </div>
                 ))
@@ -735,6 +802,17 @@ export default function ChatPage() {
                       className="text-gray-600 hover:text-blue-600 hidden sm:flex"
                     >
                       <Video className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-600 hover:text-red-600"
+                      onClick={() =>
+                        selectedChat && confirmDeleteChat(selectedChat)
+                      }
+                      title="Delete Chat"
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -847,6 +925,44 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
+
+      {/* Delete Chat Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Delete Chat
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to delete this chat? This action cannot be
+              undone and you will lose all messages.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="ghost"
+                onClick={cancelDeleteChat}
+                disabled={deletingChatId === showDeleteConfirm}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="bg-red-500 hover:bg-red-600 text-white"
+                onClick={() => handleDeleteChat(showDeleteConfirm)}
+                disabled={deletingChatId === showDeleteConfirm}
+              >
+                {deletingChatId === showDeleteConfirm ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    Deleting...
+                  </>
+                ) : (
+                  "Delete Chat"
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
