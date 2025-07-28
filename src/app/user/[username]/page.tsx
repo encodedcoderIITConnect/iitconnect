@@ -18,6 +18,7 @@ import {
   Save,
   Calendar,
   X,
+  MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -134,6 +135,38 @@ export default function UserProfilePage() {
       month: "long",
       day: "numeric",
     });
+  };
+
+  const handleSendMessage = async () => {
+    if (!session?.user?.email || !userProfile?.email) {
+      alert("Unable to start chat. Please try again.");
+      return;
+    }
+
+    try {
+      // Create or find existing chat between current user and profile user
+      const response = await fetch("/api/chat/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipientEmail: userProfile.email,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Navigate to chat page with the chat ID
+        window.location.href = `/chat?chatId=${data.chatId}`;
+      } else {
+        const errorData = await response.json();
+        alert(errorData.error || "Failed to create chat");
+      }
+    } catch (error) {
+      console.error("Error creating chat:", error);
+      alert("Failed to create chat. Please try again.");
+    }
   };
 
   if (loading) {
@@ -294,6 +327,19 @@ export default function UserProfilePage() {
                     </div>
                   )}
                 </div>
+
+                {/* Message Button - Show for other users only */}
+                {!isOwnProfile && (
+                  <div className="flex justify-center mt-6">
+                    <Button
+                      onClick={handleSendMessage}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Send Message
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 
