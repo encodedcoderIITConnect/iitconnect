@@ -50,6 +50,7 @@ export async function GET() {
           author: {
             id: author?._id.toString() || "",
             name: author?.name || "Unknown User",
+            username: author?.username || "",
             email: author?.email || "",
             image: author?.image || "",
             entryNo: author?.entryNo || "",

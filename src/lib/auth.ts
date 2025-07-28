@@ -85,9 +85,14 @@ export const authOptions = {
 
           console.log(`🎓 Assigned department: ${department}`);
 
+          // Extract username from email (part before @)
+          const username = user.email.split("@")[0];
+          console.log(`👤 Extracted username: ${username}`);
+
           // User doesn't exist, create new user in database
           const newUser = {
             name: user.name || "",
+            username: username,
             email: user.email,
             image: user.image || "",
             entryNo: extractedEntryNo,
@@ -106,6 +111,7 @@ export const authOptions = {
 
           console.log(`💾 Creating user with data:`, {
             name: newUser.name,
+            username: newUser.username,
             email: newUser.email,
             entryNo: newUser.entryNo,
             department: newUser.department,
@@ -120,14 +126,33 @@ export const authOptions = {
             `✅ Existing user logged in: ${user.name} (${user.email})`
           );
 
-          // Update existing user's profile picture and other info from Google
+          // Extract username from email (part before @)
+          const username = user.email.split("@")[0];
+
+          // Update existing user's profile picture, username, and other info from Google
           const updateData: {
             updatedAt: Date;
             image?: string;
             name?: string;
+            username?: string;
           } = {
             updatedAt: new Date(),
           };
+
+          // Always update username from email
+          // This ensures database always has the current username derived from email
+          if (username && username !== existingUser.username) {
+            updateData.username = username;
+            console.log(
+              `👤 Updating username for ${user.email}: "${
+                existingUser.username || "no username"
+              }" -> "${username}"`
+            );
+          } else if (!existingUser.username) {
+            // Set username if it doesn't exist in the database
+            updateData.username = username;
+            console.log(`👤 Setting username for ${user.email}: "${username}"`);
+          }
 
           // Always update profile image from Google if available
           // This ensures database always has the most current Google profile picture

@@ -3,6 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +29,7 @@ interface Post {
   author: {
     id: string;
     name: string;
+    username: string;
     email: string;
     image: string;
     entryNo: string;
@@ -542,9 +544,12 @@ export default function Timeline() {
 
                       <div>
                         <div className="flex items-center space-x-2">
-                          <span className="font-semibold text-white">
+                          <Link
+                            href={`/user/${post.author.username}`}
+                            className="font-semibold text-white hover:text-blue-300 transition-colors cursor-pointer"
+                          >
                             {post.author.name}
-                          </span>
+                          </Link>
                           {post.author.isVerified && (
                             <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                               <svg
