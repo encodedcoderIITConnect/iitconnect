@@ -699,8 +699,32 @@ export default function ChatPage() {
             {/* Chat List */}
             <div className="flex-1 overflow-y-auto">
               {loading ? (
-                <div className="p-4 text-gray-600 text-center">
-                  Loading chats...
+                <div className="space-y-4 p-4">
+                  {/* Skeleton loading for chat list */}
+                  {[...Array(5)].map((_, i) => (
+                    <div
+                      key={i}
+                      className="p-4 border-b border-white/20 animate-pulse"
+                      style={{ animationDelay: `${i * 100}ms` }}
+                    >
+                      <div className="flex items-center">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-200 to-blue-300 rounded-full"></div>
+                        <div className="ml-3 flex-1">
+                          <div className="flex items-center justify-between mb-2">
+                            <div
+                              className="h-4 bg-gradient-to-r from-gray-300 to-gray-400 rounded"
+                              style={{ width: `${60 + Math.random() * 30}%` }}
+                            ></div>
+                            <div className="w-12 h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded"></div>
+                          </div>
+                          <div
+                            className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded"
+                            style={{ width: `${70 + Math.random() * 25}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : chats.length === 0 ? (
                 <div className="p-4 text-gray-600 text-center">
@@ -887,8 +911,50 @@ export default function ChatPage() {
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-2 md:p-4 space-y-4">
                   {loadingMessages ? (
-                    <div className="text-center text-gray-600">
-                      Loading messages...
+                    <div className="space-y-4">
+                      {/* Skeleton loading for messages */}
+                      {[...Array(6)].map((_, i) => (
+                        <div
+                          key={i}
+                          className={`flex ${
+                            i % 3 === 0 ? "justify-end" : "justify-start"
+                          }`}
+                        >
+                          <div
+                            className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg animate-pulse ${
+                              i % 3 === 0
+                                ? "bg-gradient-to-r from-blue-200 to-blue-300"
+                                : "bg-gradient-to-r from-gray-200 to-gray-300"
+                            }`}
+                            style={{ animationDelay: `${i * 100}ms` }}
+                          >
+                            <div className="space-y-2">
+                              <div
+                                className={`h-3 rounded ${
+                                  i % 3 === 0 ? "bg-blue-400" : "bg-gray-400"
+                                } opacity-60`}
+                                style={{ width: `${60 + Math.random() * 40}%` }}
+                              ></div>
+                              {Math.random() > 0.5 && (
+                                <div
+                                  className={`h-3 rounded ${
+                                    i % 3 === 0 ? "bg-blue-400" : "bg-gray-400"
+                                  } opacity-40`}
+                                  style={{
+                                    width: `${40 + Math.random() * 30}%`,
+                                  }}
+                                ></div>
+                              )}
+                              <div
+                                className={`h-2 rounded ${
+                                  i % 3 === 0 ? "bg-blue-500" : "bg-gray-500"
+                                } opacity-30 mt-2`}
+                                style={{ width: "30%" }}
+                              ></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ) : messages.length === 0 ? (
                     <div className="text-center text-gray-600">
