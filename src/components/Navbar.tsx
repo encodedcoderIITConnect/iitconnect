@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useRef, useEffect } from "react";
+import { useUnreadCount } from "@/hooks/useUnreadCount";
 import {
   MessageCircle,
   Car,
@@ -53,6 +54,7 @@ export function DesktopSidebar() {
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { totalUnreadCount } = useUnreadCount();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -148,7 +150,12 @@ export function DesktopSidebar() {
                 }`}
               >
                 <item.icon className="h-6 w-6 mr-4" />
-                {item.name}
+                <span className="flex-1">{item.name}</span>
+                {item.name === "Chat" && totalUnreadCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
+                    {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
@@ -417,6 +424,7 @@ export function MobileBottomNav() {
     useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const { totalUnreadCount } = useUnreadCount();
 
   // Handle click outside to close mobile menu
   useEffect(() => {
@@ -528,7 +536,12 @@ export function MobileBottomNav() {
                     }}
                   >
                     <item.icon className="h-6 w-6 mr-4 flex-shrink-0" />
-                    <span className="truncate">{item.name}</span>
+                    <span className="truncate flex-1">{item.name}</span>
+                    {item.name === "Chat" && totalUnreadCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
+                        {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
+                      </span>
+                    )}
                   </Link>
                 ))}
 
@@ -597,7 +610,14 @@ export function MobileBottomNav() {
                 pathname === item.href ? "text-white" : "text-white/70"
               }`}
             >
-              <item.icon className="h-6 w-6" />
+              <div className="relative">
+                <item.icon className="h-6 w-6" />
+                {item.name === "Chat" && totalUnreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-medium shadow-lg">
+                    {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
+                  </span>
+                )}
+              </div>
               <span className="text-xs mt-1">{item.name}</span>
             </Link>
           ))}

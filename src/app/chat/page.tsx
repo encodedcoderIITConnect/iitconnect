@@ -81,12 +81,15 @@ export default function ChatPage() {
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [startingChat, setStartingChat] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [lastMessageTime, setLastMessageTime] = useState<string | null>(null);
   const [isPolling, setIsPolling] = useState(false);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
     null
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -94,6 +97,45 @@ export default function ChatPage() {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  // Calculate total unread messages across all chats
+  const calculateTotalUnread = (chatList: Chat[]) => {
+    const total = chatList.reduce((total, chat) => total + chat.unreadCount, 0);
+    console.log(
+      "Calculating total unread:",
+      total,
+      "from chats:",
+      chatList.map((c) => ({ name: c.name, unread: c.unreadCount }))
+    );
+    return total;
+  };
+
+  // Mark chat as read when user opens it
+  const markChatAsRead = async (chatId: string) => {
+    try {
+      const response = await fetch(`/api/chat/${chatId}/mark-read`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        // Update local state to reflect read status
+        setChats((prevChats) => {
+          const updatedChats = prevChats.map((chat) =>
+            chat.id === chatId ? { ...chat, unreadCount: 0 } : chat
+          );
+          // Recalculate total unread count
+          const newTotal = calculateTotalUnread(updatedChats);
+          setTotalUnreadCount(newTotal);
+          return updatedChats;
+        });
+      }
+    } catch (error) {
+      console.error("Error marking chat as read:", error);
+    }
   };
 
   // Helper function to refresh chats manually
@@ -104,7 +146,12 @@ export default function ChatPage() {
       const response = await fetch("/api/chat");
       if (response.ok) {
         const data = await response.json();
-        setChats(data.chats || []);
+        const newChats = data.chats || [];
+        setChats(newChats);
+
+        // Calculate and update total unread count
+        const totalUnread = calculateTotalUnread(newChats);
+        setTotalUnreadCount(totalUnread);
       }
     } catch (error) {
       console.error("Error refreshing chats:", error);
@@ -134,7 +181,12 @@ export default function ChatPage() {
           if (!isPolling) {
             console.log("Chat API response data:", data);
           }
-          setChats(data.chats || []);
+          const newChats = data.chats || [];
+          setChats(newChats);
+
+          // Calculate and update total unread count
+          const totalUnread = calculateTotalUnread(newChats);
+          setTotalUnreadCount(totalUnread);
         } else {
           const errorData = await response.json();
           console.error("Chat API error:", errorData);
@@ -244,6 +296,12 @@ export default function ChatPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Update total unread count whenever chats change
+  useEffect(() => {
+    const total = calculateTotalUnread(chats);
+    setTotalUnreadCount(total);
+  }, [chats]);
 
   // Cleanup polling on component unmount
   useEffect(() => {
@@ -382,6 +440,10 @@ export default function ChatPage() {
   const handleChatSelect = (chatId: string) => {
     setSelectedChat(chatId);
     setShowChatList(false); // Hide chat list on mobile when chat is selected
+
+    // Mark chat as read when user opens it
+    markChatAsRead(chatId);
+
     // Focus input after a short delay to ensure chat is loaded
     setTimeout(() => {
       inputRef.current?.focus();
@@ -740,6 +802,10 @@ export default function ChatPage() {
                       selectedChat === chat.id
                         ? "bg-white/60 border-r-2 border-r-blue-500"
                         : ""
+                    } ${
+                      chat.unreadCount > 0
+                        ? "bg-blue-50/80 border-l-4 border-l-red-500"
+                        : ""
                     }`}
                   >
                     <div className="flex items-center">
@@ -758,27 +824,37 @@ export default function ChatPage() {
                           {chat.isOnline && (
                             <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                           )}
+                          {chat.unreadCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg border-2 border-white">
+                              {chat.unreadCount > 99 ? "99+" : chat.unreadCount}
+                            </span>
+                          )}
                         </div>
 
                         <div className="ml-3 flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <p className="text-sm font-medium text-gray-900 truncate">
+                            <p
+                              className={`text-sm text-gray-900 truncate ${
+                                chat.unreadCount > 0
+                                  ? "font-bold"
+                                  : "font-medium"
+                              }`}
+                            >
                               {chat.name}
                             </p>
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-gray-500">
-                                {chat.lastMessageTime}
-                              </span>
-                              {chat.unreadCount > 0 && (
-                                <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 min-w-[18px] h-[18px] flex items-center justify-center">
-                                  {chat.unreadCount}
-                                </span>
-                              )}
-                            </div>
+                            <span className="text-xs text-gray-500">
+                              {chat.lastMessageTime}
+                            </span>
                           </div>
 
                           <div className="flex items-center justify-between">
-                            <p className="text-sm text-gray-500 truncate">
+                            <p
+                              className={`text-sm truncate ${
+                                chat.unreadCount > 0
+                                  ? "text-gray-900 font-semibold"
+                                  : "text-gray-500"
+                              }`}
+                            >
                               {chat.lastMessageSender &&
                                 chat.type === "group" &&
                                 `${chat.lastMessageSender}: `}

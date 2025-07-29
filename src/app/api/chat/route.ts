@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 // Helper function to get database collections
 async function getCollections() {
@@ -15,6 +15,7 @@ async function getCollections() {
     chats: db.collection("chats"),
     chatMembers: db.collection("chatmembers"),
     messages: db.collection("messages"),
+    messageReads: db.collection("messagereads"),
   };
 }
 
@@ -26,7 +27,8 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { client, users, chatMembers } = await getCollections();
+    const { client, users, chatMembers, messages, messageReads } =
+      await getCollections();
 
     try {
       // Find current user
@@ -136,53 +138,95 @@ export async function GET() {
         .toArray();
 
       // Format the chat data
-      const formattedChats = userChats.map((chatData) => {
-        const chat = chatData.chat;
-        const otherMembers = chatData.memberUsers.filter(
-          (member: { _id: object }) =>
-            member._id.toString() !== currentUser._id.toString()
-        );
+      const formattedChats = await Promise.all(
+        userChats.map(async (chatData) => {
+          const chat = chatData.chat;
+          const otherMembers = chatData.memberUsers.filter(
+            (member: { _id: object }) =>
+              member._id.toString() !== currentUser._id.toString()
+          );
 
-        const lastMessage = chatData.lastMessage[0] || null;
+          const lastMessage = chatData.lastMessage[0] || null;
 
-        // For direct chats, use the other user's info
-        let chatName, chatAvatar;
-        if (chat.isGroup) {
-          chatName = chat.name || "Group Chat";
-          chatAvatar =
-            "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=100";
-        } else {
-          const otherUser = otherMembers[0];
-          chatName = otherUser ? otherUser.name : "Unknown User";
-          chatAvatar =
-            otherUser?.image ||
-            `https://ui-avatars.com/api/?name=${encodeURIComponent(
-              otherUser?.name || "Unknown"
-            )}&background=3b82f6&color=ffffff&size=100`;
-        }
+          // Calculate unread count for this chat
+          let unreadCount = 0;
+          try {
+            // Get user's last read message for this chat
+            const userReadStatus = await messageReads.findOne({
+              userId: currentUser._id.toString(),
+              chatId: chat._id.toString(),
+            });
 
-        return {
-          id: chat._id.toString(),
-          name: chatName,
-          type: chat.isGroup ? "group" : "direct",
-          avatar: chatAvatar,
-          lastMessage: lastMessage ? lastMessage.content : "No messages yet",
-          lastMessageTime: lastMessage
-            ? new Date(lastMessage.createdAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })
-            : "",
-          lastMessageSender: lastMessage?.sender?.name || "",
-          unreadCount: 0, // TODO: Implement unread count logic
-          isOnline: false, // TODO: Implement online status
-          participants: chatData.memberUsers.map(
-            (user: { name: string }) => user.name
-          ),
-          otherMembers,
-          createdAt: chat.createdAt,
-        };
-      });
+            if (userReadStatus && userReadStatus.lastReadMessageId) {
+              // Count messages after the last read message
+              const lastReadMessage = await messages.findOne({
+                _id: new ObjectId(userReadStatus.lastReadMessageId),
+              });
+
+              if (lastReadMessage) {
+                unreadCount = await messages.countDocuments({
+                  chatId: chat._id.toString(),
+                  createdAt: { $gt: lastReadMessage.createdAt },
+                  senderId: { $ne: currentUser._id.toString() }, // Don't count own messages as unread
+                });
+              } else {
+                // Last read message not found, count all messages from others
+                unreadCount = await messages.countDocuments({
+                  chatId: chat._id.toString(),
+                  senderId: { $ne: currentUser._id.toString() },
+                });
+              }
+            } else {
+              // No read status found, count all messages from others as unread
+              unreadCount = await messages.countDocuments({
+                chatId: chat._id.toString(),
+                senderId: { $ne: currentUser._id.toString() },
+              });
+            }
+          } catch (error) {
+            console.error("Error calculating unread count:", error);
+            unreadCount = 0;
+          }
+
+          // For direct chats, use the other user's info
+          let chatName, chatAvatar;
+          if (chat.isGroup) {
+            chatName = chat.name || "Group Chat";
+            chatAvatar =
+              "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=100";
+          } else {
+            const otherUser = otherMembers[0];
+            chatName = otherUser ? otherUser.name : "Unknown User";
+            chatAvatar =
+              otherUser?.image ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                otherUser?.name || "Unknown"
+              )}&background=3b82f6&color=ffffff&size=100`;
+          }
+
+          return {
+            id: chat._id.toString(),
+            name: chatName,
+            type: chat.isGroup ? "group" : "direct",
+            avatar: chatAvatar,
+            lastMessage: lastMessage ? lastMessage.content : "No messages yet",
+            lastMessageTime: lastMessage
+              ? new Date(lastMessage.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "",
+            lastMessageSender: lastMessage?.sender?.name || "",
+            unreadCount: unreadCount,
+            isOnline: false, // TODO: Implement online status
+            participants: chatData.memberUsers.map(
+              (user: { name: string }) => user.name
+            ),
+            otherMembers,
+            createdAt: chat.createdAt,
+          };
+        })
+      );
 
       // Sort by last message time (most recent first)
       formattedChats.sort((a, b) => {
