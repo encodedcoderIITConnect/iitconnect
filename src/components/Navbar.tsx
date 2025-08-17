@@ -40,11 +40,12 @@ const navigation = [
   { name: "Home", href: "/", icon: Home },
   { name: "Library", href: "/library", icon: BookOpen },
   { name: "Chat", href: "/chat", icon: MessageCircle },
-  { name: "Sports", href: "/games", icon: Trophy },
+  { name: "Clubs", href: "/clubs", icon: Trophy },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
   { name: "Lost & Found", href: "/lost-found", icon: Search },
   { name: "Discussions", href: "/discussions", icon: Users },
-  { name: "Coding", href: "/coding", icon: Code },
+  { name: "About", href: "/about", icon: ExternalLink },
+  // { name: "Coding", href: "/coding", icon: Code }, // Removed Coding
 ];
 
 // Desktop Sidebar Component

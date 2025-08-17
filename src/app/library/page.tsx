@@ -249,6 +249,27 @@ const libraryResources: LibraryResource[] = [
     isPremium: true,
     provider: "PressReader",
   },
+  {
+    id: "matlab",
+    name: "MATLAB Academic License",
+    description:
+      "Numerical computing, data analysis, and visualization software for engineering and science.",
+    category: "Software & Tools",
+    icon: <Brain className="h-6 w-6" />,
+    features: [
+      "Numerical computing",
+      "Data analysis",
+      "Visualization",
+      "Toolboxes for engineering and science",
+    ],
+    normalPrice: "$100+/year",
+    studentPrice: "Free",
+    instructions:
+      "Access MATLAB via institute license. Sign in with your @iitrpr.ac.in email.",
+    link: "https://www.mathworks.com/academia/tah-portal/indian-institute-of-technology-ropar-1117203.html",
+    isPremium: true,
+    provider: "MathWorks",
+  },
 ];
 
 const categories = [
