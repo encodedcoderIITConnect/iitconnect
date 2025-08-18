@@ -335,7 +335,7 @@ export default function Timeline() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 pb-20 lg:pb-0">
       <div className="max-w-2xl mx-auto">
         {/* Create Post Section */}
         <div className="p-6 border-b border-white/20 relative z-50">

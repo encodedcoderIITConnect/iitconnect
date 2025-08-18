@@ -23,6 +23,11 @@ import {
   Search,
   Users,
   Trophy,
+  GraduationCap,
+  MoreHorizontal,
+  HelpCircle,
+  Download,
+  Mail,
 } from "lucide-react";
 
 // Extended user type for session
@@ -41,11 +46,18 @@ const navigation = [
   { name: "Library", href: "/library", icon: BookOpen },
   { name: "Chat", href: "/chat", icon: MessageCircle },
   { name: "Clubs", href: "/clubs", icon: Trophy },
-  { name: "Auto Drivers", href: "/drivers", icon: Car },
+  { name: "Departments", href: "/departments", icon: GraduationCap },
   { name: "Lost & Found", href: "/lost-found", icon: Search },
   { name: "Discussions", href: "/discussions", icon: Users },
-  { name: "About", href: "/about", icon: ExternalLink },
-  // { name: "Coding", href: "/coding", icon: Code }, // Removed Coding
+];
+
+// More menu items
+const moreMenuItems = [
+  { name: "Download Forms", href: "/download-forms", icon: Download },
+  { name: "Auto Drivers", href: "/drivers", icon: Car },
+  { name: "HelpDesk", href: "/helpdesk", icon: HelpCircle },
+  { name: "Contact Us", href: "/contact", icon: Mail },
+  { name: "About Us", href: "/about", icon: ExternalLink },
 ];
 
 // Desktop Sidebar Component
@@ -54,7 +66,9 @@ export function DesktopSidebar() {
   const pathname = usePathname();
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
   const { totalUnreadCount } = useUnreadCount();
 
   // Close menu when clicking outside
@@ -63,16 +77,22 @@ export function DesktopSidebar() {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowSignOutConfirm(false);
       }
+      if (
+        moreMenuRef.current &&
+        !moreMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowMoreMenu(false);
+      }
     };
 
-    if (showSignOutConfirm) {
+    if (showSignOutConfirm || showMoreMenu) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showSignOutConfirm]);
+  }, [showSignOutConfirm, showMoreMenu]);
 
   const handleSignOut = async () => {
     try {
@@ -159,11 +179,9 @@ export function DesktopSidebar() {
                 )}
               </Link>
             ))}
-          </nav>
 
-          {/* User Profile Menu */}
-          {session && (
-            <div className="mt-8">
+            {/* User Profile Menu */}
+            {session && (
               <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setShowSignOutConfirm(!showSignOutConfirm)}
@@ -190,7 +208,7 @@ export function DesktopSidebar() {
                   </div>
                 </button>
 
-                {/* Dropdown Menu - Positioned Above */}
+                {/* User Dropdown Menu - Positioned Above */}
                 {showSignOutConfirm && (
                   <div className="absolute bottom-full left-0 right-0 mb-2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 z-50">
                     <Link
@@ -211,8 +229,44 @@ export function DesktopSidebar() {
                   </div>
                 )}
               </div>
+            )}
+
+            {/* More Menu */}
+            <div className="relative" ref={moreMenuRef}>
+              <button
+                onClick={() => setShowMoreMenu(!showMoreMenu)}
+                className={`w-full flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-colors text-left ${
+                  moreMenuItems.some((item) => pathname === item.href)
+                    ? "bg-white/30 text-white backdrop-blur-sm"
+                    : "text-white/90 hover:bg-white/20 hover:text-white"
+                }`}
+              >
+                <Menu className="h-6 w-6 mr-4" />
+                <span className="flex-1">More</span>
+              </button>
+
+              {/* More Menu Dropdown - Positioned Above */}
+              {showMoreMenu && (
+                <div className="absolute bottom-full left-0 right-0 mb-2 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 z-50">
+                  {moreMenuItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setShowMoreMenu(false)}
+                      className={`flex items-center px-4 py-2 text-sm transition-colors ${
+                        pathname === item.href
+                          ? "bg-white/30 text-white"
+                          : "text-white/90 hover:bg-white/20 hover:text-white"
+                      }`}
+                    >
+                      <item.icon className="h-4 w-4 mr-3" />
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </nav>
         </div>
       </div>
     </>
@@ -505,7 +559,7 @@ export function MobileBottomNav() {
                 : "slideOutToRight 0.3s ease-out",
             }}
           >
-            <div className="p-6 h-full overflow-y-auto">
+            <div className="p-6 h-full overflow-y-auto flex flex-col pb-20">
               <div className="flex items-center justify-between mb-8">
                 <span className="text-2xl font-bold text-white">
                   IIT Connect
@@ -518,7 +572,7 @@ export function MobileBottomNav() {
                 </button>
               </div>
 
-              <nav className="space-y-2">
+              <nav className="space-y-2 flex-1">
                 {navigation.map((item, index) => (
                   <Link
                     key={item.name}
@@ -546,16 +600,48 @@ export function MobileBottomNav() {
                   </Link>
                 ))}
 
-                {/* Sign Out Button in Menu */}
-                {session && (
+                {/* More Menu Items */}
+                <div className="border-t border-white/20 pt-4 mt-4">
+                  <h3 className="text-white/60 text-sm font-medium px-4 mb-2">
+                    More
+                  </h3>
+                  {moreMenuItems.map((item, index) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setShowMobileMenu(false)}
+                      className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 transform ${
+                        pathname === item.href
+                          ? "bg-white/30 text-white backdrop-blur-sm scale-105 shadow-lg"
+                          : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
+                      }`}
+                      style={{
+                        animationDelay: `${(navigation.length + index) * 50}ms`,
+                        animation: showMobileMenu
+                          ? "slideInRight 0.3s ease-out forwards"
+                          : "none",
+                      }}
+                    >
+                      <item.icon className="h-6 w-6 mr-4 flex-shrink-0" />
+                      <span className="truncate flex-1">{item.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </nav>
+
+              {/* Sign Out Button - Separate from nav for prominence */}
+              {session && (
+                <div className="pt-4 border-t border-white/20 mb-8">
                   <button
                     onClick={() => {
                       setShowMobileMenu(false);
                       setShowMobileSignOutConfirm(true);
                     }}
-                    className="w-full flex items-center px-4 py-3 rounded-xl text-base font-medium text-white/90 hover:bg-red-500/20 hover:text-white transition-all duration-200 hover:scale-105 mt-4 border-t border-white/20 pt-6"
+                    className="w-full flex items-center px-4 py-4 rounded-xl text-base font-medium text-white bg-red-500/20 hover:bg-red-500/30 transition-all duration-200 hover:scale-105 border border-red-400/30"
                     style={{
-                      animationDelay: `${navigation.length * 50}ms`,
+                      animationDelay: `${
+                        (navigation.length + moreMenuItems.length) * 50
+                      }ms`,
                       animation: showMobileMenu
                         ? "slideInRight 0.3s ease-out forwards"
                         : "none",
@@ -564,8 +650,8 @@ export function MobileBottomNav() {
                     <LogOut className="h-6 w-6 mr-4 flex-shrink-0" />
                     <span>Sign Out</span>
                   </button>
-                )}
-              </nav>
+                </div>
+              )}
             </div>
           </div>
         </div>
