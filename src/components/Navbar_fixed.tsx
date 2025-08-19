@@ -14,7 +14,6 @@ import {
   User,
   LogOut,
   Menu,
-  MoreHorizontal,
   Home,
   BookOpen,
   Trophy,
@@ -24,7 +23,6 @@ import {
   Code,
   Gamepad2,
   Calendar,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -144,31 +142,31 @@ export default function Navbar() {
 
       <div
         className={`fixed left-0 top-0 h-full transition-all duration-300 bg-gradient-to-b from-blue-600 to-teal-500 border-r border-white/30 z-40 hidden lg:block ${
-          isCollapsed ? "w-16 sidebar-collapsed" : "w-64"
+          isCollapsed ? "w-14 sidebar-collapsed" : "w-56"
         }`}
       >
-        <div
-          className={`transition-all duration-300 ${
-            isCollapsed ? "p-2" : "p-6"
-          }`}
-        >
-          <div
-            className={`flex items-center ${
-              isCollapsed ? "justify-center mb-4" : "justify-between mb-8"
-            }`}
-          >
-            {!isCollapsed && (
-              <Link href="/" className="block">
+        <div className="h-full flex flex-col">
+          {/* Fixed header area */}
+          <div className="h-20 flex items-center justify-between px-4 py-4">
+            {/* Logo area - slides in from right */}
+            <div
+              className={`transition-all duration-300 overflow-hidden ${
+                isCollapsed ? "w-0 opacity-0" : "w-48 opacity-100"
+              }`}
+            >
+              <Link href="/" className="block whitespace-nowrap">
                 <span className="text-2xl font-bold text-white princess-sofia-regular poppins-bold">
                   IIT Connect
                 </span>
               </Link>
-            )}
+            </div>
+
+            {/* Toggle button - always visible */}
             <Button
               onClick={toggleSidebar}
               variant="ghost"
               size="sm"
-              className="text-white/90 hover:text-white hover:bg-white/20 p-2 h-8 w-8 rounded-lg transition-colors"
+              className="text-white/90 hover:text-white hover:bg-white/20 p-2 h-8 w-8 rounded-lg transition-colors flex-shrink-0"
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {isCollapsed ? (
@@ -179,156 +177,178 @@ export default function Navbar() {
             </Button>
           </div>
 
-          <nav className="space-y-2">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`relative flex items-center ${
-                  isCollapsed ? "justify-center px-2 py-3" : "px-3 py-3"
-                } rounded-lg text-sm font-medium transition-colors ${
-                  pathname === item.href
-                    ? "bg-white/30 text-white backdrop-blur-sm"
-                    : "text-white/90 hover:bg-white/20 hover:text-white"
-                }`}
-                title={isCollapsed ? item.name : undefined}
-              >
-                <item.icon
-                  className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}
-                />
-                {!isCollapsed && (
-                  <>
-                    <span className="flex-1">{item.name}</span>
+          {/* Navigation area */}
+          <div className="flex-1">
+            <nav className="space-y-2">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`relative flex items-center rounded-lg text-sm font-medium transition-colors min-h-[48px] pl-4 mx-2 ${
+                    pathname === item.href
+                      ? "bg-white/30 text-white backdrop-blur-sm"
+                      : "text-white/90 hover:bg-white/20 hover:text-white"
+                  }`}
+                  title={isCollapsed ? item.name : undefined}
+                >
+                  {/* Fixed icon position - aligned with logo (16px from left) */}
+                  <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                    <item.icon className="h-5 w-5" />
+                  </div>
+
+                  {/* Text content - slides in from right */}
+                  <div
+                    className={`transition-all duration-300 overflow-hidden flex items-center justify-between flex-1 ${
+                      isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+                    }`}
+                  >
+                    <span className="whitespace-nowrap pl-2">{item.name}</span>
                     {item.name === "Chat" && totalUnreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
+                      <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg mr-3">
                         {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
                       </span>
                     )}
-                  </>
-                )}
-                {isCollapsed &&
-                  item.name === "Chat" &&
-                  totalUnreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-medium shadow-lg">
-                      {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
-                    </span>
-                  )}
-              </Link>
-            ))}
+                  </div>
 
-            {/* User Profile Menu */}
-            {session && (
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setShowSignOutConfirm(!showSignOutConfirm)}
-                  className={`w-full flex items-center ${
-                    isCollapsed ? "justify-center px-2 py-3" : "px-3 py-3"
-                  } rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors`}
-                  title={
-                    isCollapsed
-                      ? session.user?.name || "User Profile"
-                      : undefined
-                  }
-                >
-                  <Avatar
-                    className={`${isCollapsed ? "h-6 w-6" : "h-6 w-6 mr-3"}`}
+                  {/* Collapsed state notification badge */}
+                  {isCollapsed &&
+                    item.name === "Chat" &&
+                    totalUnreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-medium shadow-lg">
+                        {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
+                      </span>
+                    )}
+                </Link>
+              ))}
+
+              {/* User Profile Menu */}
+              {session && (
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={() => setShowSignOutConfirm(!showSignOutConfirm)}
+                    className="w-full flex items-center rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors min-h-[48px] pl-4 mx-2"
+                    title={
+                      isCollapsed
+                        ? session.user?.name || "User Profile"
+                        : undefined
+                    }
                   >
-                    <AvatarImage src={session.user?.image || ""} />
-                    <AvatarFallback className="text-xs bg-white/30 text-white">
-                      {session.user?.name?.charAt(0)?.toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  {!isCollapsed && (
-                    <div className="flex-1 text-left">
-                      <div className="truncate text-white font-medium">
-                        {session.user?.name || "User"}
-                      </div>
-                      {(session.user as ExtendedUser)?.entryNo && (
-                        <div className="truncate text-white/60 text-xs">
-                          {(session.user as ExtendedUser).entryNo} •{" "}
-                          {(session.user as ExtendedUser).department?.split(
-                            " "
-                          )[0] || "Unknown"}
+                    {/* Fixed avatar position - aligned with logo (16px from left) */}
+                    <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                      <Avatar className="h-5 w-5">
+                        <AvatarImage src={session.user?.image || ""} />
+                        <AvatarFallback className="text-xs bg-white/30 text-white">
+                          {session.user?.name?.charAt(0)?.toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+
+                    {/* User info - slides in from right */}
+                    <div
+                      className={`transition-all duration-300 overflow-hidden flex-1 text-left ${
+                        isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+                      }`}
+                    >
+                      <div className="pl-2">
+                        <div className="truncate text-white font-medium">
+                          {session.user?.name || "User"}
                         </div>
-                      )}
+                        {(session.user as ExtendedUser)?.entryNo && (
+                          <div className="truncate text-white/60 text-xs">
+                            {(session.user as ExtendedUser).entryNo} •{" "}
+                            {(session.user as ExtendedUser).department?.split(
+                              " "
+                            )[0] || "Unknown"}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* User Dropdown Menu */}
+                  {showSignOutConfirm && (
+                    <div
+                      className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu ${
+                        isCollapsed
+                          ? "left-14 bottom-0 min-w-48"
+                          : "bottom-full left-0 right-0 mb-2"
+                      }`}
+                    >
+                      <Link
+                        href={`/user/${session?.user?.email?.split("@")[0]}`}
+                        onClick={() => setShowSignOutConfirm(false)}
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
+                      >
+                        <User className="h-4 w-4 mr-3" />
+                        Profile
+                      </Link>
+                      <button
+                        onClick={handleSignOutClick}
+                        className="w-full flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
+                      >
+                        <LogOut className="h-4 w-4 mr-3" />
+                        Sign Out
+                      </button>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* More Menu */}
+              <div className="relative" ref={moreMenuRef}>
+                <button
+                  onClick={() => setShowMoreMenu(!showMoreMenu)}
+                  className={`w-full flex items-center rounded-lg text-sm font-medium transition-colors min-h-[48px] pl-4 mx-2 ${
+                    moreMenuItems.some((item) => pathname === item.href)
+                      ? "bg-white/30 text-white backdrop-blur-sm"
+                      : "text-white/90 hover:bg-white/20 hover:text-white"
+                  }`}
+                  title={isCollapsed ? "More Options" : undefined}
+                >
+                  {/* Fixed icon position - aligned with logo (16px from left) */}
+                  <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                    <Menu className="h-5 w-5" />
+                  </div>
+
+                  {/* Text content - slides in from right */}
+                  <div
+                    className={`transition-all duration-300 overflow-hidden flex-1 text-left ${
+                      isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
+                    }`}
+                  >
+                    <span className="whitespace-nowrap pl-2">More</span>
+                  </div>
                 </button>
 
-                {/* User Dropdown Menu - Positioned with aligned bottom borders */}
-                {showSignOutConfirm && (
+                {/* More Menu Dropdown */}
+                {showMoreMenu && (
                   <div
                     className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu ${
                       isCollapsed
-                        ? "left-16 bottom-0 min-w-48"
+                        ? "left-14 bottom-0 min-w-48"
                         : "bottom-full left-0 right-0 mb-2"
                     }`}
                   >
-                    <Link
-                      href={`/user/${session?.user?.email?.split("@")[0]}`}
-                      onClick={() => setShowSignOutConfirm(false)}
-                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
-                    >
-                      <User className="h-4 w-4 mr-3" />
-                      Profile
-                    </Link>
-                    <button
-                      onClick={handleSignOutClick}
-                      className="w-full flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
-                    >
-                      <LogOut className="h-4 w-4 mr-3" />
-                      Sign Out
-                    </button>
+                    {moreMenuItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        onClick={() => setShowMoreMenu(false)}
+                        className={`flex items-center px-4 py-2 text-sm transition-colors ${
+                          pathname === item.href
+                            ? "bg-white/30 text-white"
+                            : "text-white/90 hover:bg-white/20 hover:text-white"
+                        }`}
+                      >
+                        <item.icon className="h-4 w-4 mr-3" />
+                        {item.name}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
-            )}
-
-            {/* More Menu */}
-            <div className="relative" ref={moreMenuRef}>
-              <button
-                onClick={() => setShowMoreMenu(!showMoreMenu)}
-                className={`w-full flex items-center ${
-                  isCollapsed ? "justify-center px-2 py-3" : "px-3 py-3"
-                } rounded-lg text-sm font-medium transition-colors text-left ${
-                  moreMenuItems.some((item) => pathname === item.href)
-                    ? "bg-white/30 text-white backdrop-blur-sm"
-                    : "text-white/90 hover:bg-white/20 hover:text-white"
-                }`}
-                title={isCollapsed ? "More Options" : undefined}
-              >
-                <Menu className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`} />
-                {!isCollapsed && <span className="flex-1">More</span>}
-              </button>
-
-              {/* More Menu Dropdown - Positioned with aligned bottom borders */}
-              {showMoreMenu && (
-                <div
-                  className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu ${
-                    isCollapsed
-                      ? "left-16 bottom-0 min-w-48"
-                      : "bottom-full left-0 right-0 mb-2"
-                  }`}
-                >
-                  {moreMenuItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      onClick={() => setShowMoreMenu(false)}
-                      className={`flex items-center px-4 py-2 text-sm transition-colors ${
-                        pathname === item.href
-                          ? "bg-white/30 text-white"
-                          : "text-white/90 hover:bg-white/20 hover:text-white"
-                      }`}
-                    >
-                      <item.icon className="h-4 w-4 mr-3" />
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          </nav>
+            </nav>
+          </div>
         </div>
       </div>
     </>
