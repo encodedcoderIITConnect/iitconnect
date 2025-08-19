@@ -149,7 +149,7 @@ const clubs = [
     description:
       "Robotics projects and competitions - Builds autonomous robots, participates in national robotics competitions, and conducts technical workshops.",
     image: "/clubs/robot.png",
-    website: "https://bost-19.github.io/",
+    website: "https://robotics-iitrpr.github.io/",
     instagram: "https://www.instagram.com/robotics_iitrpr/?hl=en",
   },
   {
@@ -384,6 +384,15 @@ export default function ClubsPage() {
     BOWA: "Focuses on student wellness, mental health support, and overall well-being initiatives.",
   };
 
+  const boardWebsites = {
+    BOHA: "https://www.iitrpr.ac.in/student-council/boha.php",
+    BOCA: "https://www.iitrpr.ac.in/student-council/boca.php",
+    BOST: "https://www.iitrpr.ac.in/student-council/bost.php",
+    BOLA: "https://www.iitrpr.ac.in/student-council/bola.php",
+    BOSA: "https://www.iitrpr.ac.in/student-council/bosa.php",
+    BOWA: "https://www.iitrpr.ac.in/student-council/bowa.php",
+  };
+
   // Filter clubs based on selected board
   const filteredClubsByBoard =
     selectedBoard === "ALL"
@@ -427,12 +436,25 @@ export default function ClubsPage() {
 
       {Object.entries(filteredClubsByBoard).map(([board, boardClubs]) => (
         <div key={board} className="w-full max-w-6xl mb-12">
-          <h2 className="text-2xl font-semibold text-white mb-3 text-center">
-            {boardNames[board as keyof typeof boardNames] || board}
-          </h2>
-          <p className="text-white/80 text-center mb-6 max-w-4xl mx-auto">
-            {boardDescriptions[board as keyof typeof boardDescriptions]}
-          </p>
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-semibold text-white mb-3 flex items-center justify-center gap-3">
+              {boardNames[board as keyof typeof boardNames] || board}
+              {boardWebsites[board as keyof typeof boardWebsites] && (
+                <a
+                  href={boardWebsites[board as keyof typeof boardWebsites]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 bg-white/20 hover:bg-white/30 text-white px-3 py-1 rounded-full text-sm transition-all"
+                >
+                  <Globe className="h-4 w-4" />
+                  Visit Board
+                </a>
+              )}
+            </h2>
+            <p className="text-white/80 max-w-4xl mx-auto">
+              {boardDescriptions[board as keyof typeof boardDescriptions]}
+            </p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
             {boardClubs.map((club) => (
               <div

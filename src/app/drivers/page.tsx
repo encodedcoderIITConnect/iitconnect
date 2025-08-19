@@ -15,7 +15,7 @@ export default function AutoDriversPage() {
       id: "1",
       name: "Banne",
       phone: "+91 86998 20043",
-      rating: 4.8,
+      rating: "",
       pricePerKm: 12,
       location: "IIT Ropar Main Gate",
       avatar: "👨🏻‍🦳",
