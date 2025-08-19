@@ -27,6 +27,7 @@ import {
   Mail,
   Info,
   X,
+  Building,
 } from "lucide-react";
 
 // Extended User type for TypeScript
@@ -51,8 +52,9 @@ const navigation = [
 
 const moreMenuItems = [
   { name: "Download Forms", href: "/download-forms", icon: Download },
-  { name: "Helpdesk", href: "/helpdesk", icon: HelpCircle },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
+  { name: "Hostels & Guest House", href: "/hostels", icon: Building },
+  { name: "HelpDesk", href: "/helpdesk", icon: HelpCircle },
   { name: "Contact Us", href: "/contact", icon: Mail },
   { name: "About Us", href: "/about", icon: Info },
 ];
