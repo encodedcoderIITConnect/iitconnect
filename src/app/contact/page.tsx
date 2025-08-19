@@ -74,43 +74,7 @@ export default function ContactPage() {
                     Email
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    support@iitconnect.com
-                  </p>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    admin@iitconnect.com
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="bg-green-100 dark:bg-green-900 p-3 rounded-lg">
-                  <Phone className="h-6 w-6 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">
-                    Phone
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    +91 1881-242200
-                  </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    IIT Ropar Main Office
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="bg-purple-100 dark:bg-purple-900 p-3 rounded-lg">
-                  <MapPin className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900 dark:text-white">
-                    Address
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Indian Institute of Technology Ropar
-                    <br />
-                    Bara Phool, Rupnagar, Punjab - 140001
+                    iitconnect22@gmail.com
                   </p>
                 </div>
               </div>
@@ -124,7 +88,7 @@ export default function ContactPage() {
                     Response Time
                   </h3>
                   <p className="text-gray-600 dark:text-gray-300">
-                    We typically respond within 24-48 hours
+                    We are in need of a team of volunteers to help us.
                   </p>
                 </div>
               </div>
