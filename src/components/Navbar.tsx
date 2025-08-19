@@ -21,14 +21,12 @@ import {
   GraduationCap,
   Search,
   Users,
-  Code,
-  Gamepad2,
-  Calendar,
   Sidebar,
   Download,
   HelpCircle,
   Mail,
   Info,
+  X,
 } from "lucide-react";
 
 // Extended User type for TypeScript
@@ -432,35 +430,254 @@ export function DesktopSidebar() {
   return <Navbar />;
 }
 
-// Mobile Bottom Navigation Component (for AuthGuard compatibility)
+// Mobile Bottom Navigation Component
 export function MobileBottomNav() {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const [showMobileSignOutConfirm, setShowMobileSignOutConfirm] =
+    useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
+  const { totalUnreadCount } = useUnreadCount();
+
+  // Handle click outside to close mobile menu
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showMobileMenu &&
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowMobileMenu(false);
+      }
+    };
+
+    if (showMobileMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden"; // Prevent background scrolling
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "unset";
+    };
+  }, [showMobileMenu]);
+
+  const handleMobileSignOut = async () => {
+    if (showMobileSignOutConfirm) {
+      try {
+        // Sign out using NextAuth
+        await signOut({
+          callbackUrl: "/auth/signin",
+          redirect: true,
+        });
+      } catch (error) {
+        console.error("Sign out error:", error);
+      }
+      setShowMobileSignOutConfirm(false);
+    } else {
+      setShowMobileSignOutConfirm(true);
+    }
+  };
+
+  const cancelMobileSignOut = () => {
+    setShowMobileSignOutConfirm(false);
+  };
 
   const mobileNavItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Chat", href: "/chat", icon: MessageCircle },
-    { name: "Library", href: "/library", icon: BookOpen },
-    { name: "More", href: "/discussions", icon: Menu },
+    {
+      name: "Profile",
+      href: `/user/${session?.user?.email?.split("@")[0]}`,
+      icon: User,
+    },
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-teal-500 border-t border-white/30 z-50">
-      <nav className="flex justify-around items-center py-2">
-        {mobileNavItems.map((item) => (
-          <Link
-            key={item.name}
-            href={item.href}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
-              pathname === item.href
-                ? "text-white"
-                : "text-white/70 hover:text-white"
+    <>
+      {/* Mobile Menu Overlay */}
+      {showMobileMenu && (
+        <div
+          className="fixed inset-0 bg-black/50 z-50 flex lg:hidden animate-fadeIn"
+          style={{ animation: "fadeIn 0.3s ease-out" }}
+        >
+          {/* Clickable overlay to close menu */}
+          <div
+            className="flex-1"
+            onClick={() => setShowMobileMenu(false)}
+          ></div>
+
+          {/* Menu panel sliding from right */}
+          <div
+            ref={mobileMenuRef}
+            className="bg-gradient-to-b from-blue-600 to-teal-500 w-80 max-w-[85vw] h-full shadow-2xl transform transition-transform duration-300 ease-out"
+            style={{
+              animation: showMobileMenu
+                ? "slideInFromRight 0.3s ease-out"
+                : "slideOutToRight 0.3s ease-out",
+            }}
+          >
+            <div className="p-6 h-full overflow-y-auto flex flex-col pb-20">
+              <div className="flex items-center justify-between mb-8">
+                <span className="text-2xl font-bold text-white">
+                  IIT Connect
+                </span>
+                <button
+                  onClick={() => setShowMobileMenu(false)}
+                  className="text-white/80 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <nav className="space-y-2 flex-1">
+                {navigation.map((item, index) => (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    onClick={() => setShowMobileMenu(false)}
+                    className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 transform ${
+                      pathname === item.href
+                        ? "bg-white/30 text-white backdrop-blur-sm scale-105 shadow-lg"
+                        : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
+                    }`}
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                      animation: showMobileMenu
+                        ? "slideInRight 0.3s ease-out forwards"
+                        : "none",
+                    }}
+                  >
+                    <item.icon className="h-6 w-6 mr-4 flex-shrink-0" />
+                    <span className="truncate flex-1">{item.name}</span>
+                    {item.name === "Chat" && totalUnreadCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
+                        {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+
+                {/* More Menu Items */}
+                <div className="border-t border-white/20 pt-4 mt-4">
+                  <h3 className="text-white/60 text-sm font-medium px-4 mb-2">
+                    More
+                  </h3>
+                  {moreMenuItems.map((item, index) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setShowMobileMenu(false)}
+                      className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 transform ${
+                        pathname === item.href
+                          ? "bg-white/30 text-white backdrop-blur-sm scale-105 shadow-lg"
+                          : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
+                      }`}
+                      style={{
+                        animationDelay: `${(navigation.length + index) * 50}ms`,
+                        animation: showMobileMenu
+                          ? "slideInRight 0.3s ease-out forwards"
+                          : "none",
+                      }}
+                    >
+                      <item.icon className="h-6 w-6 mr-4 flex-shrink-0" />
+                      <span className="truncate flex-1">{item.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </nav>
+
+              {/* Sign Out Button - Separate from nav for prominence */}
+              {session && (
+                <div className="pt-4 border-t border-white/20 mb-8">
+                  <button
+                    onClick={() => {
+                      setShowMobileMenu(false);
+                      setShowMobileSignOutConfirm(true);
+                    }}
+                    className="w-full flex items-center px-4 py-4 rounded-xl text-base font-medium text-white bg-red-500/20 hover:bg-red-500/30 transition-all duration-200 hover:scale-105 border border-red-400/30"
+                    style={{
+                      animationDelay: `${
+                        (navigation.length + moreMenuItems.length) * 50
+                      }ms`,
+                      animation: showMobileMenu
+                        ? "slideInRight 0.3s ease-out forwards"
+                        : "none",
+                    }}
+                  >
+                    <LogOut className="h-6 w-6 mr-4 flex-shrink-0" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Sign out confirmation overlay */}
+      {showMobileSignOutConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center lg:hidden">
+          <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl">
+            <h3 className="text-lg font-semibold text-white mb-2 poppins-semibold">
+              Sign Out
+            </h3>
+            <p className="text-white/90 mb-4 poppins-regular">
+              Are you sure you want to sign out?
+            </p>
+            <div className="flex space-x-3">
+              <Button
+                variant="outline"
+                onClick={cancelMobileSignOut}
+                className="flex-1 bg-white/30 hover:bg-white/40 text-white border-white/40"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleMobileSignOut}
+                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              >
+                Sign Out
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-teal-500 border-t border-white/30 z-50 lg:hidden">
+        <div className="flex">
+          {mobileNavItems.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`flex-1 flex flex-col items-center py-2 px-1 ${
+                pathname === item.href ? "text-white" : "text-white/70"
+              }`}
+            >
+              <div className="relative">
+                <item.icon className="h-6 w-6" />
+                {item.name === "Chat" && totalUnreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-medium shadow-lg">
+                    {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
+                  </span>
+                )}
+              </div>
+              <span className="text-xs mt-1">{item.name}</span>
+            </Link>
+          ))}
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className={`flex-1 flex flex-col items-center py-2 px-1 transition-colors ${
+              showMobileMenu ? "text-white" : "text-white/70"
             }`}
           >
-            <item.icon className="h-6 w-6 mb-1" />
-            <span className="text-xs font-medium">{item.name}</span>
-          </Link>
-        ))}
-      </nav>
-    </div>
+            <Menu className="h-6 w-6" />
+            <span className="text-xs mt-1">Menu</span>
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
