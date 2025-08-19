@@ -24,6 +24,8 @@ export const metadata: Metadata = {
   title: "IIT Connect - Campus Community Platform",
   description:
     "Connect with your IIT Ropar community - discussions, rides, games, and more",
+  viewport:
+    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
 };
 
 export default function RootLayout({

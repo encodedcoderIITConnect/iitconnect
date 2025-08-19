@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,6 +14,7 @@ import {
   User,
   LogOut,
   Menu,
+  MoreHorizontal,
   Home,
   BookOpen,
   Trophy,
@@ -24,7 +24,9 @@ import {
   Code,
   Gamepad2,
   Calendar,
-  Sidebar,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 // Extended User type for TypeScript
@@ -147,32 +149,34 @@ export default function Navbar() {
       >
         <div
           className={`transition-all duration-300 ${
-            isCollapsed ? "px-2 py-6" : "p-6"
+            isCollapsed ? "p-2" : "p-6"
           }`}
         >
           <div
             className={`flex items-center ${
-              isCollapsed ? "justify-center mb-8" : "justify-between mb-8"
+              isCollapsed ? "justify-center mb-4" : "justify-between mb-8"
             }`}
           >
             {!isCollapsed && (
               <Link href="/" className="block">
-                <Image
-                  src="/logo.png"
-                  alt="IIT Connect Logo"
-                  width={24}
-                  height={24}
-                  className="h-6 w-6"
-                />
+                <span className="text-2xl font-bold text-white princess-sofia-regular poppins-bold">
+                  IIT Connect
+                </span>
               </Link>
             )}
-            <button
+            <Button
               onClick={toggleSidebar}
-              className="flex items-center text-white/90 hover:text-white hover:bg-white/20 px-3 py-3 rounded-lg transition-colors"
+              variant="ghost"
+              size="sm"
+              className="text-white/90 hover:text-white hover:bg-white/20 p-2 h-8 w-8 rounded-lg transition-colors"
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <Sidebar className="h-6 w-6" />
-            </button>
+              {isCollapsed ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </Button>
           </div>
 
           <nav className="space-y-2">
@@ -181,7 +185,7 @@ export default function Navbar() {
                 key={item.name}
                 href={item.href}
                 className={`relative flex items-center ${
-                  isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
+                  isCollapsed ? "justify-center px-2 py-3" : "px-3 py-3"
                 } rounded-lg text-sm font-medium transition-colors ${
                   pathname === item.href
                     ? "bg-white/30 text-white backdrop-blur-sm"
@@ -214,39 +218,49 @@ export default function Navbar() {
 
             {/* User Profile Menu */}
             {session && (
-              <div ref={menuRef} className="relative">
+              <div className="relative" ref={menuRef}>
                 <button
                   onClick={() => setShowSignOutConfirm(!showSignOutConfirm)}
                   className={`w-full flex items-center ${
-                    isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
+                    isCollapsed ? "justify-center px-2 py-3" : "px-3 py-3"
                   } rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors`}
                   title={
-                    isCollapsed ? session.user?.name || "User" : "User Profile"
+                    isCollapsed
+                      ? session.user?.name || "User Profile"
+                      : undefined
                   }
                 >
-                  <Avatar className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}>
-                    <AvatarImage
-                      src={session.user?.image || "/default-avatar.png"}
-                      alt={session.user?.name || "User"}
-                    />
-                    <AvatarFallback>
-                      {session.user?.name
-                        ? session.user.name.charAt(0).toUpperCase()
-                        : "U"}
+                  <Avatar
+                    className={`${isCollapsed ? "h-6 w-6" : "h-6 w-6 mr-3"}`}
+                  >
+                    <AvatarImage src={session.user?.image || ""} />
+                    <AvatarFallback className="text-xs bg-white/30 text-white">
+                      {session.user?.name?.charAt(0)?.toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   {!isCollapsed && (
-                    <span className="flex-1 truncate">
-                      {session.user?.name}
-                    </span>
+                    <div className="flex-1 text-left">
+                      <div className="truncate text-white font-medium">
+                        {session.user?.name || "User"}
+                      </div>
+                      {(session.user as ExtendedUser)?.entryNo && (
+                        <div className="truncate text-white/60 text-xs">
+                          {(session.user as ExtendedUser).entryNo} •{" "}
+                          {(session.user as ExtendedUser).department?.split(
+                            " "
+                          )[0] || "Unknown"}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </button>
-                {/* User Dropdown Menu - Positioned right next to the menu item */}
+
+                {/* User Dropdown Menu - Positioned with aligned bottom borders */}
                 {showSignOutConfirm && (
                   <div
-                    className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu min-w-48 ${
+                    className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu ${
                       isCollapsed
-                        ? "left-full top-0 ml-2"
+                        ? "left-16 bottom-0 min-w-48"
                         : "bottom-full left-0 right-0 mb-2"
                     }`}
                   >
@@ -271,11 +285,11 @@ export default function Navbar() {
             )}
 
             {/* More Menu */}
-            <div ref={moreMenuRef} className="relative">
+            <div className="relative" ref={moreMenuRef}>
               <button
                 onClick={() => setShowMoreMenu(!showMoreMenu)}
                 className={`w-full flex items-center ${
-                  isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
+                  isCollapsed ? "justify-center px-2 py-3" : "px-3 py-3"
                 } rounded-lg text-sm font-medium transition-colors text-left ${
                   moreMenuItems.some((item) => pathname === item.href)
                     ? "bg-white/30 text-white backdrop-blur-sm"
@@ -286,12 +300,13 @@ export default function Navbar() {
                 <Menu className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`} />
                 {!isCollapsed && <span className="flex-1">More</span>}
               </button>
-              {/* More Menu Dropdown - Positioned right next to the menu item */}
+
+              {/* More Menu Dropdown - Positioned with aligned bottom borders */}
               {showMoreMenu && (
                 <div
-                  className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu min-w-48 ${
+                  className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu ${
                     isCollapsed
-                      ? "left-full top-0 ml-2"
+                      ? "left-16 bottom-0 min-w-48"
                       : "bottom-full left-0 right-0 mb-2"
                   }`}
                 >
@@ -406,44 +421,6 @@ export function RightSidebar() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-// Desktop Sidebar Component (for AuthGuard compatibility)
-export function DesktopSidebar() {
-  return <Navbar />;
-}
-
-// Mobile Bottom Navigation Component (for AuthGuard compatibility)
-export function MobileBottomNav() {
-  const pathname = usePathname();
-
-  const mobileNavItems = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "Chat", href: "/chat", icon: MessageCircle },
-    { name: "Library", href: "/library", icon: BookOpen },
-    { name: "More", href: "/discussions", icon: Menu },
-  ];
-
-  return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-teal-500 border-t border-white/30 z-50">
-      <nav className="flex justify-around items-center py-2">
-        {mobileNavItems.map((item) => (
-          <Link
-            key={item.name}
-            href={item.href}
-            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
-              pathname === item.href
-                ? "text-white"
-                : "text-white/70 hover:text-white"
-            }`}
-          >
-            <item.icon className="h-6 w-6 mb-1" />
-            <span className="text-xs font-medium">{item.name}</span>
-          </Link>
-        ))}
-      </nav>
     </div>
   );
 }

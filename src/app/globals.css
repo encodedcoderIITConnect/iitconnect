@@ -283,7 +283,75 @@ body {
 }
 
 .shimmer-dark {
-  background: linear-gradient(90deg, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.1) 75%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 25%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 75%
+  );
   background-size: 200px 100%;
   animation: shimmer 1.5s infinite;
+}
+
+/* Mobile Chat Optimizations */
+@media screen and (max-width: 768px) {
+  /* Prevent zoom on input focus for mobile */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="password"],
+  input[type="number"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="search"],
+  input[type="time"],
+  input[type="week"],
+  select,
+  textarea {
+    font-size: 16px !important;
+    transform-origin: center center;
+  }
+
+  /* Enhanced focus effect for chat input */
+  .chat-input:focus {
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+    border-color: #3b82f6 !important;
+    background: white;
+    transition: all 0.3s ease;
+  }
+}
+
+/* Prevent zoom globally on mobile */
+@media screen and (max-width: 768px) {
+  html {
+    touch-action: manipulation;
+  }
+
+  body {
+    overflow-x: hidden;
+    position: relative;
+  }
+}
+
+/* Sidebar collapsed state - ensure no text overflow */
+.sidebar-collapsed {
+  overflow: visible !important;
+}
+
+.sidebar-collapsed .sidebar-text {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Force hide text in collapsed sidebar */
+.sidebar-collapsed button .sidebar-text,
+.sidebar-collapsed a .sidebar-text {
+  display: none !important;
+  visibility: hidden !important;
 }

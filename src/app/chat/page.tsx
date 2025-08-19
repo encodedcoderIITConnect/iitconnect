@@ -560,8 +560,8 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600">
-      <div className="h-[calc(100vh-60px)] md:h-screen p-2 md:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 md:relative fixed inset-0 md:inset-auto overflow-hidden md:overflow-auto">
+      <div className="h-full md:h-screen p-2 md:p-4">
         {/* Chat Interface */}
         <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-xl overflow-hidden h-full flex">
           {/* Chat List Sidebar */}
@@ -622,6 +622,7 @@ export default function ChatPage() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-10 bg-white/70 border border-white/30 focus:bg-white focus:border-blue-300"
+                                style={{ fontSize: "16px" }}
                                 autoFocus
                               />
                             </div>
@@ -1092,11 +1093,10 @@ export default function ChatPage() {
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        className="pr-10 bg-white text-black !border-gray-300 focus:!border-gray-300 focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="chat-input pr-10 bg-white text-black !border-gray-300 focus:!border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg focus-visible:ring-2 focus-visible:ring-blue-500/20 focus-visible:ring-offset-0 transition-all duration-200 text-base md:text-sm"
                         style={{
                           borderColor: "#d1d5db !important",
-                          boxShadow: "none !important",
-                          outline: "none !important",
+                          fontSize: "16px", // Prevents zoom on iOS
                         }}
                         disabled={sending}
                       />
