@@ -25,6 +25,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
 
 // Extended User type for TypeScript
@@ -37,7 +38,15 @@ interface ExtendedUser {
   department?: string;
 }
 
-const navigation = [
+// Navigation item type
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isSpecial?: boolean;
+}
+
+const navigation: NavigationItem[] = [
   { name: "Home", href: "/", icon: Home },
   { name: "Library", href: "/library", icon: BookOpen },
   { name: "Chat", href: "/chat", icon: MessageCircle },
@@ -45,6 +54,12 @@ const navigation = [
   { name: "Departments", href: "/departments", icon: GraduationCap },
   { name: "Lost & Found", href: "/lost-found", icon: Search },
   { name: "Discussions", href: "/discussions", icon: Users },
+  {
+    name: "Join Dev Team",
+    href: "/join-dev-team",
+    icon: AlertTriangle,
+    isSpecial: true,
+  },
 ];
 
 const moreMenuItems = [
@@ -185,7 +200,9 @@ export default function Navbar() {
                   key={item.name}
                   href={item.href}
                   className={`relative flex items-center rounded-lg text-sm font-medium transition-colors min-h-[48px] pl-4 mx-2 ${
-                    pathname === item.href
+                    item.isSpecial
+                      ? "bg-red-600 hover:bg-red-700 text-white shadow-lg"
+                      : pathname === item.href
                       ? "bg-white/30 text-white backdrop-blur-sm"
                       : "text-white/90 hover:bg-white/20 hover:text-white"
                   }`}
@@ -193,7 +210,11 @@ export default function Navbar() {
                 >
                   {/* Fixed icon position - aligned with logo (16px from left) */}
                   <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
-                    <item.icon className="h-5 w-5" />
+                    <item.icon
+                      className={`h-5 w-5 ${
+                        item.isSpecial ? "text-white animate-pulse" : ""
+                      }`}
+                    />
                   </div>
 
                   {/* Text content - slides in from right */}
@@ -202,13 +223,31 @@ export default function Navbar() {
                       isCollapsed ? "w-0 opacity-0" : "w-full opacity-100"
                     }`}
                   >
-                    <span className="whitespace-nowrap pl-2">{item.name}</span>
+                    <span
+                      className={`whitespace-nowrap pl-2 ${
+                        item.isSpecial ? "font-semibold" : ""
+                      }`}
+                    >
+                      {item.name}
+                      {item.isSpecial && !isCollapsed && (
+                        <span className="ml-2 text-xs bg-yellow-400 text-red-900 px-2 py-1 rounded-full font-bold animate-pulse">
+                          NEW!
+                        </span>
+                      )}
+                    </span>
                     {item.name === "Chat" && totalUnreadCount > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg mr-3">
                         {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
                       </span>
                     )}
                   </div>
+
+                  {/* Special badge for join dev team in collapsed state */}
+                  {isCollapsed && item.isSpecial && (
+                    <span className="absolute -top-1 -right-1 bg-yellow-400 text-red-900 text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-bold shadow-lg animate-pulse">
+                      !
+                    </span>
+                  )}
 
                   {/* Collapsed state notification badge */}
                   {isCollapsed &&

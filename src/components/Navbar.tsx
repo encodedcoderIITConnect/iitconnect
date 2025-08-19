@@ -28,19 +28,18 @@ import {
   Info,
   X,
   Building,
+  AlertTriangle,
 } from "lucide-react";
 
-// Extended User type for TypeScript
-interface ExtendedUser {
-  id?: string;
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-  entryNo?: string;
-  department?: string;
+// Navigation item type
+interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  isSpecial?: boolean;
 }
 
-const navigation = [
+const navigation: NavigationItem[] = [
   { name: "Home", href: "/", icon: Home },
   { name: "Library", href: "/library", icon: BookOpen },
   { name: "Chat", href: "/chat", icon: MessageCircle },
@@ -48,6 +47,12 @@ const navigation = [
   { name: "Departments", href: "/departments", icon: GraduationCap },
   { name: "Lost & Found", href: "/lost-found", icon: Search },
   { name: "Discussions", href: "/discussions", icon: Users },
+  {
+    name: "Join Dev Team",
+    href: "/join-dev-team",
+    icon: AlertTriangle,
+    isSpecial: true,
+  },
 ];
 
 const moreMenuItems = [
@@ -200,24 +205,45 @@ export default function Navbar() {
                 className={`relative flex items-center ${
                   isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
                 } rounded-lg text-sm font-medium transition-colors ${
-                  pathname === item.href
+                  item.isSpecial
+                    ? "bg-red-600 hover:bg-red-700 text-white shadow-lg"
+                    : pathname === item.href
                     ? "bg-white/30 text-white backdrop-blur-sm"
                     : "text-white/90 hover:bg-white/20 hover:text-white"
                 }`}
                 title={isCollapsed ? item.name : undefined}
               >
                 <item.icon
-                  className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}
+                  className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""} ${
+                    item.isSpecial ? "animate-pulse" : ""
+                  }`}
                 />
                 {textVisible && (
                   <>
-                    <span className="flex-1">{item.name}</span>
+                    <span
+                      className={`flex-1 ${
+                        item.isSpecial ? "font-semibold" : ""
+                      }`}
+                    >
+                      {item.name}
+                      {item.isSpecial && (
+                        <span className="ml-2 text-xs bg-yellow-400 text-red-900 px-2 py-1 rounded-full font-bold animate-pulse">
+                          NEW!
+                        </span>
+                      )}
+                    </span>
                     {item.name === "Chat" && totalUnreadCount > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
                         {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
                       </span>
                     )}
                   </>
+                )}
+                {/* Special badge for join dev team in collapsed state */}
+                {isCollapsed && item.isSpecial && (
+                  <span className="absolute -top-1 -right-1 bg-yellow-400 text-red-900 text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-bold shadow-lg animate-pulse">
+                    !
+                  </span>
                 )}
                 {isCollapsed &&
                   item.name === "Chat" &&
@@ -540,7 +566,9 @@ export function MobileBottomNav() {
                     href={item.href}
                     onClick={() => setShowMobileMenu(false)}
                     className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 transform ${
-                      pathname === item.href
+                      item.isSpecial
+                        ? "bg-red-600 hover:bg-red-700 text-white shadow-lg scale-105"
+                        : pathname === item.href
                         ? "bg-white/30 text-white backdrop-blur-sm scale-105 shadow-lg"
                         : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
                     }`}
@@ -551,8 +579,23 @@ export function MobileBottomNav() {
                         : "none",
                     }}
                   >
-                    <item.icon className="h-6 w-6 mr-4 flex-shrink-0" />
-                    <span className="truncate flex-1">{item.name}</span>
+                    <item.icon
+                      className={`h-6 w-6 mr-4 flex-shrink-0 ${
+                        item.isSpecial ? "animate-pulse" : ""
+                      }`}
+                    />
+                    <span
+                      className={`truncate flex-1 ${
+                        item.isSpecial ? "font-semibold" : ""
+                      }`}
+                    >
+                      {item.name}
+                      {item.isSpecial && (
+                        <span className="ml-2 text-xs bg-yellow-400 text-red-900 px-2 py-1 rounded-full font-bold animate-pulse">
+                          NEW!
+                        </span>
+                      )}
+                    </span>
                     {item.name === "Chat" && totalUnreadCount > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
                         {totalUnreadCount > 99 ? "99+" : totalUnreadCount}

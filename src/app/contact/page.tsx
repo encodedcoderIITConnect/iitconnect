@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Clock, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Clock, Send, Users } from "lucide-react";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -237,9 +237,18 @@ export default function ContactPage() {
                   How do I join the development team?
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 text-sm">
-                  Contact us with your portfolio and areas of interest.
-                  We&apos;re always looking for contributors!
+                  Simply send us an email with your skills and interest!
+                  We&apos;re always looking for enthusiastic contributors.
                 </p>
+                <div className="mt-4">
+                  <a
+                    href="/join-dev-team"
+                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 transition-colors"
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    Become Part of the Devs Team
+                  </a>
+                </div>
               </div>
 
               <div className="space-y-3">
