@@ -25,6 +25,10 @@ import {
   Gamepad2,
   Calendar,
   Sidebar,
+  Download,
+  HelpCircle,
+  Mail,
+  Info,
 } from "lucide-react";
 
 // Extended User type for TypeScript
@@ -48,10 +52,11 @@ const navigation = [
 ];
 
 const moreMenuItems = [
-  { name: "Coding", href: "/coding", icon: Code },
-  { name: "Games", href: "/games", icon: Gamepad2 },
-  { name: "Projects", href: "/projects", icon: Calendar },
+  { name: "Download Forms", href: "/download-forms", icon: Download },
+  { name: "Helpdesk", href: "/helpdesk", icon: HelpCircle },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
+  { name: "Contact Us", href: "/contact", icon: Mail },
+  { name: "About Us", href: "/about", icon: Info },
 ];
 
 export default function Navbar() {
