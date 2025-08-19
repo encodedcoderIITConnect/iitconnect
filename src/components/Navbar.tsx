@@ -709,7 +709,7 @@ export function MobileBottomNav() {
                   </span>
                 )}
               </div>
-              <span className="text-xs mt-1">{item.name}</span>
+              <span className="sr-only">{item.name}</span>
             </Link>
           ))}
           <button
@@ -719,7 +719,7 @@ export function MobileBottomNav() {
             }`}
           >
             <Menu className="h-6 w-6" />
-            <span className="text-xs mt-1">Menu</span>
+            <span className="sr-only">Menu</span>
           </button>
         </div>
       </div>

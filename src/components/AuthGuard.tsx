@@ -107,6 +107,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   }
 
   // User is authenticated, show the protected content with sidebar
+  const isChat = pathname === "/chat";
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -120,8 +122,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         <main className="min-h-screen">{children}</main>
       </div>
 
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
+      {/* Mobile Bottom Navigation - Hidden on chat page */}
+      {!isChat && <MobileBottomNav />}
     </div>
   );
 }

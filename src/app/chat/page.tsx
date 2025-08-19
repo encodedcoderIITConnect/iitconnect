@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,11 +15,11 @@ import {
   Smile,
   Paperclip,
   Users,
-  ArrowLeft,
   Plus,
   Search,
   X,
   Trash2,
+  ChevronLeft,
 } from "lucide-react";
 
 interface Message {
@@ -67,6 +67,7 @@ interface User {
 export default function ChatPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState("");
   const [showChatList, setShowChatList] = useState(true);
@@ -561,9 +562,9 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 md:relative fixed inset-0 md:inset-auto overflow-hidden md:overflow-auto z-10">
-      <div className="h-full md:h-screen p-2 md:p-4 pb-24 md:pb-4">
+      <div className="h-full md:h-screen p-0 md:p-4">
         {/* Chat Interface */}
-        <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-xl overflow-hidden h-full flex">
+        <div className="bg-white md:bg-white/70 md:backdrop-blur-xl md:border md:border-white/40 md:rounded-2xl md:shadow-xl overflow-hidden h-full flex">
           {/* Chat List Sidebar */}
           <div
             className={`${
@@ -573,7 +574,17 @@ export default function ChatPage() {
             {/* Header */}
             <div className="p-4 border-b border-white/30 relative">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+                {/* Mobile Back Button */}
+                <button
+                  onClick={() => router.back()}
+                  className="lg:hidden flex items-center text-gray-900 hover:text-blue-600 transition-colors mr-4"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                  <span className="font-medium">Messages</span>
+                </button>
+
+                {/* Desktop Header */}
+                <h2 className="text-xl font-semibold text-gray-900 items-center hidden lg:flex">
                   <MessageCircle className="h-6 w-6 mr-2 text-blue-600" />
                   Chats
                 </h2>
@@ -912,40 +923,44 @@ export default function ChatPage() {
                     {/* Back button for mobile */}
                     <button
                       onClick={handleBackToChats}
-                      className="md:hidden mr-3 p-1 hover:bg-white/20 rounded-full transition-colors"
+                      className="md:hidden text-blue-500 font-bold text-2xl p-2 mr-2"
                     >
-                      <ArrowLeft className="h-5 w-5 text-gray-700" />
-                    </button>
-
-                    <div className="relative">
-                      <Image
-                        src={selectedChatData.avatar}
-                        alt={selectedChatData.name}
-                        width={40}
-                        height={40}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                      {selectedChatData.isOnline && (
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                      )}
-                    </div>
-                    <div className="ml-3">
-                      <p className="font-medium text-gray-900">
-                        {selectedChatData.name}
-                      </p>
-                      <p className="text-sm text-gray-600 flex items-center gap-2">
-                        {selectedChatData.type === "group"
-                          ? `${selectedChatData.participants?.length} members`
-                          : selectedChatData.isOnline
-                          ? "Online"
-                          : "Last seen recently"}
-                        {isPolling && (
-                          <div className="flex items-center gap-1">
-                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-                            <span className="text-xs text-blue-600">Live</span>
-                          </div>
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>{" "}
+                    {/* Combined Header for mobile and desktop */}
+                    <div className="flex items-center">
+                      <div className="relative">
+                        <Image
+                          src={selectedChatData.avatar}
+                          alt={selectedChatData.name}
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        {selectedChatData.isOnline && (
+                          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                         )}
-                      </p>
+                      </div>
+                      <div className="ml-3">
+                        <p className="font-medium text-gray-900">
+                          {selectedChatData.name}
+                        </p>
+                        <p className="text-sm text-gray-600 flex items-center gap-2">
+                          {selectedChatData.type === "group"
+                            ? `${selectedChatData.participants?.length} members`
+                            : selectedChatData.isOnline
+                            ? "Online"
+                            : "Last seen recently"}
+                          {isPolling && (
+                            <div className="flex items-center gap-1">
+                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
+                              <span className="text-xs text-blue-600">
+                                Live
+                              </span>
+                            </div>
+                          )}
+                        </p>
+                      </div>
                     </div>
                   </div>
 
