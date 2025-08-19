@@ -64,8 +64,18 @@ export default function Navbar() {
   const moreMenuRef = useRef<HTMLDivElement>(null);
   const { totalUnreadCount } = useUnreadCount();
   const { isCollapsed, toggleSidebar } = useSidebar();
+  const [textVisible, setTextVisible] = useState(!isCollapsed);
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isCollapsed) {
+      setTextVisible(false);
+    } else {
+      timer = setTimeout(() => {
+        setTextVisible(true);
+      }, 200); // delay to match transition
+    }
+
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setShowSignOutConfirm(false);
@@ -79,10 +89,12 @@ export default function Navbar() {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
+      clearTimeout(timer);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isCollapsed]);
 
   const handleSignOut = async () => {
     try {
@@ -155,7 +167,7 @@ export default function Navbar() {
               isCollapsed ? "justify-center mb-8" : "justify-between mb-8"
             }`}
           >
-            {!isCollapsed && (
+            {textVisible && (
               <Link href="/" className="block">
                 <Image
                   src="/logo.png"
@@ -192,7 +204,7 @@ export default function Navbar() {
                 <item.icon
                   className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}
                 />
-                {!isCollapsed && (
+                {textVisible && (
                   <>
                     <span className="flex-1">{item.name}</span>
                     {item.name === "Chat" && totalUnreadCount > 0 && (
@@ -217,7 +229,7 @@ export default function Navbar() {
               <div ref={menuRef} className="relative">
                 <button
                   onClick={() => setShowSignOutConfirm(!showSignOutConfirm)}
-                  className={`w-full flex items-center ${
+                  className={`w-full flex items-center text-left ${
                     isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
                   } rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors`}
                   title={
@@ -235,7 +247,7 @@ export default function Navbar() {
                         : "U"}
                     </AvatarFallback>
                   </Avatar>
-                  {!isCollapsed && (
+                  {textVisible && (
                     <span className="flex-1 truncate">
                       {session.user?.name}
                     </span>
@@ -284,7 +296,7 @@ export default function Navbar() {
                 title={isCollapsed ? "More Options" : undefined}
               >
                 <Menu className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`} />
-                {!isCollapsed && <span className="flex-1">More</span>}
+                {textVisible && <span className="flex-1">More</span>}
               </button>
               {/* More Menu Dropdown - Positioned right next to the menu item */}
               {showMoreMenu && (
