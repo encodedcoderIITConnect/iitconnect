@@ -560,8 +560,8 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 md:relative fixed inset-0 md:inset-auto overflow-hidden md:overflow-auto">
-      <div className="h-full md:h-screen p-2 md:p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 md:relative fixed inset-0 md:inset-auto overflow-hidden md:overflow-auto z-10">
+      <div className="h-full md:h-screen p-2 md:p-4 pb-24 md:pb-4">
         {/* Chat Interface */}
         <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-xl overflow-hidden h-full flex">
           {/* Chat List Sidebar */}
@@ -591,12 +591,12 @@ export default function ChatPage() {
                     <>
                       {/* Backdrop */}
                       <div
-                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 animate-in fade-in-0 duration-200"
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[55] animate-in fade-in-0 duration-200"
                         onClick={() => setShowNewChatModal(false)}
                       />
 
                       {/* Modal Container - Centered */}
-                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                      <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
                         <div className="w-full max-w-md bg-white/95 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-4 fade-in-0 duration-300 scale-in-95">
                           {/* Modal Header */}
                           <div className="p-6 border-b border-white/30 flex items-center justify-between">
@@ -1136,7 +1136,7 @@ export default function ChatPage() {
 
       {/* Delete Chat Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
           <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Delete Chat

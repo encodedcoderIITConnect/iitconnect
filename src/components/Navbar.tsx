@@ -691,13 +691,13 @@ export function MobileBottomNav() {
       )}
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-teal-500 border-t border-white/30 z-50 lg:hidden">
-        <div className="flex">
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-teal-500 border-t border-white/30 z-50 lg:hidden pb-safe">
+        <div className="flex pb-6">
           {mobileNavItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className={`flex-1 flex flex-col items-center py-2 px-1 ${
+              className={`flex-1 flex flex-col items-center py-4 px-1 ${
                 pathname === item.href ? "text-white" : "text-white/70"
               }`}
             >
@@ -714,7 +714,7 @@ export function MobileBottomNav() {
           ))}
           <button
             onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className={`flex-1 flex flex-col items-center py-2 px-1 transition-colors ${
+            className={`flex-1 flex flex-col items-center py-4 px-1 transition-colors ${
               showMobileMenu ? "text-white" : "text-white/70"
             }`}
           >
