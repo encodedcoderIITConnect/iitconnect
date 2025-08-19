@@ -246,7 +246,7 @@ export default function Navbar() {
                   <div
                     className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu min-w-48 ${
                       isCollapsed
-                        ? "left-full top-0 ml-2"
+                        ? "left-full bottom-0 ml-2"
                         : "bottom-full left-0 right-0 mb-2"
                     }`}
                   >
@@ -291,7 +291,7 @@ export default function Navbar() {
                 <div
                   className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu min-w-48 ${
                     isCollapsed
-                      ? "left-full top-0 ml-2"
+                      ? "left-full bottom-0 ml-2"
                       : "bottom-full left-0 right-0 mb-2"
                   }`}
                 >
