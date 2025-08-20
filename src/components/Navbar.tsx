@@ -42,7 +42,7 @@ interface NavigationItem {
 const navigation: NavigationItem[] = [
   { name: "Home", href: "/", icon: Home },
   { name: "Library", href: "/library", icon: BookOpen },
-  { name: "Chat", href: "/chat", icon: MessageCircle },
+  { name: "Messages", href: "/chat", icon: MessageCircle },
   { name: "Clubs", href: "/clubs", icon: Trophy },
   { name: "Departments", href: "/departments", icon: GraduationCap },
   { name: "Lost & Found", href: "/lost-found", icon: Search },
@@ -232,7 +232,7 @@ export default function Navbar() {
                         </span>
                       )}
                     </span>
-                    {item.name === "Chat" && totalUnreadCount > 0 && (
+                    {item.name === "Messages" && totalUnreadCount > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
                         {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
                       </span>
@@ -246,7 +246,7 @@ export default function Navbar() {
                   </span>
                 )}
                 {isCollapsed &&
-                  item.name === "Chat" &&
+                  item.name === "Messages" &&
                   totalUnreadCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-medium shadow-lg">
                       {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
@@ -514,7 +514,7 @@ export function MobileBottomNav() {
 
   const mobileNavItems = [
     { name: "Home", href: "/", icon: Home },
-    { name: "Chat", href: "/chat", icon: MessageCircle },
+    { name: "Messages", href: "/chat", icon: MessageCircle },
     {
       name: "Profile",
       href: `/user/${session?.user?.email?.split("@")[0]}`,
@@ -596,7 +596,7 @@ export function MobileBottomNav() {
                         </span>
                       )}
                     </span>
-                    {item.name === "Chat" && totalUnreadCount > 0 && (
+                    {item.name === "Messages" && totalUnreadCount > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
                         {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
                       </span>
@@ -703,7 +703,7 @@ export function MobileBottomNav() {
             >
               <div className="relative">
                 <item.icon className="h-6 w-6" />
-                {item.name === "Chat" && totalUnreadCount > 0 && (
+                {item.name === "Messages" && totalUnreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-medium shadow-lg">
                     {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
                   </span>

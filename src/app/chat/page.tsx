@@ -20,6 +20,8 @@ import {
   X,
   Trash2,
   ChevronLeft,
+  Archive,
+  CheckCheck,
 } from "lucide-react";
 
 interface Message {
@@ -89,12 +91,15 @@ export default function ChatPage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
     null
   );
+  const [openChatListMenu, setOpenChatListMenu] = useState<string | null>(null);
+  const [openChatHeaderMenu, setOpenChatHeaderMenu] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [totalUnreadCount, setTotalUnreadCount] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const chatPollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const chatMenuRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -306,7 +311,30 @@ export default function ChatPage() {
 
   // Cleanup polling on component unmount
   useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Chat list menu
+      if (openChatListMenu) {
+        const menuElement = chatMenuRefs.current[openChatListMenu];
+        if (menuElement && !menuElement.contains(event.target as Node)) {
+          setOpenChatListMenu(null);
+        }
+      }
+      // Chat header menu
+      if (openChatHeaderMenu) {
+        const headerMenuElement = chatMenuRefs.current["header-menu"]; // Use a fixed key for header
+        if (
+          headerMenuElement &&
+          !headerMenuElement.contains(event.target as Node)
+        ) {
+          setOpenChatHeaderMenu(false);
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
       if (pollingIntervalRef.current) {
         clearInterval(pollingIntervalRef.current);
       }
@@ -314,7 +342,7 @@ export default function ChatPage() {
         clearInterval(chatPollingIntervalRef.current);
       }
     };
-  }, []);
+  }, [openChatListMenu, openChatHeaderMenu]);
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedChat || sending) return;
@@ -434,6 +462,12 @@ export default function ChatPage() {
 
   const cancelDeleteChat = () => {
     setShowDeleteConfirm(null);
+  };
+
+  // Mark chat as read from menu
+  const handleMarkAsReadFromMenu = async (chatId: string) => {
+    await markChatAsRead(chatId);
+    setOpenChatListMenu(null);
   };
 
   const selectedChatData = chats.find((chat) => chat.id === selectedChat);
@@ -586,7 +620,7 @@ export default function ChatPage() {
                 {/* Desktop Header */}
                 <h2 className="text-xl font-semibold text-gray-900 items-center hidden lg:flex">
                   <MessageCircle className="h-6 w-6 mr-2 text-blue-600" />
-                  Chats
+                  Messages
                 </h2>
                 <div className="relative">
                   <Button
@@ -810,7 +844,7 @@ export default function ChatPage() {
                 chats.map((chat) => (
                   <div
                     key={chat.id}
-                    className={`p-4 border-b border-white/20 hover:bg-white/50 transition-colors group ${
+                    className={`p-4 border-b border-white/20 hover:bg-white/50 transition-colors group relative ${
                       selectedChat === chat.id
                         ? "bg-white/60 border-r-2 border-r-blue-500"
                         : ""
@@ -822,10 +856,10 @@ export default function ChatPage() {
                   >
                     <div className="flex items-center">
                       <div
-                        className="flex items-center flex-1 cursor-pointer"
+                        className="flex items-center flex-1 min-w-0 cursor-pointer pr-2"
                         onClick={() => handleChatSelect(chat.id)}
                       >
-                        <div className="relative">
+                        <div className="relative flex-shrink-0">
                           <Image
                             src={chat.avatar}
                             alt={chat.name}
@@ -854,14 +888,14 @@ export default function ChatPage() {
                             >
                               {chat.name}
                             </p>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
                               {chat.lastMessageTime}
                             </span>
                           </div>
 
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center">
                             <p
-                              className={`text-sm truncate ${
+                              className={`text-sm truncate flex-1 ${
                                 chat.unreadCount > 0
                                   ? "text-gray-900 font-semibold"
                                   : "text-gray-500"
@@ -873,7 +907,7 @@ export default function ChatPage() {
                               {chat.lastMessage}
                             </p>
                             {chat.type === "group" && (
-                              <Users className="h-4 w-4 text-gray-400 shrink-0 ml-1" />
+                              <Users className="h-4 w-4 text-gray-400 flex-shrink-0 ml-1" />
                             )}
                           </div>
 
@@ -885,23 +919,65 @@ export default function ChatPage() {
                         </div>
                       </div>
 
-                      {/* Delete button - appears on hover on desktop, always visible on mobile */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity ml-2 text-red-500 hover:text-red-700 hover:bg-red-50"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          confirmDeleteChat(chat.id);
+                      {/* Three dots menu - Fixed position */}
+                      <div
+                        className="relative flex-shrink-0"
+                        ref={(el) => {
+                          chatMenuRefs.current[chat.id] = el;
                         }}
-                        disabled={deletingChatId === chat.id}
                       >
-                        {deletingChatId === chat.id ? (
-                          <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity text-gray-500 hover:text-gray-700 hover:bg-gray-100 w-8 h-8 p-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenChatListMenu(
+                              openChatListMenu === chat.id ? null : chat.id
+                            );
+                          }}
+                        >
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+
+                        {/* Dropdown Menu */}
+                        {openChatListMenu === chat.id && (
+                          <div className="absolute right-0 top-full mt-1 w-48 bg-white/95 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg py-1 z-50">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkAsReadFromMenu(chat.id);
+                              }}
+                              className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                              disabled={chat.unreadCount === 0}
+                            >
+                              <CheckCheck className="h-4 w-4 mr-3 text-green-600" />
+                              Mark as Read
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenChatListMenu(null);
+                                confirmDeleteChat(chat.id);
+                              }}
+                              className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                              disabled={deletingChatId === chat.id}
+                            >
+                              {deletingChatId === chat.id ? (
+                                <>
+                                  <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin mr-3" />
+                                  Deleting...
+                                </>
+                              ) : (
+                                <>
+                                  <Trash2 className="h-4 w-4 mr-3" />
+                                  Delete
+                                </>
+                              )}
+                            </button>
+                          </div>
                         )}
-                      </Button>
+                      </div>
                     </div>
                   </div>
                 ))
@@ -950,58 +1026,89 @@ export default function ChatPage() {
                             ? `${selectedChatData.participants?.length} members`
                             : selectedChatData.isOnline
                             ? "Online"
-                            : "Last seen recently"}
-                          {isPolling && (
-                            <div className="flex items-center gap-1">
-                              <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse"></div>
-                              <span className="text-xs text-blue-600">
-                                Live
-                              </span>
-                            </div>
-                          )}
+                            : ""}
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-600 hover:text-blue-600 hidden sm:flex"
+                    <div
+                      className="relative"
+                      ref={(el) => {
+                        chatMenuRefs.current["header-menu"] = el;
+                      }}
                     >
-                      <Phone className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-600 hover:text-blue-600 hidden sm:flex"
-                    >
-                      <Video className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-600 hover:text-red-600"
-                      onClick={() =>
-                        selectedChat && confirmDeleteChat(selectedChat)
-                      }
-                      title="Delete Chat"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-600 hover:text-blue-600"
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-gray-600 hover:text-blue-600"
+                        onClick={() => setOpenChatHeaderMenu((prev) => !prev)}
+                      >
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                      {/* Dropdown Menu for chat header */}
+                      {openChatHeaderMenu && (
+                        <div className="absolute right-0 top-full mt-1 w-48 bg-white/95 backdrop-blur-xl border border-white/40 rounded-lg shadow-lg py-1 z-50">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (selectedChat) {
+                                handleMarkAsReadFromMenu(selectedChat);
+                              }
+                              setOpenChatHeaderMenu(false);
+                            }}
+                            className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            disabled={selectedChatData?.unreadCount === 0}
+                          >
+                            <CheckCheck className="h-4 w-4 mr-3 text-green-600" />
+                            Mark as Read
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenChatHeaderMenu(false);
+                              if (selectedChat) {
+                                confirmDeleteChat(selectedChat);
+                              }
+                            }}
+                            className="w-full flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                            disabled={deletingChatId === selectedChat}
+                          >
+                            {deletingChatId === selectedChat ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin mr-3" />
+                                Deleting...
+                              </>
+                            ) : (
+                              <>
+                                <Trash2 className="h-4 w-4 mr-3" />
+                                Delete
+                              </>
+                            )}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenChatHeaderMenu(false);
+                              handleBackToChats();
+                            }}
+                            className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                          >
+                            <ChevronLeft className="h-4 w-4 mr-3 text-gray-600" />
+                            Close Chat
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-2 md:p-4 space-y-4">
+                {/* Messages - Fill container to bottom, gradient background */}
+                <div
+                  className="flex-1 overflow-y-auto p-2 md:p-4 space-y-4"
+                  style={{ paddingBottom: "100px" }}
+                >
                   {loadingMessages ? (
                     <div className="space-y-4">
                       {/* Skeleton loading for messages */}
@@ -1090,48 +1197,36 @@ export default function ChatPage() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message Input */}
-                <div className="p-2 md:p-4 border-t border-white/30 bg-white/70 backdrop-blur-xl">
-                  <div className="flex items-center gap-1 md:gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-gray-600 hover:text-blue-600 hidden sm:flex"
-                    >
-                      <Paperclip className="h-4 w-4" />
-                    </Button>
-
-                    <div className="flex-1 relative">
+                {/* Message Input - Redesigned */}
+                <div
+                  className="relative flex items-center justify-center py-4 px-2 md:px-6 bg-transparent"
+                  style={{ minHeight: "72px", marginBottom: "24px" }}
+                >
+                  <div
+                    className="absolute left-0 right-0 mx-auto bottom-6 md:bottom-6 w-full max-w-2xl flex items-center justify-center pointer-events-none"
+                    style={{ bottom: "24px" }}
+                  >
+                    <div className="flex w-full items-center gap-2 pointer-events-auto">
                       <Input
                         ref={inputRef}
                         placeholder="Type a message..."
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyPress={handleKeyPress}
-                        className="chat-input pr-10 bg-white text-black !border-gray-300 focus:!border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:shadow-lg focus-visible:ring-2 focus-visible:ring-blue-500/20 focus-visible:ring-offset-0 transition-all duration-200 text-base md:text-sm"
-                        style={{
-                          borderColor: "#d1d5db !important",
-                          fontSize: "16px", // Prevents zoom on iOS
-                        }}
+                        className="rounded-full bg-white text-black border border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-lg transition-all duration-200 text-base px-6 py-3 flex-1 ml-2 md:ml-0"
+                        style={{ fontSize: "16px" }}
                         disabled={sending}
                       />
                       <Button
-                        variant="ghost"
+                        onClick={handleSendMessage}
+                        disabled={!newMessage.trim() || sending}
                         size="sm"
-                        className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-600 hover:text-blue-600 hidden sm:flex"
+                        className="rounded-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-5 py-3 flex items-center justify-center shadow-lg mr-2 md:mr-0"
+                        style={{ minWidth: "48px", minHeight: "48px" }}
                       >
-                        <Smile className="h-4 w-4" />
+                        <Send className="h-5 w-5" />
                       </Button>
                     </div>
-
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!newMessage.trim() || sending}
-                      size="sm"
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-                    >
-                      <Send className="h-4 w-4" />
-                    </Button>
                   </div>
                 </div>
               </>
