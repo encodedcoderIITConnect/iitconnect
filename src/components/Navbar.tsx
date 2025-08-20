@@ -317,7 +317,7 @@ export default function Navbar() {
             <div ref={moreMenuRef} className="relative">
               <button
                 onClick={() => setShowMoreMenu(!showMoreMenu)}
-                className={`w-full flex items-center ${
+                className={`w-full flex items-center relative ${
                   isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
                 } rounded-lg text-sm font-medium transition-colors text-left ${
                   moreMenuItems.some((item) => pathname === item.href)
@@ -326,7 +326,17 @@ export default function Navbar() {
                 }`}
                 title={isCollapsed ? "More Options" : undefined}
               >
-                <Menu className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`} />
+                <span className="relative inline-block">
+                  <Menu className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`} />
+                  {/* Blinking red dot for mobile only, overlays the icon */}
+                  <span
+                    className="absolute z-20 w-3.5 h-3.5 rounded-full bg-red-500 border-2 border-white animate-blink block md:hidden"
+                    style={{
+                      top: "-8px",
+                      right: "-8px",
+                    }}
+                  />
+                </span>
                 {textVisible && <span className="flex-1">More</span>}
               </button>
               {/* More Menu Dropdown - Positioned right next to the menu item */}
@@ -718,7 +728,10 @@ export function MobileBottomNav() {
               showMobileMenu ? "text-white" : "text-white/70"
             }`}
           >
-            <Menu className="h-6 w-6" />
+            <div className="relative">
+              <Menu className="h-6 w-6" />
+              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse z-10 border-2 border-white"></span>
+            </div>
             <span className="sr-only">Menu</span>
           </button>
         </div>
