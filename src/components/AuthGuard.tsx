@@ -6,6 +6,7 @@ import { ReactNode } from "react";
 import { signIn } from "next-auth/react";
 import Navbar, { MobileBottomNav } from "@/components/Navbar";
 import { useSidebar } from "@/hooks/useSidebar";
+import Image from "next/image";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -28,8 +29,17 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       <div className="min-h-screen bg-gradient-to-br from-blue-600 to-teal-500 flex items-center justify-center">
         <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-6 shadow-2xl">
           <div className="poppins-regular text-gray-900 text-lg">
-            Loading...
+            <Image
+              src="/logo.png"
+              alt="IIT Connect Logo"
+              width={100}
+              height={100}
+              className="mx-auto"
+            />
           </div>
+          <p className="poppins-regular text-gray-900 text-lg text-center mt-5">
+            Welcome to IIT Connect!
+          </p>
         </div>
       </div>
     );
