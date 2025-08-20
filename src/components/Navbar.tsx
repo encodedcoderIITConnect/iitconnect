@@ -29,6 +29,7 @@ import {
   X,
   Building,
   AlertTriangle,
+  Gamepad2,
 } from "lucide-react";
 
 // Navigation item type
@@ -58,6 +59,7 @@ const navigation: NavigationItem[] = [
 const moreMenuItems = [
   { name: "Download Forms", href: "/download-forms", icon: Download },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
+  { name: "Games", href: "/games", icon: Gamepad2 },
   { name: "Hostels & Guest House", href: "/hostels", icon: Building },
   { name: "HelpDesk", href: "/helpdesk", icon: HelpCircle },
   { name: "Contact Us", href: "/contact", icon: Mail },

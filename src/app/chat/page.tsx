@@ -10,18 +10,13 @@ import "./blink.css";
 import {
   MessageCircle,
   Send,
-  Phone,
-  Video,
   MoreVertical,
-  Smile,
-  Paperclip,
   Users,
   Plus,
   Search,
   X,
   Trash2,
   ChevronLeft,
-  Archive,
   CheckCheck,
 } from "lucide-react";
 
@@ -88,6 +83,7 @@ export default function ChatPage() {
   const [error, setError] = useState<string | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [lastMessageTime, setLastMessageTime] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isPolling, setIsPolling] = useState(false);
   const [deletingChatId, setDeletingChatId] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(

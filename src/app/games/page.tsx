@@ -1,177 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Gamepad2, Users, MapPin, Clock, Star } from "lucide-react";
-
-interface Game {
-  id: string;
-  name: string;
-  type: "physical" | "video";
-  availability: "available" | "occupied" | "maintenance";
-  location: string;
-  maxPlayers: number;
-  currentPlayers: number;
-  rating: number;
-  description: string;
-  image: string;
-  organizer: {
-    name: string;
-    avatar: string;
-  };
-  scheduledTime?: string;
-  tags: string[];
-}
+import { Gamepad2 } from "lucide-react";
 
 export default function GamesPage() {
   const { data: session } = useSession();
-
-  // Sample games data
-  const [games] = useState<Game[]>([
-    {
-      id: "1",
-      name: "Badminton Court 1",
-      type: "physical",
-      availability: "available",
-      location: "Sports Complex",
-      maxPlayers: 4,
-      currentPlayers: 2,
-      rating: 4.8,
-      description: "Professional badminton court with good lighting",
-      image: "https://images.unsplash.com/photo-1544717684-4d7d3f0b0d1e?w=400",
-      organizer: {
-        name: "Rahul Sharma",
-        avatar:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
-      },
-      scheduledTime: "2025-07-26T18:00:00",
-      tags: ["indoor", "racket-sport", "competitive"],
-    },
-    {
-      id: "2",
-      name: "FIFA 24 Tournament",
-      type: "video",
-      availability: "available",
-      location: "Gaming Room",
-      maxPlayers: 8,
-      currentPlayers: 5,
-      rating: 4.6,
-      description: "Weekly FIFA tournament with prizes",
-      image:
-        "https://images.unsplash.com/photo-1538300342682-cf57afb97285?w=400",
-      organizer: {
-        name: "Priya Patel",
-        avatar:
-          "https://images.unsplash.com/photo-1494790108755-2616b612b630?w=100",
-      },
-      scheduledTime: "2025-07-26T20:00:00",
-      tags: ["esports", "tournament", "football"],
-    },
-    {
-      id: "3",
-      name: "Table Tennis",
-      type: "physical",
-      availability: "occupied",
-      location: "Recreation Center",
-      maxPlayers: 4,
-      currentPlayers: 4,
-      rating: 4.7,
-      description: "Fast-paced table tennis matches",
-      image: "https://images.unsplash.com/photo-1544717684-4d7d3f0b0d1e?w=400",
-      organizer: {
-        name: "Arjun Singh",
-        avatar:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
-      },
-      tags: ["indoor", "racket-sport", "quick-game"],
-    },
-    {
-      id: "4",
-      name: "CS:GO Tournament",
-      type: "video",
-      availability: "available",
-      location: "Computer Lab",
-      maxPlayers: 10,
-      currentPlayers: 3,
-      rating: 4.9,
-      description: "Counter-Strike tournament for all skill levels",
-      image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400",
-      organizer: {
-        name: "Vikash Kumar",
-        avatar:
-          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100",
-      },
-      scheduledTime: "2025-07-27T16:00:00",
-      tags: ["esports", "fps", "strategy"],
-    },
-    {
-      id: "5",
-      name: "Cricket Practice",
-      type: "physical",
-      availability: "available",
-      location: "Main Ground",
-      maxPlayers: 22,
-      currentPlayers: 8,
-      rating: 4.5,
-      description: "Casual cricket practice session",
-      image:
-        "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400",
-      organizer: {
-        name: "Suresh Yadav",
-        avatar:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100",
-      },
-      scheduledTime: "2025-07-26T17:00:00",
-      tags: ["outdoor", "team-sport", "practice"],
-    },
-    {
-      id: "6",
-      name: "Among Us Night",
-      type: "video",
-      availability: "available",
-      location: "Online",
-      maxPlayers: 10,
-      currentPlayers: 6,
-      rating: 4.4,
-      description: "Fun social deduction game night",
-      image:
-        "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=400",
-      organizer: {
-        name: "Anita Reddy",
-        avatar:
-          "https://images.unsplash.com/photo-1494790108755-2616b612b630?w=100",
-      },
-      scheduledTime: "2025-07-26T21:00:00",
-      tags: ["online", "social", "casual"],
-    },
-  ]);
-
-  const getAvailabilityColor = (availability: string) => {
-    switch (availability) {
-      case "available":
-        return "text-green-600 bg-green-100";
-      case "occupied":
-        return "text-red-600 bg-red-100";
-      case "maintenance":
-        return "text-yellow-600 bg-yellow-100";
-      default:
-        return "text-gray-600 bg-gray-100";
-    }
-  };
-
-  const getTypeIcon = (type: string) => {
-    return type === "video" ? "🎮" : "🏃‍♂️";
-  };
-
-  const formatTime = (timeString: string) => {
-    return new Date(timeString).toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-    });
-  };
-
   if (!session) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 flex items-center justify-center p-8">
@@ -211,108 +45,161 @@ export default function GamesPage() {
           </p>
         </div>
 
-        {/* Games Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {games.map((game) => (
-            <div
-              key={game.id}
-              className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] group"
-            >
-              <div className="relative">
-                <Image
-                  src={game.image}
-                  alt={game.name}
-                  width={400}
-                  height={192}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="absolute top-4 left-4">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getAvailabilityColor(
-                      game.availability
-                    )}`}
-                  >
-                    {game.availability}
-                  </span>
-                </div>
-                <div className="absolute top-4 right-4 text-2xl">
-                  {getTypeIcon(game.type)}
-                </div>
+        {/* Browser Games Section */}
+        <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-4">
+              🎮 Browser Games
+            </h2>
+            <p className="text-white/80 max-w-2xl mx-auto">
+              Quick games you can play right here! Challenge your friends and
+              climb the leaderboards
+            </p>
+          </div>
+
+          {/* Browser Games Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            {/* Flappy Bird */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group">
+              <div className="text-4xl mb-3">🐦</div>
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600">
+                Flappy Bird
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">Tap to fly!</p>
+              <Button
+                size="sm"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0"
+                onClick={() => (window.location.href = "/games/flappy-bird")}
+              >
+                Play Now
+              </Button>
+            </div>
+
+            {/* Chrome Dino */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group">
+              <div className="text-4xl mb-3">🦕</div>
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600">
+                Dino Run
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">Jump over cacti!</p>
+              <Button
+                size="sm"
+                className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white border-0"
+                onClick={() => (window.location.href = "/games/dino-run")}
+              >
+                Play Now
+              </Button>
+            </div>
+
+            {/* Snake */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group">
+              <div className="text-4xl mb-3">🐍</div>
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600">
+                Snake
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">Eat and grow!</p>
+              <Button
+                size="sm"
+                className="w-full bg-gradient-to-r from-yellow-500 to-red-600 hover:from-yellow-600 hover:to-red-700 text-white border-0"
+                onClick={() => (window.location.href = "/games/snake")}
+              >
+                Play Now
+              </Button>
+            </div>
+
+            {/* 2048 */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group">
+              <div className="text-4xl mb-3">🔢</div>
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600">
+                2048
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">Merge tiles!</p>
+              <Button
+                size="sm"
+                className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-0"
+                onClick={() => (window.location.href = "/games/2048")}
+              >
+                Coming Soon
+              </Button>
+            </div>
+
+            {/* Tetris */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group">
+              <div className="text-4xl mb-3">🧩</div>
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600">
+                Tetris
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">Classic puzzle!</p>
+              <Button
+                size="sm"
+                className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white border-0"
+                onClick={() => (window.location.href = "/games/tetris")}
+              >
+                Coming Soon
+              </Button>
+            </div>
+          </div>
+
+          {/* Quick Leaderboard Preview */}
+          <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+                <span className="text-2xl mr-2">🏆</span>
+                Campus Leaderboard
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-blue-600 border-blue-300 hover:bg-blue-50"
+              >
+                View All
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl">
+                <div className="text-2xl mb-2">🥇</div>
+                <p className="font-semibold text-gray-900">Arjun S.</p>
+                <p className="text-sm text-gray-600">Flappy Bird Champion</p>
+                <p className="text-lg font-bold text-yellow-600">2,847 pts</p>
               </div>
-
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                    {game.name}
-                  </h3>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Star className="h-4 w-4 text-yellow-400 mr-1" />
-                    {game.rating}
-                  </div>
-                </div>
-
-                <p className="text-gray-600 text-sm mb-4">{game.description}</p>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="h-4 w-4 mr-2" />
-                    {game.location}
-                  </div>
-
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Users className="h-4 w-4 mr-2" />
-                    {game.currentPlayers}/{game.maxPlayers} players
-                  </div>
-
-                  {game.scheduledTime && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Clock className="h-4 w-4 mr-2" />
-                      Today at {formatTime(game.scheduledTime)}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center">
-                    <Image
-                      src={game.organizer.avatar}
-                      alt={game.organizer.name}
-                      width={24}
-                      height={24}
-                      className="w-6 h-6 rounded-full mr-2"
-                    />
-                    <span className="text-sm text-gray-600">
-                      {game.organizer.name}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {game.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <Button
-                  size="sm"
-                  className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-                  disabled={
-                    game.availability === "occupied" ||
-                    game.availability === "maintenance"
-                  }
-                >
-                  {game.availability === "available"
-                    ? "Join Game"
-                    : "Unavailable"}
-                </Button>
+              <div className="text-center p-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl">
+                <div className="text-2xl mb-2">🥈</div>
+                <p className="font-semibold text-gray-900">Priya P.</p>
+                <p className="text-sm text-gray-600">Snake Master</p>
+                <p className="text-lg font-bold text-gray-600">1,943 pts</p>
+              </div>
+              <div className="text-center p-4 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl">
+                <div className="text-2xl mb-2">🥉</div>
+                <p className="font-semibold text-gray-900">Rahul K.</p>
+                <p className="text-sm text-gray-600">Dino Runner</p>
+                <p className="text-lg font-bold text-orange-600">1,654 pts</p>
               </div>
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center">
+          <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-8">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              🚀 More Games Coming Soon!
+            </h3>
+            <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
+              We&apos;re working hard to bring you more exciting games. Stay
+              tuned for Tetris, 2048, and many more classic games!
+            </p>
+            <div className="flex flex-wrap justify-center gap-3">
+              <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                🧩 Tetris - Coming Soon
+              </span>
+              <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                🔢 2048 - Coming Soon
+              </span>
+              <span className="px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                🏓 Pong - Coming Soon
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
