@@ -40,9 +40,6 @@ export default function GamesPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Gaming Hub
           </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Discover and join physical games and esports tournaments
-          </p>
         </div>
 
         {/* Browser Games Section */}
@@ -58,7 +55,7 @@ export default function GamesPage() {
           </div>
 
           {/* Browser Games Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
             {/* Flappy Bird */}
             <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group">
               <div className="text-4xl mb-3">🐦</div>
@@ -119,7 +116,7 @@ export default function GamesPage() {
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white border-0"
                 onClick={() => (window.location.href = "/games/2048")}
               >
-                Coming Soon
+                Play Now
               </Button>
             </div>
 
@@ -135,17 +132,33 @@ export default function GamesPage() {
                 className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white border-0"
                 onClick={() => (window.location.href = "/games/tetris")}
               >
-                Coming Soon
+                Play Now
+              </Button>
+            </div>
+
+            {/* Pong */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group">
+              <div className="text-4xl mb-3">🏓</div>
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600">
+                Pong
+              </h3>
+              <p className="text-xs text-gray-600 mb-3">Classic arcade!</p>
+              <Button
+                size="sm"
+                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white border-0"
+                onClick={() => (window.location.href = "/games/pong")}
+              >
+                Play Now
               </Button>
             </div>
           </div>
 
-          {/* Quick Leaderboard Preview */}
+          {/* Game Leaderboards Preview */}
           <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-semibold text-gray-900 flex items-center">
                 <span className="text-2xl mr-2">🏆</span>
-                Campus Leaderboard
+                Game Leaderboards
               </h3>
               <Button
                 variant="outline"
@@ -155,24 +168,229 @@ export default function GamesPage() {
                 View All
               </Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-xl">
-                <div className="text-2xl mb-2">🥇</div>
-                <p className="font-semibold text-gray-900">Arjun S.</p>
-                <p className="text-sm text-gray-600">Flappy Bird Champion</p>
-                <p className="text-lg font-bold text-yellow-600">2,847 pts</p>
+
+            {/* Per-Game Leaderboards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+              {/* Flappy Bird Leaderboard */}
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
+                <div className="flex items-center justify-center mb-3">
+                  <span className="text-2xl mr-2">🐦</span>
+                  <h4 className="font-bold text-blue-800">Flappy Bird</h4>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥇</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥈</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥉</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-center p-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl">
-                <div className="text-2xl mb-2">🥈</div>
-                <p className="font-semibold text-gray-900">Priya P.</p>
-                <p className="text-sm text-gray-600">Snake Master</p>
-                <p className="text-lg font-bold text-gray-600">1,943 pts</p>
+
+              {/* Snake Leaderboard */}
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
+                <div className="flex items-center justify-center mb-3">
+                  <span className="text-2xl mr-2">🐍</span>
+                  <h4 className="font-bold text-green-800">Snake</h4>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥇</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥈</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥉</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                </div>
               </div>
-              <div className="text-center p-4 bg-gradient-to-br from-orange-100 to-orange-200 rounded-xl">
-                <div className="text-2xl mb-2">🥉</div>
-                <p className="font-semibold text-gray-900">Rahul K.</p>
-                <p className="text-sm text-gray-600">Dino Runner</p>
-                <p className="text-lg font-bold text-orange-600">1,654 pts</p>
+
+              {/* Dino Run Leaderboard */}
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4 border border-orange-200">
+                <div className="flex items-center justify-center mb-3">
+                  <span className="text-2xl mr-2">�</span>
+                  <h4 className="font-bold text-orange-800">Dino Run</h4>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥇</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥈</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥉</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2048 Leaderboard */}
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4 border border-purple-200">
+                <div className="flex items-center justify-center mb-3">
+                  <span className="text-2xl mr-2">🔢</span>
+                  <h4 className="font-bold text-purple-800">2048</h4>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥇</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥈</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥉</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tetris Leaderboard */}
+              <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-xl p-4 border border-cyan-200">
+                <div className="flex items-center justify-center mb-3">
+                  <span className="text-2xl mr-2">🧩</span>
+                  <h4 className="font-bold text-cyan-800">Tetris</h4>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥇</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥈</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥉</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pong Leaderboard */}
+              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4 border border-indigo-200">
+                <div className="flex items-center justify-center mb-3">
+                  <span className="text-2xl mr-2">🏓</span>
+                  <h4 className="font-bold text-indigo-800">Pong</h4>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-white/60 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥇</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥈</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-white/40 rounded-lg">
+                    <div className="flex items-center">
+                      <span className="text-sm mr-2">🥉</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        Coming Soon
+                      </span>
+                    </div>
+                    <span className="text-sm text-gray-500">--- pts</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
