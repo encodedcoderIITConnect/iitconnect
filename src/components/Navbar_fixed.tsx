@@ -55,7 +55,7 @@ const navigation: NavigationItem[] = [
   { name: "Lost & Found", href: "/lost-found", icon: Search },
   { name: "Discussions", href: "/discussions", icon: Users },
   {
-    name: "Join Dev Team",
+    name: "Join Team",
     href: "/join-dev-team",
     icon: AlertTriangle,
     isSpecial: true,
@@ -242,7 +242,7 @@ export default function Navbar() {
                     )}
                   </div>
 
-                  {/* Special badge for join dev team in collapsed state */}
+                  {/* Special badge for Join Team in collapsed state */}
                   {isCollapsed && item.isSpecial && (
                     <span className="absolute -top-1 -right-1 bg-yellow-400 text-red-900 text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-bold shadow-lg animate-pulse">
                       !
