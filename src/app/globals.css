@@ -355,3 +355,47 @@ body {
   display: none !important;
   visibility: hidden !important;
 }
+
+/* Mobile-specific optimizations for admin panel */
+@media (max-width: 640px) {
+  /* Ensure touch targets are at least 44px */
+  button,
+  a,
+  input {
+    min-height: 44px;
+  }
+
+  /* Better spacing for mobile */
+  .admin-card {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Better text wrapping on mobile */
+  .break-words {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* Touch-friendly buttons */
+.touch-button {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth transitions for mobile interactions */
+@media (hover: none) {
+  .hover\:bg-white\/20:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .hover\:bg-white\/30:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+}

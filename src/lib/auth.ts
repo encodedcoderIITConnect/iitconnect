@@ -1,5 +1,7 @@
 import GoogleProvider from "next-auth/providers/google";
 import { getUsersCollection } from "./mongodb";
+import { isTestLoginAllowed } from "./testLogins";
+import { isUserBlocked } from "./blockedUsers";
 // import { PrismaAdapter } from "@next-auth/prisma-adapter";
 // import { db } from "./db";
 
@@ -16,10 +18,34 @@ export const authOptions = {
     async signIn({ user }: any) {
       console.log(`🔍 SignIn callback triggered for: ${user.email}`);
 
-      // Check if the user's email domain is @iitrpr.ac.in
-      if (!user.email || !user.email.endsWith("@iitrpr.ac.in")) {
-        console.log(`❌ Login denied: Invalid email domain - ${user.email}`);
+      // First check if user is blocked
+      const userBlocked = await isUserBlocked(user.email);
+      if (userBlocked) {
+        console.log(`🚫 Login denied: ${user.email} - User is blocked`);
         return false;
+      }
+
+      // Check if user is admin
+      const isAdminUser = user.email === process.env.ADMIN_EMAIL;
+
+      // Check if user has @iitrpr.ac.in domain
+      const isIITEmail = user.email && user.email.endsWith("@iitrpr.ac.in");
+
+      // Check if user is in testLogins database collection
+      const isTestEmail = await isTestLoginAllowed(user.email);
+
+      // Allow login if: IIT email OR admin OR in testLogins collection
+      if (!user.email || (!isIITEmail && !isAdminUser && !isTestEmail)) {
+        console.log(
+          `❌ Login denied: ${user.email} - Not IIT email, not admin, and not in test logins`
+        );
+        return false;
+      }
+
+      if (isAdminUser) {
+        console.log(`👑 Admin login: ${user.email}`);
+      } else if (isTestEmail) {
+        console.log(`🧪 Test email login allowed: ${user.email}`);
       }
 
       try {
@@ -36,50 +62,72 @@ export const authOptions = {
         if (!existingUser) {
           console.log(`👤 New user detected: ${user.email}`);
 
-          // Extract entry number and other info from email
-          const emailParts = user.email.split("@")[0]; // e.g., "suresh.24csz0009" or "kashish.24chz0001"
-          const entryNoMatch = emailParts.match(/\.(\d{2}[a-z]{3}\d{4})$/i); // Match pattern like .24csz0009
-          const extractedEntryNo = entryNoMatch
-            ? entryNoMatch[1].toUpperCase()
-            : null;
+          // Check user type
+          const isAdminUser = user.email === process.env.ADMIN_EMAIL;
+          const isTestEmail = await isTestLoginAllowed(user.email);
+          const isIITEmail = user.email && user.email.endsWith("@iitrpr.ac.in");
 
-          console.log(`📧 Extracted entry number: ${extractedEntryNo}`);
-
-          // Extract department from entry number (e.g., CSZ -> CSE, CHZ -> CHE)
+          let extractedEntryNo = null;
           let department = "";
-          if (extractedEntryNo) {
-            const deptCode = extractedEntryNo.substring(2, 5); // Extract middle 3 letters
-            console.log(`🏢 Department code: ${deptCode}`);
-            switch (deptCode.toUpperCase()) {
-              case "CSZ":
-                department = "Computer Science and Engineering";
-                break;
-              case "CHZ":
-                department = "Chemical Engineering";
-                break;
-              case "CEZ":
-                department = "Civil Engineering";
-                break;
-              case "EEZ":
-                department = "Electrical Engineering";
-                break;
-              case "MEZ":
-                department = "Mechanical Engineering";
-                break;
-              case "HSZ":
-                department = "Humanities and Social Sciences";
-                break;
-              case "PHZ":
-                department = "Physics";
-                break;
-              case "CHY":
-                department = "Chemistry";
-                break;
-              case "MTZ":
-                department = "Mathematics";
-                break;
-              default:
-                department = "Unknown";
+          let course = "";
+
+          if (isAdminUser) {
+            // For admin, use admin values
+            console.log(`👑 Processing admin user: ${user.email}`);
+            department = "Administration";
+            course = "Admin";
+          } else if (isTestEmail) {
+            // For test emails, use default values
+            console.log(`🧪 Processing test email: ${user.email}`);
+            department = "Test Account";
+            course = "Developer/Tester";
+          } else if (isIITEmail) {
+            // Extract entry number and other info from IIT Ropar email
+            const emailParts = user.email.split("@")[0]; // e.g., "suresh.24csz0009" or "kashish.24chz0001"
+            const entryNoMatch = emailParts.match(/\.(\d{2}[a-z]{3}\d{4})$/i); // Match pattern like .24csz0009
+            extractedEntryNo = entryNoMatch
+              ? entryNoMatch[1].toUpperCase()
+              : null;
+
+            console.log(`📧 Extracted entry number: ${extractedEntryNo}`);
+
+            // Extract department from entry number (e.g., CSZ -> CSE, CHZ -> CHE)
+            if (extractedEntryNo) {
+              const deptCode = extractedEntryNo.substring(2, 5); // Extract middle 3 letters
+              console.log(`🏢 Department code: ${deptCode}`);
+              switch (deptCode.toUpperCase()) {
+                case "CSZ":
+                  department = "Computer Science and Engineering";
+                  break;
+                case "CHZ":
+                  department = "Chemical Engineering";
+                  break;
+                case "CEZ":
+                  department = "Civil Engineering";
+                  break;
+                case "EEZ":
+                  department = "Electrical Engineering";
+                  break;
+                case "MEZ":
+                  department = "Mechanical Engineering";
+                  break;
+                case "HSZ":
+                  department = "Humanities and Social Sciences";
+                  break;
+                case "PHZ":
+                  department = "Physics";
+                  break;
+                case "CHY":
+                  department = "Chemistry";
+                  break;
+                case "MTZ":
+                  department = "Mathematics";
+                  break;
+                default:
+                  department = "Unknown";
+              }
+
+              course = extractedEntryNo.startsWith("24") ? "B.Tech" : "Unknown";
             }
           }
 
@@ -98,11 +146,7 @@ export const authOptions = {
             entryNo: extractedEntryNo,
             phone: "",
             department: department,
-            course: extractedEntryNo
-              ? extractedEntryNo.startsWith("24")
-                ? "B.Tech"
-                : "Unknown"
-              : "",
+            course: course,
             socialLink: "",
             isPublicEmail: true,
             createdAt: new Date(),

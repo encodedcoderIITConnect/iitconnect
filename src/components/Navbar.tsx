@@ -30,6 +30,7 @@ import {
   Building,
   AlertTriangle,
   Gamepad2,
+  Settings,
 } from "lucide-react";
 
 // Navigation item type
@@ -77,6 +78,9 @@ export default function Navbar() {
   const { totalUnreadCount } = useUnreadCount();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [textVisible, setTextVisible] = useState(!isCollapsed);
+
+  // Check if current user is admin (simple client-side check)
+  const isAdminUser = session?.user?.email === "iitconnect22@gmail.com";
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -303,6 +307,16 @@ export default function Navbar() {
                       <User className="h-4 w-4 mr-3" />
                       Profile
                     </Link>
+                    {isAdminUser && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setShowSignOutConfirm(false)}
+                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
+                      >
+                        <Settings className="h-4 w-4 mr-3" />
+                        Admin Panel
+                      </Link>
+                    )}
                     <button
                       onClick={handleSignOutClick}
                       className="w-full flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"

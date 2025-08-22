@@ -1,12 +1,15 @@
 "use client";
 
 import { useSession, signIn } from "next-auth/react";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Shield, AlertTriangle } from "lucide-react";
 
 export default function SignIn() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) {
@@ -14,6 +17,16 @@ export default function SignIn() {
       router.push("/");
     }
   }, [session, router]);
+
+  useEffect(() => {
+    // Check for authentication errors
+    const errorParam = searchParams.get("error");
+    if (errorParam === "AccessDenied") {
+      setError("blocked");
+    } else if (errorParam) {
+      setError("general");
+    }
+  }, [searchParams]);
 
   // Show loading state while checking authentication
   if (status === "loading") {
@@ -52,6 +65,45 @@ export default function SignIn() {
 
           {/* Login form */}
           <div className="space-y-6">
+            {/* Error Messages */}
+            {error && (
+              <div
+                className={`p-4 rounded-lg border ${
+                  error === "blocked"
+                    ? "bg-red-500/20 border-red-400/30"
+                    : "bg-yellow-500/20 border-yellow-400/30"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  {error === "blocked" ? (
+                    <Shield className="w-5 h-5 text-red-600" />
+                  ) : (
+                    <AlertTriangle className="w-5 h-5 text-yellow-600" />
+                  )}
+                  <div>
+                    <p
+                      className={`font-medium ${
+                        error === "blocked" ? "text-red-800" : "text-yellow-800"
+                      }`}
+                    >
+                      {error === "blocked"
+                        ? "Access Blocked"
+                        : "Sign In Failed"}
+                    </p>
+                    <p
+                      className={`text-sm ${
+                        error === "blocked" ? "text-red-700" : "text-yellow-700"
+                      }`}
+                    >
+                      {error === "blocked"
+                        ? "You are blocked to access the Platform, Contact Admin (iitconnect22@gmail.com)"
+                        : "Please check your email domain or try again"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="text-center mb-6">
               <h2 className="poppins-semibold text-xl text-gray-900 mb-2">
                 Sign in to continue
