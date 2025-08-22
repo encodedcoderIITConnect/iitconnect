@@ -145,7 +145,6 @@ export default function LoginCard() {
           className="w-full h-full object-cover object-center"
           draggable="false"
         />
-        <div className="absolute inset-0 bg-gradient-to-tr from-purple-600/40 to-pink-400/30" />
       </div>
     </div>
   );
