@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { Camera, Download, Heart, Eye, Search, Filter, Upload } from "lucide-react";
+import {
+  Camera,
+  Download,
+  Heart,
+  Eye,
+  Search,
+  Filter,
+  Upload,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface GalleryImage {
@@ -21,21 +29,23 @@ const galleryImages: GalleryImage[] = [
     id: "1",
     src: "/campus/SAB.png",
     title: "Student Academic Block",
-    description: "The iconic SAB building - heart of academic activities at IIT Ropar",
+    description:
+      "The iconic SAB building - heart of academic activities at IIT Ropar",
     category: "Architecture",
     tags: ["SAB", "academic", "building", "modern"],
     likes: 45,
-    views: 234
+    views: 234,
   },
   {
     id: "2",
     src: "/campus/spiral.jpg",
     title: "Spiral Architecture",
-    description: "Beautiful spiral design showcasing modern architectural excellence",
+    description:
+      "Beautiful spiral design showcasing modern architectural excellence",
     category: "Architecture",
     tags: ["spiral", "design", "modern", "structure"],
     likes: 32,
-    views: 187
+    views: 187,
   },
   {
     id: "3",
@@ -45,48 +55,52 @@ const galleryImages: GalleryImage[] = [
     category: "Nature",
     tags: ["night", "lights", "campus", "evening"],
     likes: 67,
-    views: 345
+    views: 345,
   },
   {
     id: "4",
     src: "/campus/Sunset.jpg",
     title: "Golden Hour",
-    description: "Breathtaking sunset view from campus - nature's daily masterpiece",
+    description:
+      "Breathtaking sunset view from campus - nature's daily masterpiece",
     category: "Nature",
     tags: ["sunset", "golden", "sky", "evening"],
     likes: 89,
-    views: 456
+    views: 456,
   },
   {
     id: "5",
     src: "/campus/Sunset_2.jpg",
     title: "Evening Serenity",
-    description: "Another stunning sunset capturing the peaceful campus atmosphere",
+    description:
+      "Another stunning sunset capturing the peaceful campus atmosphere",
     category: "Nature",
     tags: ["sunset", "peaceful", "sky", "serene"],
     likes: 73,
-    views: 298
+    views: 298,
   },
   {
     id: "6",
     src: "/campus/Leaves.jpg",
     title: "Campus Greenery",
-    description: "Lush green foliage showcasing the natural beauty of our campus",
+    description:
+      "Lush green foliage showcasing the natural beauty of our campus",
     category: "Nature",
     tags: ["leaves", "green", "nature", "plants"],
     likes: 41,
-    views: 189
+    views: 189,
   },
   {
     id: "7",
     src: "/campus/Academics.jpg",
     title: "Academic Excellence",
-    description: "Academic buildings representing the pursuit of knowledge and innovation",
+    description:
+      "Academic buildings representing the pursuit of knowledge and innovation",
     category: "Architecture",
     tags: ["academic", "education", "building", "learning"],
     likes: 56,
-    views: 267
-  }
+    views: 267,
+  },
 ];
 
 const categories = ["All", "Architecture", "Nature", "Events"];
@@ -103,15 +117,18 @@ export default function Gallery() {
 
     // Filter by category
     if (selectedCategory !== "All") {
-      filtered = filtered.filter(img => img.category === selectedCategory);
+      filtered = filtered.filter((img) => img.category === selectedCategory);
     }
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(img => 
-        img.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        img.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        img.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+      filtered = filtered.filter(
+        (img) =>
+          img.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          img.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          img.tags.some((tag) =>
+            tag.toLowerCase().includes(searchTerm.toLowerCase())
+          )
       );
     }
 
@@ -142,7 +159,9 @@ export default function Gallery() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-white mb-4">Campus Gallery</h1>
-          <p className="text-blue-100 text-lg">Discover the beauty of IIT Ropar through stunning visuals</p>
+          <p className="text-blue-100 text-lg">
+            Discover the beauty of IIT Ropar through stunning visuals
+          </p>
         </div>
 
         {/* Search and Filter Controls */}
@@ -205,7 +224,7 @@ export default function Gallery() {
                   className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-                
+
                 {/* Overlay Controls */}
                 <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-y-2">
                   <button
@@ -219,7 +238,11 @@ export default function Gallery() {
                         : "bg-white/20 text-white hover:bg-white/30"
                     }`}
                   >
-                    <Heart className={`w-5 h-5 ${likedImages.has(image.id) ? "fill-current" : ""}`} />
+                    <Heart
+                      className={`w-5 h-5 ${
+                        likedImages.has(image.id) ? "fill-current" : ""
+                      }`}
+                    />
                   </button>
                   <button className="w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 flex items-center justify-center backdrop-blur-md transition-all duration-300">
                     <Download className="w-5 h-5" />
@@ -229,9 +252,13 @@ export default function Gallery() {
 
               {/* Image Info */}
               <div className="p-4">
-                <h3 className="text-white font-semibold text-lg mb-2">{image.title}</h3>
-                <p className="text-blue-100 text-sm mb-3 line-clamp-2">{image.description}</p>
-                
+                <h3 className="text-white font-semibold text-lg mb-2">
+                  {image.title}
+                </h3>
+                <p className="text-blue-100 text-sm mb-3 line-clamp-2">
+                  {image.description}
+                </p>
+
                 {/* Stats */}
                 <div className="flex items-center justify-between text-blue-200 text-sm">
                   <div className="flex items-center gap-4">
@@ -269,8 +296,12 @@ export default function Gallery() {
         {filteredImages.length === 0 && (
           <div className="text-center py-12">
             <Camera className="w-16 h-16 text-blue-200 mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-white mb-2">No images found</h3>
-            <p className="text-blue-200">Try adjusting your search or filter criteria</p>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              No images found
+            </h3>
+            <p className="text-blue-200">
+              Try adjusting your search or filter criteria
+            </p>
           </div>
         )}
       </div>
@@ -295,7 +326,9 @@ export default function Gallery() {
               </button>
             </div>
             <div className="p-6">
-              <h2 className="text-2xl font-bold text-white mb-2">{selectedImage.title}</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                {selectedImage.title}
+              </h2>
               <p className="text-blue-100 mb-4">{selectedImage.description}</p>
               <div className="flex items-center justify-between">
                 <div className="flex gap-6 text-blue-200">

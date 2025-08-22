@@ -28,7 +28,7 @@ import {
   Info,
   X,
   Building,
-  AlertTriangle,
+  Zap,
   Gamepad2,
   Settings,
   Camera,
@@ -53,7 +53,7 @@ const navigation: NavigationItem[] = [
   {
     name: "Join Team",
     href: "/join-dev-team",
-    icon: AlertTriangle,
+    icon: Zap,
     isSpecial: true,
   },
 ];
