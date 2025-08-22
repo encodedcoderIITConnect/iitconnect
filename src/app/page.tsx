@@ -44,6 +44,8 @@ interface Post {
 
 export default function Timeline() {
   const { data: session } = useSession();
+
+  // State for authenticated users - declare all state first
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
@@ -66,40 +68,7 @@ export default function Timeline() {
     }>
   >([]);
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (openDropdownId && !(event.target as Element).closest(".relative")) {
-        setOpenDropdownId(null);
-      }
-      if (
-        showCategoryDropdown &&
-        !(event.target as Element).closest(".relative")
-      ) {
-        setShowCategoryDropdown(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [openDropdownId, showCategoryDropdown]);
-
-  // Auto-remove toasts after 4 seconds
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setToasts((prevToasts) =>
-        prevToasts.filter((toast) => Date.now() - toast.timestamp < 4000)
-      );
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [toasts]);
-
+  // Function declarations
   const showToast = (
     message: string,
     type: "success" | "error" | "info" = "info"
@@ -131,6 +100,42 @@ export default function Timeline() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (session) {
+      fetchPosts();
+    }
+  }, [session]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openDropdownId && !(event.target as Element).closest(".relative")) {
+        setOpenDropdownId(null);
+      }
+      if (
+        showCategoryDropdown &&
+        !(event.target as Element).closest(".relative")
+      ) {
+        setShowCategoryDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openDropdownId, showCategoryDropdown]);
+
+  // Auto-remove toasts after 4 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setToasts((prevToasts) =>
+        prevToasts.filter((toast) => Date.now() - toast.timestamp < 4000)
+      );
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [toasts]);
 
   const handleDeletePost = async (postId: string) => {
     setPostToDelete(postId);
