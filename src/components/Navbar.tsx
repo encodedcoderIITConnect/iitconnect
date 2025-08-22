@@ -31,6 +31,7 @@ import {
   AlertTriangle,
   Gamepad2,
   Settings,
+  Camera,
 } from "lucide-react";
 
 // Navigation item type
@@ -58,6 +59,7 @@ const navigation: NavigationItem[] = [
 ];
 
 const moreMenuItems = [
+  { name: "Gallery", href: "/gallery", icon: Camera },
   { name: "Download Forms", href: "/download-forms", icon: Download },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
   { name: "Games", href: "/games", icon: Gamepad2 },
