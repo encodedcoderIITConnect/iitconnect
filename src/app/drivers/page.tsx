@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Car, Phone, Star, MapPin, Copy, Check } from "lucide-react";
+import { Car, Phone, Star, Copy, Check } from "lucide-react";
 
 export default function AutoDriversPage() {
   const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
@@ -12,54 +12,46 @@ export default function AutoDriversPage() {
 
   const drivers = [
     {
+      id: "0",
+      name: "Sonu Bhaiya",
+      phone: "+91 76268 86478",
+      rating: "",
+      avatar: "🛺",
+    },
+    {
       id: "1",
       name: "Banne",
       phone: "+91 86998 20043",
       rating: "",
-      pricePerKm: 12,
-      location: "IIT Ropar Main Gate",
-      avatar: "👨🏻‍🦳",
-      carModel: "Maruti Swift Dzire",
+      avatar: "🛺",
     },
     {
       id: "2",
       name: "Rajvir",
       phone: "+91 98142 14458",
-      rating: 4.7,
-      pricePerKm: 11,
-      location: "Near Admin Block",
-      avatar: "👨🏻",
-      carModel: "Hyundai Grand i10",
+      rating: "",
+      avatar: "🛺",
     },
     {
       id: "3",
       name: "Sukhdev",
       phone: "+91 94172 85632",
-      rating: 4.9,
-      pricePerKm: 14,
-      location: "Campus Gate 2",
-      avatar: "👨🏽‍🦱",
-      carModel: "Honda City",
+      rating: "",
+      avatar: "🛺",
     },
     {
       id: "4",
       name: "Gurpreet",
       phone: "+91 97798 45123",
-      rating: 4.5,
-      pricePerKm: 10,
-      location: "Near Hostel Area",
-      avatar: "👨🏻‍🦲",
-      carModel: "Maruti Alto",
+      rating: "",
+      avatar: "🛺",
     },
     {
       id: "5",
       name: "Harjeet",
       phone: "+91 94635 78912",
-      rating: 4.6,
-      pricePerKm: 11,
-      location: "Academic Block",
-      avatar: "👨🏽",
-      carModel: "Tata Tiago",
+      rating: "",
+      avatar: "🛺",
     },
   ];
 
@@ -89,8 +81,8 @@ export default function AutoDriversPage() {
           </div>
           <h1 className="text-4xl lg:text-6xl font-bold mb-6">Auto Drivers</h1>
           <p className="text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto mb-8">
-            Connect with verified auto drivers for safe and reliable
-            transportation around IIT Ropar campus and nearby areas.
+            A list of auto drivers for easy access. This list is just for easy
+            access. We have not verified them.
           </p>
         </div>
 
@@ -107,29 +99,21 @@ export default function AutoDriversPage() {
                 <h3 className="text-xl font-bold text-gray-800 mb-1">
                   {driver.name}
                 </h3>
-                <div className="flex items-center justify-center gap-1 mb-2">
-                  <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                  <span className="text-sm font-medium text-gray-700">
-                    {driver.rating}
-                  </span>
-                </div>
+                {driver.rating && (
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="text-sm font-medium text-gray-700">
+                      {driver.rating}
+                    </span>
+                  </div>
+                )}
               </div>
 
-              {/* Driver Details */}
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center text-sm text-gray-600">
-                  <MapPin className="h-4 w-4 mr-2 text-gray-400" />
-                  {driver.location}
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Car className="h-4 w-4 mr-2 text-gray-400" />
-                  {driver.carModel}
-                </div>
-                <div className="text-center">
-                  <span className="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
-                    ₹{driver.pricePerKm}/km
-                  </span>
-                </div>
+              {/* Phone Number Display */}
+              <div className="mb-6 text-center">
+                <span className="text-lg font-medium text-gray-700">
+                  {driver.phone}
+                </span>
               </div>
 
               {/* Action Buttons */}
@@ -152,11 +136,6 @@ export default function AutoDriversPage() {
                     <Copy className="h-4 w-4" />
                   )}
                 </button>
-              </div>
-
-              {/* Phone Number Display */}
-              <div className="mt-3 text-center">
-                <span className="text-xs text-gray-500">{driver.phone}</span>
               </div>
             </div>
           ))}
