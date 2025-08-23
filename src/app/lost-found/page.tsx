@@ -302,6 +302,23 @@ export default function LostAndFound() {
               </Button>
             </div>
 
+            {/* Under Development Notice */}
+            <div className="bg-amber-500/20 backdrop-blur-xl border border-amber-400/30 rounded-xl p-4 mb-6">
+              <div className="flex items-center gap-3">
+                <AlertTriangle className="h-5 w-5 text-amber-200 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-amber-100 mb-1">
+                    🚧 Under Development
+                  </h4>
+                  <p className="text-sm text-amber-200/80">
+                    Lost & Found feature is currently being developed. Soon
+                    you&apos;ll be able to post and search for lost items across
+                    campus!
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Search and Filters */}
             <div className="flex flex-col sm:flex-row gap-4 mb-4">
               <div className="flex-1 relative">

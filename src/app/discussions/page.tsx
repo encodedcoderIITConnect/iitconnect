@@ -20,6 +20,7 @@ import {
   ShoppingBag,
   Calendar,
   Eye,
+  AlertTriangle,
 } from "lucide-react";
 
 const categories = [
@@ -249,6 +250,27 @@ export default function Discussions() {
             Connect with fellow students • Share rides • Buy/sell items •
             Exchange knowledge
           </p>
+        </div>
+
+        {/* Under Development Notice */}
+        <div className="mb-8">
+          <div className="bg-amber-500/20 backdrop-blur-xl border border-amber-400/30 rounded-2xl p-6">
+            <div className="flex items-center gap-4">
+              <div className="bg-amber-500/30 p-3 rounded-full">
+                <AlertTriangle className="h-6 w-6 text-amber-200" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-amber-100 mb-2">
+                  🚧 Under Development
+                </h3>
+                <p className="text-amber-200/80">
+                  Campus Discussions feature is currently being developed. Soon
+                  you&apos;ll be able to create posts for cab sharing,
+                  buying/selling items, and connecting with fellow students!
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Search and Controls */}
