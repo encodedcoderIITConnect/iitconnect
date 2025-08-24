@@ -767,28 +767,6 @@ export default function Game2048() {
                 </div>
               </div>
             </div>
-
-            {/* Mobile Tips */}
-            <div className="bg-white/80 backdrop-blur-xl border border-white/40 rounded-2xl p-5">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center justify-center">
-                <span className="text-xl mr-2">💡</span>
-                Quick Tips
-              </h3>
-              <div className="space-y-2 text-sm text-gray-700">
-                <div className="flex items-center bg-gray-50 rounded-lg p-2">
-                  <span className="mr-2">📱</span>
-                  <span>Swipe in any direction to move tiles</span>
-                </div>
-                <div className="flex items-center bg-gray-50 rounded-lg p-2">
-                  <span className="mr-2">🎯</span>
-                  <span>Combine same numbers to reach 2048</span>
-                </div>
-                <div className="flex items-center bg-gray-50 rounded-lg p-2">
-                  <span className="mr-2">🧠</span>
-                  <span>Plan ahead and keep highest tile in corner</span>
-                </div>
-              </div>
-            </div>
           </div>
 
           {/* Game Info Sidebar - Hidden on mobile */}
