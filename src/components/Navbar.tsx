@@ -32,6 +32,8 @@ import {
   Gamepad2,
   Settings,
   Camera,
+  Calendar,
+  Bus,
 } from "lucide-react";
 
 // Navigation item type
@@ -61,6 +63,8 @@ const navigation: NavigationItem[] = [
 const moreMenuItems = [
   { name: "Gallery", href: "/gallery", icon: Camera },
   { name: "Download Forms", href: "/download-forms", icon: Download },
+  { name: "Holidays", href: "/holidays", icon: Calendar },
+  { name: "Bus Timing", href: "/bus-timing", icon: Bus },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
   { name: "Games", href: "/games", icon: Gamepad2 },
   { name: "Hostels & Guest House", href: "/hostels", icon: Building },
