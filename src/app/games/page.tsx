@@ -96,7 +96,7 @@ export default function GamesPage() {
               <div className="text-6xl mb-4 group-hover:animate-bounce">🐍</div>
 
               {/* Game Name */}
-              <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-yellow-600 transition-colors">
+              <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-green-600 transition-colors">
                 Snake
               </h3>
 
@@ -107,7 +107,7 @@ export default function GamesPage() {
 
               {/* Play Game Button */}
               <Button
-                className="w-full bg-gradient-to-r from-yellow-500 to-red-600 hover:from-yellow-600 hover:to-red-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
+                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
                 onClick={() => (window.location.href = "/games/snake")}
               >
                 🎮 Play Game
@@ -509,7 +509,7 @@ export default function GamesPage() {
                   </div>
                   <p className="text-gray-600">Most played game today!</p>
                 </div>
-                <div className="text-6xl animate-bounce">🐍</div>
+                <div className="text-6xl animate-bounce">�</div>
               </div>
             </div>
 
