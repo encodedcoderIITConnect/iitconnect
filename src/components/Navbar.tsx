@@ -34,6 +34,7 @@ import {
   Camera,
   Calendar,
   Bus,
+  CalendarDays,
 } from "lucide-react";
 
 // Navigation item type
@@ -48,6 +49,7 @@ const navigation: NavigationItem[] = [
   { name: "Home", href: "/", icon: Home },
   { name: "Library", href: "/library", icon: BookOpen },
   { name: "Messages", href: "/chat", icon: MessageCircle },
+  { name: "Events", href: "/events", icon: Calendar },
   { name: "Clubs", href: "/clubs", icon: Trophy },
   { name: "Departments", href: "/departments", icon: GraduationCap },
   { name: "Lost & Found", href: "/lost-found", icon: Search },
@@ -63,7 +65,7 @@ const navigation: NavigationItem[] = [
 const moreMenuItems = [
   { name: "Gallery", href: "/gallery", icon: Camera },
   { name: "Download Forms", href: "/download-forms", icon: Download },
-  { name: "Holidays", href: "/holidays", icon: Calendar },
+  { name: "Holidays", href: "/holidays", icon: CalendarDays },
   { name: "Bus Timing", href: "/bus-timing", icon: Bus },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
   { name: "Games", href: "/games", icon: Gamepad2 },
