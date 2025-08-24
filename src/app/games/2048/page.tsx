@@ -1,167 +1,164 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Home, Trophy, Gamepad2 } from "lucide-react";
+import { ChevronLeft, RotateCcw, Trophy, Star, ArrowLeft } from "lucide-react";
+
+// Game types
+interface Tile {
+  id: number;
+  value: number;
+  row: number;
+  col: number;
+  isNew?: boolean;
+  isMerged?: boolean;
+}
+
+interface GameState {
+  tiles: Tile[];
+  score: number;
+  bestScore: number;
+  isGameOver: boolean;
+  hasWon: boolean;
+  gameStatus: "menu" | "playing" | "gameOver" | "won";
+}
+
+// Tile colors matching the 2048 game design
+const getTileColor = (value: number) => {
+  const colors: Record<number, string> = {
+    2: "bg-slate-100 text-slate-800 border-slate-200",
+    4: "bg-slate-200 text-slate-800 border-slate-300",
+    8: "bg-orange-300 text-white border-orange-400",
+    16: "bg-orange-400 text-white border-orange-500",
+    32: "bg-orange-500 text-white border-orange-600",
+    64: "bg-orange-600 text-white border-orange-700",
+    128: "bg-yellow-400 text-white border-yellow-500",
+    256: "bg-yellow-500 text-white border-yellow-600",
+    512: "bg-yellow-600 text-white border-yellow-700",
+    1024: "bg-yellow-700 text-white border-yellow-800",
+    2048: "bg-yellow-800 text-white border-yellow-900",
+  };
+  return colors[value] || "bg-slate-800 text-white border-slate-900";
+};
 
 export default function Game2048() {
   const { data: session } = useSession();
-  const [gameState, setGameState] = useState<
-    "menu" | "playing" | "gameOver" | "won"
-  >("menu");
-  const [grid, setGrid] = useState<number[][]>(() =>
-    Array(4)
-      .fill(null)
-      .map(() => Array(4).fill(0))
+  const gameboardRef = useRef<HTMLDivElement>(null);
+  const [gameState, setGameState] = useState<GameState>({
+    tiles: [],
+    score: 0,
+    bestScore: 0,
+    isGameOver: false,
+    hasWon: false,
+    gameStatus: "menu",
+  });
+
+  // Touch handling for swipe detection
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(
+    null
   );
-  const [score, setScore] = useState(0);
-  const [bestScore, setBestScore] = useState(0);
-  const [hasWon, setHasWon] = useState(false);
+  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(
+    null
+  );
+
+  // Minimum swipe distance
+  const minSwipeDistance = 50;
 
   // Load best score from localStorage
   useEffect(() => {
     const saved = localStorage.getItem("2048-best-score");
     if (saved) {
-      setBestScore(parseInt(saved));
+      setGameState((prev) => ({ ...prev, bestScore: parseInt(saved) }));
     }
   }, []);
 
-  // Save best score to localStorage
-  useEffect(() => {
-    if (score > bestScore) {
-      setBestScore(score);
-      localStorage.setItem("2048-best-score", score.toString());
-    }
-  }, [score, bestScore]);
+  // Initialize empty board
+  const createEmptyBoard = (): Tile[] => {
+    return [];
+  };
 
-  const addRandomTile = useCallback((currentGrid: number[][]) => {
-    const emptyCells: [number, number][] = [];
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        if (currentGrid[i][j] === 0) {
-          emptyCells.push([i, j]);
+  // Get empty cells
+  const getEmptyCells = (tiles: Tile[]): { row: number; col: number }[] => {
+    const occupiedCells = new Set(
+      tiles.map((tile) => `${tile.row}-${tile.col}`)
+    );
+    const emptyCells = [];
+
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        if (!occupiedCells.has(`${row}-${col}`)) {
+          emptyCells.push({ row, col });
         }
       }
     }
+    return emptyCells;
+  };
 
-    if (emptyCells.length > 0) {
-      const randomIndex = Math.floor(Math.random() * emptyCells.length);
-      const [row, col] = emptyCells[randomIndex];
-      const newGrid = currentGrid.map((row) => [...row]);
-      newGrid[row][col] = Math.random() < 0.9 ? 2 : 4;
-      return newGrid;
-    }
-    return currentGrid;
+  // Add random tile
+  const addRandomTile = useCallback((tiles: Tile[]): Tile[] => {
+    const emptyCells = getEmptyCells(tiles);
+    if (emptyCells.length === 0) return tiles;
+
+    const randomCell =
+      emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    const newTile: Tile = {
+      id: Date.now() + Math.random(),
+      value: Math.random() < 0.9 ? 2 : 4,
+      row: randomCell.row,
+      col: randomCell.col,
+      isNew: true,
+    };
+
+    return [...tiles, newTile];
   }, []);
 
-  const initializeGame = useCallback(() => {
-    let newGrid = Array(4)
-      .fill(null)
-      .map(() => Array(4).fill(0));
-    newGrid = addRandomTile(newGrid);
-    newGrid = addRandomTile(newGrid);
-    setGrid(newGrid);
-    setScore(0);
-    setHasWon(false);
-    setGameState("playing");
+  // Start new game
+  const startNewGame = useCallback(() => {
+    let newTiles = createEmptyBoard();
+    newTiles = addRandomTile(newTiles);
+    newTiles = addRandomTile(newTiles);
+
+    setGameState((prev) => ({
+      ...prev,
+      tiles: newTiles,
+      score: 0,
+      isGameOver: false,
+      hasWon: false,
+      gameStatus: "playing",
+    }));
   }, [addRandomTile]);
 
-  const moveLeft = (grid: number[][]) => {
-    const newGrid = grid.map((row) => [...row]);
-    let moved = false;
-    let scoreIncrease = 0;
+  // Check if game is over
+  const checkGameOver = useCallback((tiles: Tile[]): boolean => {
+    // Check if board is full
+    if (tiles.length < 16) return false;
 
-    for (let i = 0; i < 4; i++) {
-      // Remove zeros
-      let row = newGrid[i].filter((val) => val !== 0);
+    // Create grid
+    const grid: (number | null)[][] = Array(4)
+      .fill(null)
+      .map(() => Array(4).fill(null));
+    tiles.forEach((tile) => {
+      grid[tile.row][tile.col] = tile.value;
+    });
 
-      // Merge tiles
-      for (let j = 0; j < row.length - 1; j++) {
-        if (row[j] === row[j + 1]) {
-          row[j] *= 2;
-          scoreIncrease += row[j];
-          row[j + 1] = 0;
-          if (row[j] === 2048 && !hasWon) {
-            setHasWon(true);
-            setGameState("won");
-          }
-        }
-      }
+    // Check for possible moves
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 4; col++) {
+        const current = grid[row][col];
 
-      // Remove zeros again after merging
-      row = row.filter((val) => val !== 0);
-
-      // Fill with zeros
-      while (row.length < 4) {
-        row.push(0);
-      }
-
-      // Check if row changed
-      for (let j = 0; j < 4; j++) {
-        if (newGrid[i][j] !== row[j]) {
-          moved = true;
-        }
-      }
-
-      newGrid[i] = row;
-    }
-
-    return { grid: newGrid, moved, scoreIncrease };
-  };
-
-  const moveRight = (grid: number[][]) => {
-    const rotatedGrid = grid.map((row) => [...row].reverse());
-    const { grid: movedGrid, moved, scoreIncrease } = moveLeft(rotatedGrid);
-    const finalGrid = movedGrid.map((row) => [...row].reverse());
-    return { grid: finalGrid, moved, scoreIncrease };
-  };
-
-  const moveUp = (grid: number[][]) => {
-    // Transpose
-    const transposed = grid[0].map((_, colIndex) =>
-      grid.map((row) => row[colIndex])
-    );
-    const { grid: movedGrid, moved, scoreIncrease } = moveLeft(transposed);
-    // Transpose back
-    const finalGrid = movedGrid[0].map((_, colIndex) =>
-      movedGrid.map((row) => row[colIndex])
-    );
-    return { grid: finalGrid, moved, scoreIncrease };
-  };
-
-  const moveDown = (grid: number[][]) => {
-    // Transpose and reverse
-    const transposed = grid[0].map((_, colIndex) =>
-      grid.map((row) => row[colIndex]).reverse()
-    );
-    const { grid: movedGrid, moved, scoreIncrease } = moveLeft(transposed);
-    // Reverse and transpose back
-    const finalGrid = movedGrid
-      .map((row) => [...row].reverse())[0]
-      .map((_, colIndex) =>
-        movedGrid.map((row) => [...row].reverse()).map((row) => row[colIndex])
-      );
-    return { grid: finalGrid, moved, scoreIncrease };
-  };
-
-  const isGameOver = (grid: number[][]) => {
-    // Check for empty cells
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        if (grid[i][j] === 0) return false;
-      }
-    }
-
-    // Check for possible merges
-    for (let i = 0; i < 4; i++) {
-      for (let j = 0; j < 4; j++) {
-        const current = grid[i][j];
+        // Check right neighbor
         if (
-          (i > 0 && grid[i - 1][j] === current) ||
-          (i < 3 && grid[i + 1][j] === current) ||
-          (j > 0 && grid[i][j - 1] === current) ||
-          (j < 3 && grid[i][j + 1] === current)
+          col < 3 &&
+          (grid[row][col + 1] === null || grid[row][col + 1] === current)
+        ) {
+          return false;
+        }
+
+        // Check bottom neighbor
+        if (
+          row < 3 &&
+          (grid[row + 1][col] === null || grid[row + 1][col] === current)
         ) {
           return false;
         }
@@ -169,115 +166,332 @@ export default function Game2048() {
     }
 
     return true;
-  };
+  }, []);
 
-  const handleMove = useCallback(
-    (direction: "left" | "right" | "up" | "down") => {
-      if (gameState !== "playing") return;
+  // Move tiles in a direction
+  const moveTiles = useCallback(
+    (direction: "left" | "right" | "up" | "down"): boolean => {
+      if (gameState.gameStatus !== "playing") return false;
 
-      let result;
-      switch (direction) {
-        case "left":
-          result = moveLeft(grid);
-          break;
-        case "right":
-          result = moveRight(grid);
-          break;
-        case "up":
-          result = moveUp(grid);
-          break;
-        case "down":
-          result = moveDown(grid);
-          break;
-      }
+      const newTiles = [...gameState.tiles];
+      let moved = false;
+      let newScore = gameState.score;
+      let hasWon = gameState.hasWon;
 
-      if (result.moved) {
-        const newGrid = addRandomTile(result.grid);
-        setGrid(newGrid);
-        setScore((prev) => prev + result.scoreIncrease);
+      // Clear previous merge flags
+      newTiles.forEach((tile) => {
+        tile.isMerged = false;
+        tile.isNew = false;
+      });
 
-        if (isGameOver(newGrid)) {
-          setTimeout(() => setGameState("gameOver"), 100);
+      // Create 4x4 grid
+      const grid: (Tile | null)[][] = Array(4)
+        .fill(null)
+        .map(() => Array(4).fill(null));
+      newTiles.forEach((tile) => {
+        grid[tile.row][tile.col] = tile;
+      });
+
+      // Movement logic based on direction
+      const moveInDirection = () => {
+        if (direction === "left") {
+          for (let row = 0; row < 4; row++) {
+            const rowTiles = grid[row].filter(
+              (tile) => tile !== null
+            ) as Tile[];
+            let newCol = 0;
+
+            for (let i = 0; i < rowTiles.length; i++) {
+              const tile = rowTiles[i];
+
+              // Check if we can merge with the previous tile
+              if (
+                i > 0 &&
+                rowTiles[i - 1].value === tile.value &&
+                !rowTiles[i - 1].isMerged
+              ) {
+                // Merge tiles
+                rowTiles[i - 1].value *= 2;
+                rowTiles[i - 1].isMerged = true;
+                newScore += rowTiles[i - 1].value;
+
+                if (rowTiles[i - 1].value === 2048 && !hasWon) {
+                  hasWon = true;
+                }
+
+                // Remove the current tile
+                const tileIndex = newTiles.findIndex((t) => t.id === tile.id);
+                if (tileIndex > -1) {
+                  newTiles.splice(tileIndex, 1);
+                  moved = true;
+                }
+              } else {
+                // Move tile to new position
+                if (tile.col !== newCol) {
+                  tile.col = newCol;
+                  moved = true;
+                }
+                newCol++;
+              }
+            }
+          }
+        } else if (direction === "right") {
+          for (let row = 0; row < 4; row++) {
+            const rowTiles = grid[row].filter(
+              (tile) => tile !== null
+            ) as Tile[];
+            let newCol = 3;
+
+            for (let i = rowTiles.length - 1; i >= 0; i--) {
+              const tile = rowTiles[i];
+
+              // Check if we can merge with the next tile
+              if (
+                i < rowTiles.length - 1 &&
+                rowTiles[i + 1].value === tile.value &&
+                !rowTiles[i + 1].isMerged
+              ) {
+                // Merge tiles
+                rowTiles[i + 1].value *= 2;
+                rowTiles[i + 1].isMerged = true;
+                newScore += rowTiles[i + 1].value;
+
+                if (rowTiles[i + 1].value === 2048 && !hasWon) {
+                  hasWon = true;
+                }
+
+                // Remove the current tile
+                const tileIndex = newTiles.findIndex((t) => t.id === tile.id);
+                if (tileIndex > -1) {
+                  newTiles.splice(tileIndex, 1);
+                  moved = true;
+                }
+              } else {
+                // Move tile to new position
+                if (tile.col !== newCol) {
+                  tile.col = newCol;
+                  moved = true;
+                }
+                newCol--;
+              }
+            }
+          }
+        } else if (direction === "up") {
+          for (let col = 0; col < 4; col++) {
+            const colTiles = [];
+            for (let row = 0; row < 4; row++) {
+              if (grid[row][col]) colTiles.push(grid[row][col] as Tile);
+            }
+
+            let newRow = 0;
+            for (let i = 0; i < colTiles.length; i++) {
+              const tile = colTiles[i];
+
+              // Check if we can merge with the previous tile
+              if (
+                i > 0 &&
+                colTiles[i - 1].value === tile.value &&
+                !colTiles[i - 1].isMerged
+              ) {
+                // Merge tiles
+                colTiles[i - 1].value *= 2;
+                colTiles[i - 1].isMerged = true;
+                newScore += colTiles[i - 1].value;
+
+                if (colTiles[i - 1].value === 2048 && !hasWon) {
+                  hasWon = true;
+                }
+
+                // Remove the current tile
+                const tileIndex = newTiles.findIndex((t) => t.id === tile.id);
+                if (tileIndex > -1) {
+                  newTiles.splice(tileIndex, 1);
+                  moved = true;
+                }
+              } else {
+                // Move tile to new position
+                if (tile.row !== newRow) {
+                  tile.row = newRow;
+                  moved = true;
+                }
+                newRow++;
+              }
+            }
+          }
+        } else if (direction === "down") {
+          for (let col = 0; col < 4; col++) {
+            const colTiles = [];
+            for (let row = 0; row < 4; row++) {
+              if (grid[row][col]) colTiles.push(grid[row][col] as Tile);
+            }
+
+            let newRow = 3;
+            for (let i = colTiles.length - 1; i >= 0; i--) {
+              const tile = colTiles[i];
+
+              // Check if we can merge with the next tile
+              if (
+                i < colTiles.length - 1 &&
+                colTiles[i + 1].value === tile.value &&
+                !colTiles[i + 1].isMerged
+              ) {
+                // Merge tiles
+                colTiles[i + 1].value *= 2;
+                colTiles[i + 1].isMerged = true;
+                newScore += colTiles[i + 1].value;
+
+                if (colTiles[i + 1].value === 2048 && !hasWon) {
+                  hasWon = true;
+                }
+
+                // Remove the current tile
+                const tileIndex = newTiles.findIndex((t) => t.id === tile.id);
+                if (tileIndex > -1) {
+                  newTiles.splice(tileIndex, 1);
+                  moved = true;
+                }
+              } else {
+                // Move tile to new position
+                if (tile.row !== newRow) {
+                  tile.row = newRow;
+                  moved = true;
+                }
+                newRow--;
+              }
+            }
+          }
         }
+      };
+
+      moveInDirection();
+
+      if (moved) {
+        // Add new random tile
+        const tilesWithNewTile = addRandomTile(newTiles);
+
+        // Check for game over
+        const isGameOver = checkGameOver(tilesWithNewTile);
+
+        // Update best score
+        let newBestScore = gameState.bestScore;
+        if (newScore > newBestScore) {
+          newBestScore = newScore;
+          localStorage.setItem("2048-best-score", newScore.toString());
+        }
+
+        setGameState((prev) => ({
+          ...prev,
+          tiles: tilesWithNewTile,
+          score: newScore,
+          bestScore: newBestScore,
+          isGameOver,
+          hasWon,
+          gameStatus: hasWon ? "won" : isGameOver ? "gameOver" : "playing",
+        }));
       }
+
+      return moved;
     },
-    [grid, gameState, addRandomTile]
+    [gameState, addRandomTile, checkGameOver]
   );
 
   // Keyboard controls
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (gameState !== "playing") return;
+      if (gameState.gameStatus === "playing") {
+        let direction: "left" | "right" | "up" | "down" | null = null;
 
-      switch (e.key) {
-        case "ArrowLeft":
-        case "a":
-        case "A":
+        switch (e.code) {
+          case "ArrowLeft":
+          case "KeyA":
+            direction = "left";
+            break;
+          case "ArrowRight":
+          case "KeyD":
+            direction = "right";
+            break;
+          case "ArrowUp":
+          case "KeyW":
+            direction = "up";
+            break;
+          case "ArrowDown":
+          case "KeyS":
+            direction = "down";
+            break;
+        }
+
+        if (direction) {
           e.preventDefault();
-          handleMove("left");
-          break;
-        case "ArrowRight":
-        case "d":
-        case "D":
-          e.preventDefault();
-          handleMove("right");
-          break;
-        case "ArrowUp":
-        case "w":
-        case "W":
-          e.preventDefault();
-          handleMove("up");
-          break;
-        case "ArrowDown":
-        case "s":
-        case "S":
-          e.preventDefault();
-          handleMove("down");
-          break;
+          moveTiles(direction);
+        }
+      } else if (e.code === "Space") {
+        e.preventDefault();
+        if (
+          gameState.gameStatus === "menu" ||
+          gameState.gameStatus === "gameOver"
+        ) {
+          startNewGame();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [gameState, handleMove]);
+  }, [gameState.gameStatus, moveTiles, startNewGame]);
 
-  const getTileColor = (value: number) => {
-    const colors: { [key: number]: string } = {
-      0: "bg-gray-200",
-      2: "bg-red-100 text-red-800",
-      4: "bg-red-200 text-red-900",
-      8: "bg-orange-200 text-orange-900",
-      16: "bg-orange-300 text-orange-900",
-      32: "bg-yellow-200 text-yellow-900",
-      64: "bg-yellow-300 text-yellow-900",
-      128: "bg-green-200 text-green-900",
-      256: "bg-green-300 text-green-900",
-      512: "bg-blue-200 text-blue-900",
-      1024: "bg-blue-300 text-blue-900",
-      2048: "bg-purple-300 text-purple-900",
-      4096: "bg-pink-300 text-pink-900",
-    };
-    return (
-      colors[value] ||
-      "bg-gradient-to-br from-purple-400 to-pink-400 text-white"
-    );
+  // Touch event handlers for swipe detection
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY,
+    });
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd({
+      x: e.targetTouches[0].clientX,
+      y: e.targetTouches[0].clientY,
+    });
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+
+    const distanceX = touchStart.x - touchEnd.x;
+    const distanceY = touchStart.y - touchEnd.y;
+    const isLeftSwipe = distanceX > minSwipeDistance;
+    const isRightSwipe = distanceX < -minSwipeDistance;
+    const isUpSwipe = distanceY > minSwipeDistance;
+    const isDownSwipe = distanceY < -minSwipeDistance;
+
+    if (gameState.gameStatus === "playing") {
+      if (isLeftSwipe) {
+        moveTiles("left");
+      } else if (isRightSwipe) {
+        moveTiles("right");
+      } else if (isUpSwipe) {
+        moveTiles("up");
+      } else if (isDownSwipe) {
+        moveTiles("down");
+      }
+    }
   };
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 flex items-center justify-center p-8">
+      <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 flex items-center justify-center p-8">
         <div className="text-center text-white max-w-md">
-          <Gamepad2 className="h-16 w-16 mx-auto mb-4 opacity-80" />
+          <div className="text-6xl mb-4">🔢</div>
           <h1 className="text-2xl font-bold mb-4">2048 Game</h1>
           <p className="mb-6">
-            Sign in with your @iitrpr.ac.in email to play 2048 and save your
-            high scores
+            Sign in to save your high scores and compete with other students!
           </p>
           <Button
             onClick={() => (window.location.href = "/auth/signin")}
-            className="bg-white text-purple-600 hover:bg-gray-100"
+            className="bg-white text-blue-600 hover:bg-gray-100"
           >
-            Sign In to Continue
+            Sign In to Play
           </Button>
         </div>
       </div>
@@ -285,198 +499,374 @@ export default function Game2048() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 flex items-center justify-center p-4">
-      <div className="bg-white/90 backdrop-blur-xl border border-white/40 rounded-2xl shadow-2xl p-8 w-full max-w-md">
-        {gameState === "menu" && (
-          <div className="text-center">
-            <div className="mb-6">
-              <div className="text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">
-                2048
+    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-purple-600 to-teal-600 p-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between mb-6 md:hidden">
+          <Button
+            onClick={() => (window.location.href = "/games")}
+            variant="ghost"
+            size="sm"
+            className="text-white hover:bg-white/20 p-2 flex items-center"
+          >
+            <ChevronLeft className="h-6 w-6 mr-1" />
+            <span className="text-2xl font-bold">2048</span>
+          </Button>
+
+          <div className="flex items-center space-x-3 text-white text-sm">
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
+              <div className="text-xs font-medium text-white/80 mb-1">
+                SCORE
               </div>
-              <p className="text-gray-600">Merge tiles to reach 2048!</p>
-            </div>
-
-            <div className="space-y-4 mb-6">
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4">
-                <h3 className="font-semibold text-gray-900 mb-2 flex items-center justify-center">
-                  <span className="text-xl mr-2">🎮</span>
-                  How to Play
-                </h3>
-                <div className="space-y-2 text-sm text-gray-700">
-                  <p>• Use arrow keys or WASD to move tiles</p>
-                  <p>• Tiles with same numbers merge when they touch</p>
-                  <p>• Get to 2048 to win!</p>
-                  <p>• Keep going for higher scores! 🎯</p>
-                </div>
+              <div className="text-lg font-bold text-white">
+                {gameState.score.toLocaleString()}
               </div>
-
-              {bestScore > 0 && (
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4">
-                  <h3 className="font-semibold text-gray-900 mb-2 flex items-center justify-center">
-                    <Trophy className="h-5 w-5 mr-2 text-yellow-600" />
-                    Best Score
-                  </h3>
-                  <p className="text-2xl font-bold text-yellow-600">
-                    {bestScore.toLocaleString()}
-                  </p>
-                </div>
-              )}
             </div>
-
-            <Button
-              onClick={initializeGame}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              Start Game
-            </Button>
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
+              <div className="text-xs font-medium text-white/80 mb-1">BEST</div>
+              <div className="text-lg font-bold text-yellow-300">
+                {gameState.bestScore.toLocaleString()}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
-        {(gameState === "playing" ||
-          gameState === "gameOver" ||
-          gameState === "won") && (
-          <div>
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-              <Button
-                onClick={() => (window.location.href = "/games")}
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-purple-600"
-              >
-                <Home className="h-4 w-4 mr-2" />
-                Games
-              </Button>
-              <h1 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
-                2048
-              </h1>
-              <Button
-                onClick={initializeGame}
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-purple-600"
-              >
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-            </div>
+        {/* Desktop Header */}
+        <div className="hidden md:flex items-center justify-between mb-6">
+          <Button
+            onClick={() => (window.location.href = "/games")}
+            variant="outline"
+            className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Games
+          </Button>
 
-            {/* Score */}
-            <div className="flex gap-4 mb-6">
-              <div className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-xl p-3 flex-1 text-center">
-                <p className="text-sm text-gray-600 mb-1">Score</p>
-                <p className="text-xl font-bold text-purple-700">
-                  {score.toLocaleString()}
-                </p>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold text-white flex items-center justify-center">
+              <span className="text-4xl mr-2">🔢</span>
+              2048 Game
+            </h1>
+          </div>
+
+          <div className="flex items-center space-x-6 text-white">
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+              <div className="text-sm font-medium text-white/80 mb-1">
+                SCORE
               </div>
-              <div className="bg-gradient-to-r from-yellow-100 to-orange-100 rounded-xl p-3 flex-1 text-center">
-                <p className="text-sm text-gray-600 mb-1">Best</p>
-                <p className="text-xl font-bold text-yellow-700">
-                  {bestScore.toLocaleString()}
-                </p>
+              <div className="text-xl font-bold text-white">
+                {gameState.score.toLocaleString()}
               </div>
             </div>
+            <div className="text-center bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 border border-white/20">
+              <div className="text-sm font-medium text-white/80 mb-1 flex items-center justify-center">
+                <Trophy className="h-4 w-4 mr-1 text-yellow-300" />
+                BEST
+              </div>
+              <div className="text-xl font-bold text-yellow-300">
+                {gameState.bestScore.toLocaleString()}
+              </div>
+            </div>
+          </div>
+        </div>
 
-            {/* Game Grid */}
-            <div className="bg-gray-300 rounded-xl p-3 mb-6">
-              <div className="grid grid-cols-4 gap-2">
-                {grid.flat().map((cell, index) => (
+        <div className="flex flex-col lg:flex-row gap-8 items-start justify-center">
+          {/* Game Board */}
+          <div className="flex-1 flex justify-center max-w-md mx-auto lg:mx-0">
+            <div className="relative">
+              <div
+                ref={gameboardRef}
+                className="bg-slate-300 rounded-lg p-4 shadow-2xl"
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
+                style={{ width: "320px", height: "320px" }}
+              >
+                {/* Grid background */}
+                <div className="grid grid-cols-4 gap-3 h-full w-full">
+                  {Array(16)
+                    .fill(0)
+                    .map((_, index) => (
+                      <div key={index} className="bg-slate-200 rounded-md" />
+                    ))}
+                </div>
+
+                {/* Tiles */}
+                {gameState.tiles.map((tile) => (
                   <div
-                    key={index}
-                    className={`aspect-square rounded-lg flex items-center justify-center text-lg font-bold transition-all duration-150 ${getTileColor(
-                      cell
-                    )}`}
+                    key={tile.id}
+                    className={`absolute rounded-md flex items-center justify-center font-bold text-xl transition-all duration-200 ${getTileColor(
+                      tile.value
+                    )} ${tile.isNew ? "animate-pulse scale-110" : ""} ${
+                      tile.isMerged ? "scale-105 shadow-lg" : ""
+                    }`}
+                    style={{
+                      width: "70px",
+                      height: "70px",
+                      left: `${tile.col * 76 + 16}px`,
+                      top: `${tile.row * 76 + 16}px`,
+                      transform: tile.isNew
+                        ? "scale(1.1)"
+                        : tile.isMerged
+                        ? "scale(1.05)"
+                        : "scale(1)",
+                    }}
                   >
-                    {cell !== 0 && cell}
+                    {tile.value}
                   </div>
                 ))}
               </div>
-            </div>
 
-            {/* Controls */}
-            <div className="text-center mb-4">
-              <p className="text-sm text-gray-600 mb-3">
-                Use arrow keys or WASD to move
-              </p>
-              <div className="grid grid-cols-3 gap-2 max-w-32 mx-auto">
-                <div></div>
-                <Button
-                  onClick={() => handleMove("up")}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 w-8 p-0 text-xs"
-                  disabled={gameState !== "playing"}
-                >
-                  ↑
-                </Button>
-                <div></div>
-                <Button
-                  onClick={() => handleMove("left")}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 w-8 p-0 text-xs"
-                  disabled={gameState !== "playing"}
-                >
-                  ←
-                </Button>
-                <Button
-                  onClick={() => handleMove("down")}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 w-8 p-0 text-xs"
-                  disabled={gameState !== "playing"}
-                >
-                  ↓
-                </Button>
-                <Button
-                  onClick={() => handleMove("right")}
-                  variant="outline"
-                  size="sm"
-                  className="h-8 w-8 p-0 text-xs"
-                  disabled={gameState !== "playing"}
-                >
-                  →
-                </Button>
-              </div>
-            </div>
-
-            {/* Game Over/Won Modal */}
-            {(gameState === "gameOver" || gameState === "won") && (
-              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-                <div className="bg-white rounded-2xl p-8 text-center max-w-sm mx-4">
-                  <div className="text-4xl mb-4">
-                    {gameState === "won" ? "🎉" : "😔"}
-                  </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {gameState === "won" ? "You Won!" : "Game Over"}
-                  </h2>
-                  <p className="text-gray-600 mb-2">
-                    {gameState === "won"
-                      ? "Congratulations! You reached 2048!"
-                      : "No more moves available!"}
-                  </p>
-                  <p className="text-lg font-semibold text-purple-600 mb-6">
-                    Final Score: {score.toLocaleString()}
-                  </p>
-                  <div className="space-y-3">
+              {/* Game overlays */}
+              {gameState.gameStatus === "menu" && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                  <div className="text-center text-white p-6">
+                    <div className="text-5xl mb-4">🔢</div>
+                    <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                      2048
+                    </h2>
+                    <p className="mb-4 text-sm text-white/90">
+                      Join numbers to reach 2048!
+                    </p>
+                    <div className="space-y-2 text-xs text-white/80 mb-4 bg-white/10 rounded-lg p-3">
+                      <p>📱 Swipe to move tiles</p>
+                      <p>⌨️ Use arrow keys on desktop</p>
+                      <p>🎯 Combine same numbers</p>
+                    </div>
                     <Button
-                      onClick={initializeGame}
-                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                      onClick={startNewGame}
+                      className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-bold px-6 py-2 rounded-lg"
                     >
-                      Play Again
-                    </Button>
-                    <Button
-                      onClick={() => (window.location.href = "/games")}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      Back to Games
+                      Start Game
                     </Button>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+
+              {gameState.gameStatus === "won" && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                  <div className="text-center text-white p-6">
+                    <div className="text-5xl mb-4">🎉</div>
+                    <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                      You Win!
+                    </h2>
+                    <p className="text-lg mb-4">You reached 2048!</p>
+                    <p className="text-sm mb-4">
+                      Score:{" "}
+                      <span className="font-bold text-yellow-300">
+                        {gameState.score.toLocaleString()}
+                      </span>
+                    </p>
+                    <div className="space-y-2">
+                      <Button
+                        onClick={() =>
+                          setGameState((prev) => ({
+                            ...prev,
+                            gameStatus: "playing",
+                          }))
+                        }
+                        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold px-6 py-2 rounded-lg w-full"
+                      >
+                        Continue Playing
+                      </Button>
+                      <Button
+                        onClick={startNewGame}
+                        variant="outline"
+                        className="bg-white/20 border-white/30 text-white hover:bg-white/30 w-full rounded-lg"
+                      >
+                        New Game
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {gameState.gameStatus === "gameOver" && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                  <div className="text-center text-white p-6">
+                    <div className="text-5xl mb-4">😵</div>
+                    <h2 className="text-2xl font-bold mb-4 bg-gradient-to-r from-red-400 to-orange-500 bg-clip-text text-transparent">
+                      Game Over!
+                    </h2>
+                    <p className="text-lg mb-4">No more moves!</p>
+                    <div className="bg-white/10 rounded-lg p-4 mb-4">
+                      <p className="text-sm mb-2">
+                        Score:{" "}
+                        <span className="font-bold text-yellow-300">
+                          {gameState.score.toLocaleString()}
+                        </span>
+                      </p>
+                      {gameState.score === gameState.bestScore &&
+                        gameState.score > 0 && (
+                          <div className="bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-lg p-2 mb-2">
+                            <p className="text-yellow-300 flex items-center justify-center text-sm">
+                              <Star className="h-4 w-4 mr-1" />
+                              New High Score!
+                              <Star className="h-4 w-4 ml-1" />
+                            </p>
+                          </div>
+                        )}
+                    </div>
+                    <div className="space-y-2">
+                      <Button
+                        onClick={startNewGame}
+                        className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold px-6 py-2 rounded-lg w-full"
+                      >
+                        <RotateCcw className="h-4 w-4 mr-2" />
+                        Try Again
+                      </Button>
+                      <Button
+                        onClick={() => (window.location.href = "/games")}
+                        variant="outline"
+                        className="bg-white/20 border-white/30 text-white hover:bg-white/30 w-full rounded-lg"
+                      >
+                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        Back to Games
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        )}
+
+          {/* Mobile Game Stats - Visible only on mobile */}
+          <div className="lg:hidden w-full max-w-md mx-auto mt-6 space-y-4">
+            {/* Game Stats */}
+            <div className="bg-white/80 backdrop-blur-xl border border-white/40 rounded-2xl p-5">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center justify-center">
+                <span className="text-xl mr-2">📊</span>
+                Game Stats
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center bg-blue-50 rounded-xl p-3">
+                  <div className="text-sm text-gray-600 mb-1">
+                    Current Score
+                  </div>
+                  <div className="text-lg font-bold text-blue-600">
+                    {gameState.score.toLocaleString()}
+                  </div>
+                </div>
+                <div className="text-center bg-yellow-50 rounded-xl p-3">
+                  <div className="text-sm text-gray-600 mb-1">Best Score</div>
+                  <div className="text-lg font-bold text-yellow-600">
+                    {gameState.bestScore.toLocaleString()}
+                  </div>
+                </div>
+                <div className="text-center bg-green-50 rounded-xl p-3">
+                  <div className="text-sm text-gray-600 mb-1">Tiles Used</div>
+                  <div className="text-lg font-bold text-green-600">
+                    {gameState.tiles.length}/16
+                  </div>
+                </div>
+                <div className="text-center bg-purple-50 rounded-xl p-3">
+                  <div className="text-sm text-gray-600 mb-1">Player</div>
+                  <div className="text-lg font-bold text-purple-600">
+                    {session.user?.name?.split(" ")[0] || "You"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Mobile Tips */}
+            <div className="bg-white/80 backdrop-blur-xl border border-white/40 rounded-2xl p-5">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center justify-center">
+                <span className="text-xl mr-2">💡</span>
+                Quick Tips
+              </h3>
+              <div className="space-y-2 text-sm text-gray-700">
+                <div className="flex items-center bg-gray-50 rounded-lg p-2">
+                  <span className="mr-2">📱</span>
+                  <span>Swipe in any direction to move tiles</span>
+                </div>
+                <div className="flex items-center bg-gray-50 rounded-lg p-2">
+                  <span className="mr-2">🎯</span>
+                  <span>Combine same numbers to reach 2048</span>
+                </div>
+                <div className="flex items-center bg-gray-50 rounded-lg p-2">
+                  <span className="mr-2">🧠</span>
+                  <span>Plan ahead and keep highest tile in corner</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Game Info Sidebar - Hidden on mobile */}
+          <div className="hidden lg:block w-80 space-y-6">
+            {/* Controls */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                <span className="text-xl mr-2">🎮</span>
+                How to Play
+              </h3>
+              <div className="space-y-3 text-sm text-gray-700">
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <span className="font-medium mr-2">📱 Mobile:</span>
+                    <span>Swipe to move tiles</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="font-medium mr-2">⌨️ Desktop:</span>
+                    <span>Arrow keys or WASD</span>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="font-medium mr-2">🎯 Goal:</span>
+                    <span>Reach the 2048 tile!</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                <span className="text-xl mr-2">📊</span>
+                Your Stats
+              </h3>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-700">Score:</span>
+                  <span className="font-bold text-blue-600">
+                    {gameState.score.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-700">Best Score:</span>
+                  <span className="font-bold text-yellow-600">
+                    {gameState.bestScore.toLocaleString()}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-700">Tiles:</span>
+                  <span className="font-bold text-green-600">
+                    {gameState.tiles.length}/16
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-700">Player:</span>
+                  <span className="font-medium text-gray-900">
+                    {session.user?.name?.split(" ")[0] || "Player"}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Tips */}
+            <div className="bg-white/70 backdrop-blur-xl border border-white/40 rounded-2xl p-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center">
+                <span className="text-xl mr-2">💡</span>
+                Pro Tips
+              </h3>
+              <div className="space-y-2 text-sm text-gray-700">
+                <p>• Keep your highest tile in a corner</p>
+                <p>• Build tiles in one direction</p>
+                <p>• Don&apos;t fill up the board randomly</p>
+                <p>• Plan several moves ahead</p>
+                <p>• Stay calm and think strategically! 🧠</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -261,63 +261,6 @@ export default function GamesPage() {
               </div>
             </div>
 
-            {/* 2048 */}
-            <div className="bg-white/90 backdrop-blur-xl border border-white/60 rounded-3xl p-8 text-center hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
-              {/* Game Emoji */}
-              <div className="text-6xl mb-4 group-hover:animate-bounce">🔢</div>
-
-              {/* Game Name */}
-              <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">
-                2048
-              </h3>
-
-              {/* Game Tagline */}
-              <p className="text-gray-600 mb-6 text-lg">
-                Merge tiles to reach 2048!
-              </p>
-
-              {/* Play Game Button */}
-              <Button
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
-                onClick={() => (window.location.href = "/games/2048")}
-              >
-                🎮 Play Game
-              </Button>
-
-              {/* Divider */}
-              <div className="border-t border-gray-200 my-6"></div>
-
-              {/* Leaderboard */}
-              <div>
-                <h4 className="text-lg font-semibold text-gray-800 mb-4">
-                  🏆 Leaderboard
-                </h4>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between items-center bg-yellow-50 rounded-lg p-2">
-                    <span className="flex items-center">
-                      <span className="text-yellow-500 mr-2">🥇</span>Coming
-                      Soon...
-                    </span>
-                    <span className="text-gray-500">--- pts</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-gray-50 rounded-lg p-2">
-                    <span className="flex items-center">
-                      <span className="text-gray-400 mr-2">🥈</span>Coming
-                      Soon...
-                    </span>
-                    <span className="text-gray-500">--- pts</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-orange-50 rounded-lg p-2">
-                    <span className="flex items-center">
-                      <span className="text-orange-400 mr-2">🥉</span>Coming
-                      Soon...
-                    </span>
-                    <span className="text-gray-500">--- pts</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Tetris */}
             <div className="bg-white/90 backdrop-blur-xl border border-white/60 rounded-3xl p-8 text-center hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
               {/* Game Emoji */}
@@ -394,6 +337,63 @@ export default function GamesPage() {
               <Button
                 className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
                 onClick={() => (window.location.href = "/games/pong")}
+              >
+                🎮 Play Game
+              </Button>
+
+              {/* Divider */}
+              <div className="border-t border-gray-200 my-6"></div>
+
+              {/* Leaderboard */}
+              <div>
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">
+                  🏆 Leaderboard
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between items-center bg-yellow-50 rounded-lg p-2">
+                    <span className="flex items-center">
+                      <span className="text-yellow-500 mr-2">🥇</span>Coming
+                      Soon...
+                    </span>
+                    <span className="text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-gray-50 rounded-lg p-2">
+                    <span className="flex items-center">
+                      <span className="text-gray-400 mr-2">🥈</span>Coming
+                      Soon...
+                    </span>
+                    <span className="text-gray-500">--- pts</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-orange-50 rounded-lg p-2">
+                    <span className="flex items-center">
+                      <span className="text-orange-400 mr-2">🥉</span>Coming
+                      Soon...
+                    </span>
+                    <span className="text-gray-500">--- pts</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2048 */}
+            <div className="bg-white/90 backdrop-blur-xl border border-white/60 rounded-3xl p-8 text-center hover:shadow-2xl transition-all duration-500 hover:scale-105 group">
+              {/* Game Emoji */}
+              <div className="text-6xl mb-4 group-hover:animate-bounce">🔢</div>
+
+              {/* Game Name */}
+              <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-yellow-600 transition-colors">
+                2048
+              </h3>
+
+              {/* Game Tagline */}
+              <p className="text-gray-600 mb-6 text-lg">
+                Join numbers to reach 2048!
+              </p>
+
+              {/* Play Game Button */}
+              <Button
+                className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
+                onClick={() => (window.location.href = "/games/2048")}
               >
                 🎮 Play Game
               </Button>
@@ -530,15 +530,6 @@ export default function GamesPage() {
                   </span>
                 </div>
                 <div className="flex items-center space-x-3 bg-white rounded-lg p-3 hover:shadow-md transition-shadow">
-                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
-                  <span className="text-sm">
-                    <strong>Priya_2023ECE</strong> completed 2048!
-                  </span>
-                  <span className="text-xs text-gray-500 ml-auto">
-                    5 min ago
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3 bg-white rounded-lg p-3 hover:shadow-md transition-shadow">
                   <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
                   <span className="text-sm">
                     <strong>Amit_2024ME</strong> beat his Flappy Bird record!
@@ -553,7 +544,7 @@ export default function GamesPage() {
                     <strong>Arjun_2024EE</strong> started a Pong tournament
                   </span>
                   <span className="text-xs text-gray-500 ml-auto">
-                    15 min ago
+                    12 min ago
                   </span>
                 </div>
               </div>
