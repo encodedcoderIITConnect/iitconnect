@@ -441,6 +441,7 @@ export default function Game2048() {
 
   // Touch event handlers for swipe detection
   const onTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault(); // Prevent page scrolling
     setTouchEnd(null);
     setTouchStart({
       x: e.targetTouches[0].clientX,
@@ -449,6 +450,7 @@ export default function Game2048() {
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault(); // Prevent page scrolling during swipe
     setTouchEnd({
       x: e.targetTouches[0].clientX,
       y: e.targetTouches[0].clientY,
@@ -576,11 +578,16 @@ export default function Game2048() {
             <div className="relative">
               <div
                 ref={gameboardRef}
-                className="bg-slate-300 rounded-lg p-4 shadow-2xl"
+                className="bg-slate-300 rounded-lg p-4 shadow-2xl touch-none select-none"
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
-                style={{ width: "320px", height: "320px" }}
+                style={{
+                  width: "320px",
+                  height: "320px",
+                  touchAction: "none",
+                  userSelect: "none",
+                }}
               >
                 {/* Grid background */}
                 <div className="grid grid-cols-4 gap-3 h-full w-full">
