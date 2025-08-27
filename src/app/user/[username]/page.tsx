@@ -13,14 +13,12 @@ import {
   GraduationCap,
   Building,
   ExternalLink,
-  ArrowLeft,
   Edit3,
   Save,
   Calendar,
   X,
   MessageCircle,
 } from "lucide-react";
-import Link from "next/link";
 
 interface UserProfile {
   _id: string;
@@ -187,11 +185,6 @@ export default function UserProfilePage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto relative">
-            {/* Back Arrow - Loading */}
-            <div className="absolute -top-2 -left-2 z-10 p-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
-              <ArrowLeft className="h-5 w-5 text-white/50" />
-            </div>
-
             <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden">
               {/* Hero Section Skeleton */}
               <div className="relative pt-20 pb-16 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-teal-600/20">
@@ -267,11 +260,6 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
         <div className="text-center relative">
-          <Link href="/">
-            <button className="absolute -top-8 -left-8 p-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-200 hover:scale-110">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          </Link>
           <div className="text-white text-lg mb-4">
             {error || "User not found"}
           </div>
@@ -285,15 +273,8 @@ export default function UserProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
       {/* Profile Card */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pb-32 lg:pb-8">
         <div className="max-w-4xl mx-auto relative">
-          {/* Back Arrow - Top Left Corner */}
-          <Link href="/">
-            <button className="absolute -top-2 -left-2 z-10 p-3 bg-white/10 backdrop-blur-md rounded-full border border-white/20 text-white hover:bg-white/20 transition-all duration-200 hover:scale-110">
-              <ArrowLeft className="h-5 w-5" />
-            </button>
-          </Link>
-
           <div className="bg-white/10 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden">
             {/* Hero Section */}
             <div className="relative pt-20 pb-16 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-teal-600/20">
