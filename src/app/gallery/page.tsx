@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  Camera,
-  Download,
-  Heart,
-  Eye,
-  Search,
-  Upload,
-} from "lucide-react";
+import { Camera, Download, Heart, Eye, Search, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface GalleryImage {
@@ -223,10 +216,10 @@ export default function Gallery() {
                   height={300}
                   className="w-full h-auto object-cover"
                 />
-                
+
                 {/* Gradient Overlay on Hover */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                
+
                 {/* Top Right Action Buttons */}
                 <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-y-2">
                   <button
@@ -246,7 +239,7 @@ export default function Gallery() {
                       }`}
                     />
                   </button>
-                  <button 
+                  <button
                     onClick={(e) => e.stopPropagation()}
                     className="w-8 h-8 rounded-full bg-white/90 text-gray-700 hover:bg-white flex items-center justify-center backdrop-blur-md transition-all duration-300"
                   >
@@ -262,7 +255,7 @@ export default function Gallery() {
                   <p className="text-white/90 text-sm mb-2 line-clamp-2 drop-shadow">
                     {image.description}
                   </p>
-                  
+
                   {/* Stats and Category */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3 text-white/80 text-xs">
@@ -279,7 +272,7 @@ export default function Gallery() {
                       {image.category}
                     </span>
                   </div>
-                  
+
                   {/* Tags */}
                   <div className="flex flex-wrap gap-1">
                     {image.tags.slice(0, 3).map((tag) => (
@@ -325,11 +318,11 @@ export default function Gallery() {
 
       {/* Modal for Full Image View */}
       {selectedImage && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={closeModal}
         >
-          <div 
+          <div
             className="max-w-4xl max-h-[90vh] w-full bg-white/10 backdrop-blur-xl border border-white/30 rounded-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
