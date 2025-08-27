@@ -8,7 +8,6 @@ import {
   Heart,
   Eye,
   Search,
-  Filter,
   Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -207,85 +206,103 @@ export default function Gallery() {
           </div>
         </div>
 
-        {/* Gallery Grid */}
-        <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
+        {/* Gallery Grid - Pinterest Style */}
+        <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
           {filteredImages.map((image) => (
             <div
               key={image.id}
-              className="break-inside-avoid bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-300 group cursor-pointer"
+              className="break-inside-avoid relative group cursor-pointer overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]"
               onClick={() => openModal(image)}
             >
-              <div className="relative overflow-hidden">
+              {/* Image */}
+              <div className="relative">
                 <Image
                   src={image.src}
                   alt={image.title}
                   width={400}
                   height={300}
-                  className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-auto object-cover"
                 />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-
-                {/* Overlay Controls */}
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-y-2">
+                
+                {/* Gradient Overlay on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                
+                {/* Top Right Action Buttons */}
+                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 space-y-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handleLike(image.id);
                     }}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 ${
+                    className={`w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 ${
                       likedImages.has(image.id)
                         ? "bg-red-500 text-white"
-                        : "bg-white/20 text-white hover:bg-white/30"
+                        : "bg-white/90 text-gray-700 hover:bg-white"
                     }`}
                   >
                     <Heart
-                      className={`w-5 h-5 ${
+                      className={`w-4 h-4 ${
                         likedImages.has(image.id) ? "fill-current" : ""
                       }`}
                     />
                   </button>
-                  <button className="w-10 h-10 rounded-full bg-white/20 text-white hover:bg-white/30 flex items-center justify-center backdrop-blur-md transition-all duration-300">
-                    <Download className="w-5 h-5" />
+                  <button 
+                    onClick={(e) => e.stopPropagation()}
+                    className="w-8 h-8 rounded-full bg-white/90 text-gray-700 hover:bg-white flex items-center justify-center backdrop-blur-md transition-all duration-300"
+                  >
+                    <Download className="w-4 h-4" />
                   </button>
                 </div>
-              </div>
 
-              {/* Image Info */}
-              <div className="p-4">
-                <h3 className="text-white font-semibold text-lg mb-2">
-                  {image.title}
-                </h3>
-                <p className="text-blue-100 text-sm mb-3 line-clamp-2">
-                  {image.description}
-                </p>
-
-                {/* Stats */}
-                <div className="flex items-center justify-between text-blue-200 text-sm">
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1">
-                      <Heart className="w-4 h-4" />
-                      {image.likes}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Eye className="w-4 h-4" />
-                      {image.views}
+                {/* Bottom Overlay with Details */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <h3 className="text-white font-bold text-lg mb-1 drop-shadow-lg">
+                    {image.title}
+                  </h3>
+                  <p className="text-white/90 text-sm mb-2 line-clamp-2 drop-shadow">
+                    {image.description}
+                  </p>
+                  
+                  {/* Stats and Category */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3 text-white/80 text-xs">
+                      <span className="flex items-center gap-1">
+                        <Heart className="w-3 h-3" />
+                        {image.likes}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="w-3 h-3" />
+                        {image.views}
+                      </span>
+                    </div>
+                    <span className="bg-white/20 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs border border-white/30">
+                      {image.category}
                     </span>
                   </div>
-                  <span className="bg-white/20 px-2 py-1 rounded-full text-xs">
-                    {image.category}
-                  </span>
+                  
+                  {/* Tags */}
+                  <div className="flex flex-wrap gap-1">
+                    {image.tags.slice(0, 3).map((tag) => (
+                      <span
+                        key={tag}
+                        className="bg-black/30 backdrop-blur-sm text-white/90 px-2 py-1 rounded-full text-xs border border-white/20"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                    {image.tags.length > 3 && (
+                      <span className="bg-black/30 backdrop-blur-sm text-white/90 px-2 py-1 rounded-full text-xs border border-white/20">
+                        +{image.tags.length - 3}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
-                {/* Tags */}
-                <div className="flex flex-wrap gap-1 mt-3">
-                  {image.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-blue-500/30 text-blue-100 px-2 py-1 rounded-full text-xs"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
+                {/* Quick View Icon */}
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
+                    <Eye className="w-6 h-6 text-white" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -308,8 +325,14 @@ export default function Gallery() {
 
       {/* Modal for Full Image View */}
       {selectedImage && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="max-w-4xl max-h-[90vh] w-full bg-white/10 backdrop-blur-xl border border-white/30 rounded-2xl overflow-hidden">
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={closeModal}
+        >
+          <div 
+            className="max-w-4xl max-h-[90vh] w-full bg-white/10 backdrop-blur-xl border border-white/30 rounded-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="relative">
               <Image
                 src={selectedImage.src}
@@ -344,6 +367,17 @@ export default function Gallery() {
                 <span className="bg-white/20 px-3 py-1 rounded-full text-blue-100">
                   {selectedImage.category}
                 </span>
+              </div>
+              {/* All Tags in Modal */}
+              <div className="flex flex-wrap gap-1 mt-4">
+                {selectedImage.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="bg-blue-500/30 text-blue-100 px-2 py-1 rounded-full text-xs"
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
