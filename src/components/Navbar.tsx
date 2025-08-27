@@ -53,7 +53,6 @@ const navigation: NavigationItem[] = [
   { name: "Clubs", href: "/clubs", icon: Trophy },
   { name: "Departments", href: "/departments", icon: GraduationCap },
   { name: "Lost & Found", href: "/lost-found", icon: Search },
-  { name: "Discussions", href: "/discussions", icon: Users },
   {
     name: "Join Team",
     href: "/join-dev-team",
@@ -63,6 +62,7 @@ const navigation: NavigationItem[] = [
 ];
 
 const moreMenuItems = [
+  { name: "Discussions", href: "/discussions", icon: Users },
   { name: "Gallery", href: "/gallery", icon: Camera },
   { name: "Download Forms", href: "/download-forms", icon: Download },
   { name: "Holidays", href: "/holidays", icon: CalendarDays },
