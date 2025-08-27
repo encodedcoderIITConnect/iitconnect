@@ -62,103 +62,31 @@ export const authOptions = {
         if (!existingUser) {
           console.log(`👤 New user detected: ${user.email}`);
 
-          // Check user type
-          const isAdminUser = user.email === process.env.ADMIN_EMAIL;
-          const isTestEmail = await isTestLoginAllowed(user.email);
-          const isIITEmail = user.email && user.email.endsWith("@iitrpr.ac.in");
-
-          let extractedEntryNo = null;
-          let department = "";
-          let course = "";
-
-          if (isAdminUser) {
-            // For admin, use admin values
-            console.log(`👑 Processing admin user: ${user.email}`);
-            department = "Administration";
-            course = "Admin";
-          } else if (isTestEmail) {
-            // For test emails, use default values
-            console.log(`🧪 Processing test email: ${user.email}`);
-            department = "Test Account";
-            course = "Developer/Tester";
-          } else if (isIITEmail) {
-            // Extract entry number and other info from IIT Ropar email
-            const emailParts = user.email.split("@")[0]; // e.g., "suresh.24csz0009" or "kashish.24chz0001"
-            const entryNoMatch = emailParts.match(/\.(\d{2}[a-z]{3}\d{4})$/i); // Match pattern like .24csz0009
-            extractedEntryNo = entryNoMatch
-              ? entryNoMatch[1].toUpperCase()
-              : null;
-
-            console.log(`📧 Extracted entry number: ${extractedEntryNo}`);
-
-            // Extract department from entry number (e.g., CSZ -> CSE, CHZ -> CHE)
-            if (extractedEntryNo) {
-              const deptCode = extractedEntryNo.substring(2, 5); // Extract middle 3 letters
-              console.log(`🏢 Department code: ${deptCode}`);
-              switch (deptCode.toUpperCase()) {
-                case "CSZ":
-                  department = "Computer Science and Engineering";
-                  break;
-                case "CHZ":
-                  department = "Chemical Engineering";
-                  break;
-                case "CEZ":
-                  department = "Civil Engineering";
-                  break;
-                case "EEZ":
-                  department = "Electrical Engineering";
-                  break;
-                case "MEZ":
-                  department = "Mechanical Engineering";
-                  break;
-                case "HSZ":
-                  department = "Humanities and Social Sciences";
-                  break;
-                case "PHZ":
-                  department = "Physics";
-                  break;
-                case "CHY":
-                  department = "Chemistry";
-                  break;
-                case "MTZ":
-                  department = "Mathematics";
-                  break;
-                default:
-                  department = "Unknown";
-              }
-
-              course = extractedEntryNo.startsWith("24") ? "B.Tech" : "Unknown";
-            }
-          }
-
-          console.log(`🎓 Assigned department: ${department}`);
-
           // Extract username from email (part before @)
           const username = user.email.split("@")[0];
-          console.log(`👤 Extracted username: ${username}`);
+          console.log(`� Extracted username: ${username}`);
 
-          // User doesn't exist, create new user in database
+          // Create new user with only basic information
           const newUser = {
             name: user.name || "",
             username: username,
             email: user.email,
             image: user.image || "",
-            entryNo: extractedEntryNo,
-            phone: "",
-            department: department,
-            course: course,
-            socialLink: "",
+            entryNo: "", // Empty string - no extraction
+            phone: "", // Empty string
+            department: "", // Empty string
+            course: "", // Empty string
+            socialLink: "", // Empty string
             isPublicEmail: true,
             createdAt: new Date(),
             updatedAt: new Date(),
           };
 
-          console.log(`💾 Creating user with data:`, {
+          console.log(`💾 Creating user with basic data:`, {
             name: newUser.name,
             username: newUser.username,
             email: newUser.email,
-            entryNo: newUser.entryNo,
-            department: newUser.department,
+            image: newUser.image ? "Has image" : "No image",
           });
 
           const result = await usersCollection.insertOne(newUser);
