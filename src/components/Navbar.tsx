@@ -149,8 +149,14 @@ export default function Navbar() {
     <>
       {/* Sign Out Confirmation Dialog */}
       {showSignOutDialog && (
-        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center">
-          <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl">
+        <div
+          className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center"
+          onClick={cancelSignOut}
+        >
+          <div
+            className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-lg font-semibold text-gray-900 mb-2 poppins-semibold">
               Sign Out
             </h3>
@@ -697,8 +703,14 @@ export function MobileBottomNav() {
 
       {/* Sign out confirmation overlay */}
       {showMobileSignOutConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center lg:hidden">
-          <div className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center lg:hidden"
+          onClick={cancelMobileSignOut}
+        >
+          <div
+            className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <h3 className="text-lg font-semibold text-white mb-2 poppins-semibold">
               Sign Out
             </h3>
