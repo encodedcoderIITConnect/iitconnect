@@ -52,7 +52,7 @@ export async function GET(
 
     // Filter sensitive information based on privacy settings
     const isOwnProfile = session.user?.email === user.email;
-    
+
     const publicProfile = {
       ...user,
       email: isOwnProfile || user.isPublicEmail ? user.email : null,

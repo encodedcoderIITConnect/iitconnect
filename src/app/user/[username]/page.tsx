@@ -116,7 +116,7 @@ export default function UserProfilePage() {
       if (response.ok) {
         const updatedUser = await response.json();
         setUserProfile({ ...userProfile!, ...updatedUser });
-        
+
         // Update form data with the fresh data
         setFormData({
           phone: updatedUser.phone || "",
@@ -126,7 +126,7 @@ export default function UserProfilePage() {
           course: updatedUser.course || "",
           isPublicEmail: updatedUser.isPublicEmail ?? true,
         });
-        
+
         setIsEditing(false);
         setSuccess("Profile updated successfully!");
         setTimeout(() => setSuccess(null), 3000); // Clear success message after 3 seconds
@@ -551,18 +551,22 @@ export default function UserProfilePage() {
                                   }
                                   className="mr-2 rounded"
                                 />
-                                <span className="text-white/60">Make public</span>
+                                <span className="text-white/60">
+                                  Make public
+                                </span>
                               </label>
                             )}
                           </div>
                           <div className="text-white font-medium">
                             {userProfile.email}
                           </div>
-                          {isOwnProfile && !isEditing && !userProfile.isPublicEmail && (
-                            <div className="text-white/50 text-sm mt-1">
-                              (Hidden from other users)
-                            </div>
-                          )}
+                          {isOwnProfile &&
+                            !isEditing &&
+                            !userProfile.isPublicEmail && (
+                              <div className="text-white/50 text-sm mt-1">
+                                (Hidden from other users)
+                              </div>
+                            )}
                         </div>
                       )}
 

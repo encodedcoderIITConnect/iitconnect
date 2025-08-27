@@ -704,30 +704,30 @@ export function MobileBottomNav() {
       {/* Sign out confirmation overlay */}
       {showMobileSignOutConfirm && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center lg:hidden"
+          className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center lg:hidden animate-fadeIn"
           onClick={cancelMobileSignOut}
         >
           <div
-            className="bg-white/20 backdrop-blur-xl border border-white/30 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl"
+            className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 mx-4 max-w-sm w-full shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-semibold text-white mb-2 poppins-semibold">
               Sign Out
             </h3>
-            <p className="text-white/90 mb-4 poppins-regular">
+            <p className="text-white/80 mb-6 poppins-regular">
               Are you sure you want to sign out?
             </p>
             <div className="flex space-x-3">
               <Button
                 variant="outline"
                 onClick={cancelMobileSignOut}
-                className="flex-1 bg-white/30 hover:bg-white/40 text-white border-white/40"
+                className="flex-1 bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleMobileSignOut}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                className="flex-1 bg-red-500/80 hover:bg-red-600/90 text-white backdrop-blur-sm border border-red-400/30"
               >
                 Sign Out
               </Button>
