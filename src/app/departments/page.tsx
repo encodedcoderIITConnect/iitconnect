@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Globe } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 
 // Departments and their courses based on the official IIT Ropar structure
 const departments = [
@@ -36,7 +36,7 @@ const departments = [
   },
   {
     name: "Chemical Engineering",
-    shortName: "ChE",
+    shortName: "Chemical",
     category: "Engineering",
     courses: [
       "B.Tech in Chemical Engineering",
@@ -45,12 +45,12 @@ const departments = [
     ],
     description:
       "Involves process design, chemical reactions, and industrial chemistry applications.",
-    image: "/campus/pillar.png",
-    website: "https://www.iitrpr.ac.in/chemical",
+    image: "/campus/lights-on.jpg",
+    website: "https://www.iitrpr.ac.in/chemical/Index/index.php",
   },
   {
     name: "Civil Engineering",
-    shortName: "CE",
+    shortName: "Civil",
     category: "Engineering",
     courses: [
       "B.Tech in Civil Engineering",
@@ -59,7 +59,7 @@ const departments = [
     ],
     description:
       "Covers structural engineering, transportation, and infrastructure development.",
-    image: "/campus/lights-on.jpg",
+    image: "/campus/SAB.png",
     website: "https://www.iitrpr.ac.in/civil/",
   },
   {
@@ -78,7 +78,7 @@ const departments = [
   },
   {
     name: "Electrical Engineering",
-    shortName: "EE",
+    shortName: "Electrical",
     category: "Engineering",
     courses: [
       "B.Tech in Electrical Engineering",
@@ -92,7 +92,7 @@ const departments = [
   },
   {
     name: "Mechanical Engineering",
-    shortName: "ME",
+    shortName: "Mechanical",
     category: "Engineering",
     courses: [
       "B.Tech in Mechanical Engineering",
@@ -101,7 +101,7 @@ const departments = [
     ],
     description:
       "Deals with design, manufacturing, thermal systems, and mechanical systems.",
-    image: "/campus/pillar.png",
+    image: "/campus/Academics.jpg",
     website: "https://mech.iitrpr.ac.in/",
   },
   {
@@ -126,7 +126,7 @@ const departments = [
     courses: ["M.Sc in Chemistry", "Ph.D in Chemistry"],
     description:
       "Focuses on organic, inorganic, physical, and analytical chemistry research.",
-    image: "/campus/lights-on.jpg",
+    image: "/campus/Leaves.jpg",
     website: "https://www.iitrpr.ac.in/chemistry",
   },
   {
@@ -141,13 +141,13 @@ const departments = [
   },
   {
     name: "Mathematics",
-    shortName: "Math",
+    shortName: "Mathematics",
     category: "Sciences",
     courses: ["M.Sc in Mathematics", "Ph.D in Mathematics"],
     description:
       "Combines pure mathematics, applied mathematics, and computational methods.",
-    image: "/campus/pillar.png",
-    website: "https://www.iitrpr.ac.in/math",
+    image: "/campus/Sunset.jpg",
+    website: "https://www.iitrpr.ac.in/math/",
   },
   // Humanities Department
   {
@@ -169,32 +169,45 @@ const departments = [
 // Research Centers
 const centers = [
   {
-    name: "Center of BioMedical Engineering",
-    shortName: "CBME",
+    name: "Center for Artificial Intelligence and Robotics in Defense Systems",
+    shortName: "CARDS",
     description:
-      "Interdisciplinary research in biomedical engineering and healthcare technologies.",
-    image: "/campus/pillar.png",
+      "Advanced research in AI and robotics for defense applications and security systems.",
+    image: "/campus/spiral.jpg",
+    website: "https://www.iitrpr.ac.in/datascience/",
   },
   {
-    name: "Center for Materials and Energy",
-    shortName: "CME",
+    name: "Center of Excellence for Sustainable Agriculture and Rural Development Systems",
+    shortName: "CoE-SARDS",
     description:
-      "Research focused on advanced materials and sustainable energy solutions.",
-    image: "/campus/SAB.png",
+      "Promoting sustainable agriculture practices and rural development through technology.",
+    image: "/campus/Leaves.jpg",
+    website: "https://www.iitrpr.ac.in/coe-sards/",
   },
-];
-
-// Additional Programs from the official list
-const additionalPrograms = [
-  "B.Tech",
-  "M.Tech",
-  "M.Sc (IAM)",
-  "M.Sc (Data Science and Management)",
-  "Ph.D (List of Shortlisted Candidates)",
-  "Ph.D (List of Selected Candidates)",
-  "Ph.D Categories",
-  "B.Sc - B.Ed",
-  "M.S in Data Science",
+  {
+    name: "Center for Engineering Education",
+    shortName: "CEE",
+    description:
+      "Enhancing engineering education through innovative teaching methods and curriculum development.",
+    image: "/campus/Academics.jpg",
+    website: "https://www.iitrpr.ac.in/center-engineering-education",
+  },
+  {
+    name: "Indo-Taiwan Joint Research Center",
+    shortName: "IT JRC",
+    description:
+      "Collaborative research center fostering Indo-Taiwan academic and industrial partnerships.",
+    image: "/campus/SAB.png",
+    website: "https://www.iitrpr.ac.in/indo-taiwan/",
+  },
+  {
+    name: "Center for Research in Energy and Environment for Development",
+    shortName: "CREED",
+    description:
+      "Research focused on sustainable energy solutions and environmental development.",
+    image: "/campus/Sunset.jpg",
+    website: "https://iitrpr.ac.in/creed",
+  },
 ];
 
 export default function DepartmentsPage() {
@@ -277,7 +290,7 @@ export default function DepartmentsPage() {
                     <h5 className="font-semibold text-blue-800 mb-2">
                       Courses Offered:
                     </h5>
-                    <ul className="space-y-1">
+                    <ul className="space-y-1 mb-4">
                       {dept.courses.map((course, index) => (
                         <li
                           key={index}
@@ -288,6 +301,17 @@ export default function DepartmentsPage() {
                         </li>
                       ))}
                     </ul>
+
+                    {/* Website Link Button */}
+                    <a
+                      href={dept.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Visit Website
+                    </a>
                   </div>
                 </div>
               ))}
@@ -318,28 +342,22 @@ export default function DepartmentsPage() {
               <h4 className="text-lg font-medium mb-3 text-gray-800">
                 {center.name}
               </h4>
-              <p className="text-gray-600 text-sm">{center.description}</p>
+              <p className="text-gray-600 text-sm mb-4">{center.description}</p>
+
+              {/* Website Link Button */}
+              <div className="mt-auto">
+                <a
+                  href={center.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Visit Website
+                </a>
+              </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Additional Programs Section */}
-      <div className="w-full max-w-7xl">
-        <h2 className="text-2xl font-semibold text-white mb-6 text-center">
-          Additional Programs
-        </h2>
-        <div className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-8 border border-teal-200">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {additionalPrograms.map((program, index) => (
-              <div
-                key={index}
-                className="bg-blue-50 rounded-lg p-4 text-center border border-blue-200"
-              >
-                <span className="text-blue-800 font-medium">{program}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </div>
