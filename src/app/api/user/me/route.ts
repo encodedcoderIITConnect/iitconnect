@@ -85,37 +85,40 @@ export async function PUT(request: Request) {
 
     // Check if username is provided and validate
     if (username && username.trim()) {
-      // If user already has a username, prevent changes
-      if (currentUser.username) {
+      const trimmedUsername = username.trim().toLowerCase();
+
+      // If user already has a username and is trying to change it, prevent the change
+      if (currentUser.username && currentUser.username !== trimmedUsername) {
         return NextResponse.json(
           { error: "Username cannot be changed once set" },
           { status: 400 }
         );
       }
 
-      const trimmedUsername = username.trim().toLowerCase();
+      // Only validate and check for duplicates if this is a new or different username
+      if (!currentUser.username || currentUser.username !== trimmedUsername) {
+        // Validate username format (alphanumeric and underscores only)
+        if (!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
+          return NextResponse.json(
+            {
+              error:
+                "Username can only contain letters, numbers, and underscores",
+            },
+            { status: 400 }
+          );
+        }
 
-      // Validate username format (alphanumeric and underscores only)
-      if (!/^[a-zA-Z0-9_]+$/.test(trimmedUsername)) {
-        return NextResponse.json(
-          {
-            error:
-              "Username can only contain letters, numbers, and underscores",
-          },
-          { status: 400 }
-        );
-      }
+        // Check if username is already taken by another user
+        const existingUser = await usersCollection.findOne({
+          username: trimmedUsername,
+        });
 
-      // Check if username is already taken by another user
-      const existingUser = await usersCollection.findOne({
-        username: trimmedUsername,
-      });
-
-      if (existingUser) {
-        return NextResponse.json(
-          { error: "Username is already taken" },
-          { status: 400 }
-        );
+        if (existingUser) {
+          return NextResponse.json(
+            { error: "Username is already taken" },
+            { status: 400 }
+          );
+        }
       }
     }
 
@@ -139,9 +142,12 @@ export async function PUT(request: Request) {
       updatedAt: new Date(),
     };
 
-    // Only set username if user doesn't have one already
-    if (username && username.trim() && !currentUser.username) {
-      updateData.username = username.trim().toLowerCase();
+    // Only set username if user doesn't have one already or if it's the same as current
+    if (username && username.trim()) {
+      const trimmedUsername = username.trim().toLowerCase();
+      if (!currentUser.username || currentUser.username === trimmedUsername) {
+        updateData.username = trimmedUsername;
+      }
     }
 
     const updateResult = await usersCollection.updateOne(

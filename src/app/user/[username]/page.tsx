@@ -55,6 +55,7 @@ export default function UserProfilePage() {
     entryNo: "",
     department: "",
     course: "",
+    isPublicEmail: true,
   });
 
   useEffect(() => {
@@ -82,6 +83,7 @@ export default function UserProfilePage() {
             entryNo: data.user.entryNo || "",
             department: data.user.department || "",
             course: data.user.course || "",
+            isPublicEmail: data.user.isPublicEmail ?? true,
           });
         }
       } catch (error) {
@@ -114,6 +116,17 @@ export default function UserProfilePage() {
       if (response.ok) {
         const updatedUser = await response.json();
         setUserProfile({ ...userProfile!, ...updatedUser });
+        
+        // Update form data with the fresh data
+        setFormData({
+          phone: updatedUser.phone || "",
+          socialLink: updatedUser.socialLink || "",
+          entryNo: updatedUser.entryNo || "",
+          department: updatedUser.department || "",
+          course: updatedUser.course || "",
+          isPublicEmail: updatedUser.isPublicEmail ?? true,
+        });
+        
         setIsEditing(false);
         setSuccess("Profile updated successfully!");
         setTimeout(() => setSuccess(null), 3000); // Clear success message after 3 seconds
@@ -267,7 +280,7 @@ export default function UserProfilePage() {
     );
   }
 
-  const isOwnProfile = session?.user?.email === userProfile.email;
+  const isOwnProfile = session?.user?.email === userProfile?.email;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900">
@@ -359,7 +372,7 @@ export default function UserProfilePage() {
                 </div>
 
                 {/* Edit Button - Only show for own profile */}
-                {isOwnProfile && (
+                {session && userProfile && isOwnProfile && (
                   <div className="flex gap-2">
                     {isEditing ? (
                       <>
@@ -520,13 +533,36 @@ export default function UserProfilePage() {
                     {(isOwnProfile || userProfile.isPublicEmail) &&
                       userProfile.email && (
                         <div className="bg-white/5 rounded-lg p-4">
-                          <div className="flex items-center text-white/70 mb-1">
-                            <Mail className="h-4 w-4 mr-2" />
-                            Email
+                          <div className="flex items-center justify-between text-white/70 mb-1">
+                            <div className="flex items-center">
+                              <Mail className="h-4 w-4 mr-2" />
+                              Email
+                            </div>
+                            {isOwnProfile && isEditing && (
+                              <label className="flex items-center text-sm">
+                                <input
+                                  type="checkbox"
+                                  checked={formData.isPublicEmail}
+                                  onChange={(e) =>
+                                    setFormData({
+                                      ...formData,
+                                      isPublicEmail: e.target.checked,
+                                    })
+                                  }
+                                  className="mr-2 rounded"
+                                />
+                                <span className="text-white/60">Make public</span>
+                              </label>
+                            )}
                           </div>
                           <div className="text-white font-medium">
                             {userProfile.email}
                           </div>
+                          {isOwnProfile && !isEditing && !userProfile.isPublicEmail && (
+                            <div className="text-white/50 text-sm mt-1">
+                              (Hidden from other users)
+                            </div>
+                          )}
                         </div>
                       )}
 

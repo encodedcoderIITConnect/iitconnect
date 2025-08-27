@@ -51,9 +51,11 @@ export async function GET(
     }
 
     // Filter sensitive information based on privacy settings
+    const isOwnProfile = session.user?.email === user.email;
+    
     const publicProfile = {
       ...user,
-      email: user.isPublicEmail ? user.email : null,
+      email: isOwnProfile || user.isPublicEmail ? user.email : null,
       phone: user.phone || null, // Only show if user has added it
     };
 
