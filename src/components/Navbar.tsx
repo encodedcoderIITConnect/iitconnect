@@ -588,9 +588,18 @@ export function MobileBottomNav() {
           >
             <div className="p-6 h-full overflow-y-auto flex flex-col pb-20">
               <div className="flex items-center justify-between mb-8">
-                <span className="text-2xl font-bold text-white">
-                  IIT Connect
-                </span>
+                <div className="flex items-center space-x-3">
+                  <Image
+                    src="/logo.png"
+                    alt="IIT Connect Logo"
+                    width={32}
+                    height={32}
+                    className="h-8 w-8"
+                  />
+                  <span className="text-2xl font-bold text-white">
+                    IIT Connect
+                  </span>
+                </div>
                 <button
                   onClick={() => setShowMobileMenu(false)}
                   className="text-white/80 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
