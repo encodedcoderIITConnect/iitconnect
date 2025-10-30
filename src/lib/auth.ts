@@ -64,7 +64,7 @@ export const authOptions = {
 
           // Extract username from email (part before @)
           const username = user.email.split("@")[0];
-          console.log(`� Extracted username: ${username}`);
+          console.log(`📧 Extracted username: ${username}`);
 
           // Create new user with only basic information
           const newUser = {
@@ -72,11 +72,11 @@ export const authOptions = {
             username: username,
             email: user.email,
             image: user.image || "",
-            entryNo: "", // Empty string - no extraction
-            phone: "", // Empty string
-            department: "", // Empty string
-            course: "", // Empty string
-            socialLink: "", // Empty string
+            entryNo: username, // Use email prefix as entryNo to ensure uniqueness
+            phone: null, // null allows multiple users without phone
+            department: null, // null allows multiple users without department
+            course: null, // null allows multiple users without course
+            socialLink: null, // null allows multiple users without social link
             isPublicEmail: true,
             createdAt: new Date(),
             updatedAt: new Date(),
