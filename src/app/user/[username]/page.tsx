@@ -632,6 +632,38 @@ export default function UserProfilePage() {
                   </div>
                 </div>
               </div>
+
+              {/* Account Deletion Section - Only show for own profile */}
+              {isOwnProfile && (
+                <div className="mt-8 pt-8 border-t border-white/20">
+                  <h3 className="text-xl font-semibold text-white mb-4">
+                    Account Management
+                  </h3>
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-6">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-white font-semibold mb-2">
+                          Request Account Deletion
+                        </h4>
+                        <p className="text-white/70 text-sm mb-4">
+                          Permanently delete your account and all associated
+                          data. This action cannot be undone.
+                        </p>
+                        <Button
+                          disabled
+                          className="bg-red-600/50 text-white cursor-not-allowed opacity-60 relative"
+                        >
+                          <span className="mr-2">🚧</span>
+                          Coming Soon
+                        </Button>
+                        <p className="text-white/50 text-xs mt-2">
+                          Account deletion feature will be available soon
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

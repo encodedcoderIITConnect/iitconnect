@@ -78,10 +78,10 @@ const moreMenuItems = [
 export default function Navbar() {
   const { data: session } = useSession();
   const pathname = usePathname();
-  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [showAdminDropdown, setShowAdminDropdown] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const adminMenuRef = useRef<HTMLDivElement>(null);
   const moreMenuRef = useRef<HTMLDivElement>(null);
   const { totalUnreadCount } = useUnreadCount();
   const { isCollapsed, toggleSidebar } = useSidebar();
@@ -101,8 +101,11 @@ export default function Navbar() {
     }
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowSignOutConfirm(false);
+      if (
+        adminMenuRef.current &&
+        !adminMenuRef.current.contains(event.target as Node)
+      ) {
+        setShowAdminDropdown(false);
       }
       if (
         moreMenuRef.current &&
@@ -132,7 +135,7 @@ export default function Navbar() {
   };
 
   const handleSignOutClick = () => {
-    setShowSignOutConfirm(false); // Close the profile menu
+    setShowMoreMenu(false); // Close the more menu
     setShowSignOutDialog(true); // Show confirmation dialog
   };
 
@@ -275,70 +278,100 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* User Profile Menu */}
+            {/* User Profile - Direct link for regular users, dropdown for admin */}
             {session && (
-              <div ref={menuRef} className="relative">
-                <button
-                  onClick={() => setShowSignOutConfirm(!showSignOutConfirm)}
-                  className={`w-full flex items-center text-left ${
-                    isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
-                  } rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors`}
-                  title={
-                    isCollapsed ? session.user?.name || "User" : "User Profile"
-                  }
-                >
-                  <Avatar className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}>
-                    <AvatarImage
-                      src={session.user?.image || "/default-avatar.png"}
-                      alt={session.user?.name || "User"}
-                    />
-                    <AvatarFallback>
-                      {session.user?.name
-                        ? session.user.name.charAt(0).toUpperCase()
-                        : "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  {textVisible && (
-                    <span className="flex-1 truncate">
-                      {session.user?.name}
-                    </span>
-                  )}
-                </button>
-                {/* User Dropdown Menu - Positioned right next to the menu item */}
-                {showSignOutConfirm && (
-                  <div
-                    className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu min-w-48 ${
-                      isCollapsed
-                        ? "left-full bottom-0 ml-2"
-                        : "bottom-full left-0 right-0 mb-2"
-                    }`}
-                  >
-                    <Link
-                      href={`/user/${session?.user?.email?.split("@")[0]}`}
-                      onClick={() => setShowSignOutConfirm(false)}
-                      className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
-                    >
-                      <User className="h-4 w-4 mr-3" />
-                      Profile
-                    </Link>
-                    {isAdminUser && (
-                      <Link
-                        href="/admin"
-                        onClick={() => setShowSignOutConfirm(false)}
-                        className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
-                      >
-                        <Settings className="h-4 w-4 mr-3" />
-                        Admin Panel
-                      </Link>
-                    )}
+              <div ref={adminMenuRef} className="relative">
+                {isAdminUser ? (
+                  // Admin users: Show dropdown with Profile and Admin Panel
+                  <>
                     <button
-                      onClick={handleSignOutClick}
-                      className="w-full flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
+                      onClick={() => setShowAdminDropdown(!showAdminDropdown)}
+                      className={`w-full flex items-center text-left ${
+                        isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
+                      } rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors`}
+                      title={
+                        isCollapsed
+                          ? session.user?.name || "User"
+                          : "User Profile"
+                      }
                     >
-                      <LogOut className="h-4 w-4 mr-3" />
-                      Sign Out
+                      <Avatar
+                        className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}
+                      >
+                        <AvatarImage
+                          src={session.user?.image || "/default-avatar.png"}
+                          alt={session.user?.name || "User"}
+                        />
+                        <AvatarFallback>
+                          {session.user?.name
+                            ? session.user.name.charAt(0).toUpperCase()
+                            : "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      {textVisible && (
+                        <span className="flex-1 truncate">
+                          {session.user?.name}
+                        </span>
+                      )}
                     </button>
-                  </div>
+                    {/* Admin Dropdown Menu */}
+                    {showAdminDropdown && (
+                      <div
+                        className={`absolute z-50 bg-white/20 backdrop-blur-xl border border-white/30 rounded-lg shadow-lg py-1 dropdown-menu min-w-48 ${
+                          isCollapsed
+                            ? "left-full bottom-0 ml-2"
+                            : "bottom-full left-0 right-0 mb-2"
+                        }`}
+                      >
+                        <Link
+                          href={`/user/${session?.user?.email?.split("@")[0]}`}
+                          onClick={() => setShowAdminDropdown(false)}
+                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
+                        >
+                          <User className="h-4 w-4 mr-3" />
+                          Profile
+                        </Link>
+                        <Link
+                          href="/admin"
+                          onClick={() => setShowAdminDropdown(false)}
+                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
+                        >
+                          <Settings className="h-4 w-4 mr-3" />
+                          Admin Panel
+                        </Link>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  // Regular users: Direct link to profile page
+                  <Link
+                    href={`/user/${session?.user?.email?.split("@")[0]}`}
+                    className={`w-full flex items-center ${
+                      isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
+                    } rounded-lg text-sm font-medium text-white/90 hover:bg-white/20 hover:text-white transition-colors`}
+                    title={
+                      isCollapsed
+                        ? session.user?.name || "User"
+                        : "User Profile"
+                    }
+                  >
+                    <Avatar className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}>
+                      <AvatarImage
+                        src={session.user?.image || "/default-avatar.png"}
+                        alt={session.user?.name || "User"}
+                      />
+                      <AvatarFallback>
+                        {session.user?.name
+                          ? session.user.name.charAt(0).toUpperCase()
+                          : "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    {textVisible && (
+                      <span className="flex-1 truncate">
+                        {session.user?.name}
+                      </span>
+                    )}
+                  </Link>
                 )}
               </div>
             )}
@@ -393,6 +426,18 @@ export default function Navbar() {
                       {item.name}
                     </Link>
                   ))}
+                  {/* Separator */}
+                  <div className="border-t border-white/20 my-1"></div>
+                  {/* Sign Out Button */}
+                  <div className="px-2 py-1">
+                    <button
+                      onClick={handleSignOutClick}
+                      className="w-full flex items-center justify-center px-4 py-2 text-sm text-white bg-red-600 hover:bg-red-700 rounded-md whitespace-nowrap transition-all shadow-sm"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
