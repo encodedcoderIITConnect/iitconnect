@@ -187,14 +187,14 @@ export default function Gallery() {
             ))}
           </div>
 
-          {/* Coming Soon Upload Button */}
+          {/* Share Your Moment Button */}
           <div className="text-center">
             <Button
-              disabled
-              className="bg-white/20 text-white border border-white/30 hover:bg-white/30 cursor-not-allowed"
+              onClick={() => (window.location.href = "/gallery/submit")}
+              className="bg-white text-blue-600 hover:bg-blue-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <Upload className="w-4 h-4 mr-2" />
-              Upload Photos (Coming Soon)
+              Share Your Moment
             </Button>
           </div>
         </div>
