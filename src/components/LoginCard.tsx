@@ -3,6 +3,7 @@
 import { useSession, signIn } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { Shield, AlertTriangle } from "lucide-react";
 
 export default function LoginCard() {
@@ -139,11 +140,13 @@ export default function LoginCard() {
       </div>
       {/* Right: SAB Image */}
       <div className="md:w-1/2 w-full h-48 md:h-auto relative hidden sm:block">
-        <img
+        <Image
           src="/campus/SAB.png"
           alt="SAB Building"
-          className="w-full h-full object-cover object-center"
-          draggable="false"
+          fill
+          className="object-cover object-center"
+          draggable={false}
+          priority
         />
       </div>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { ExternalLink } from "lucide-react";
 
 // Departments and their courses based on the official IIT Ropar structure
@@ -272,9 +273,11 @@ export default function DepartmentsPage() {
                   key={dept.shortName}
                   className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-8 flex flex-col hover:scale-[1.02] hover:shadow-2xl transition-all border border-teal-200"
                 >
-                  <img
+                  <Image
                     src={dept.image}
                     alt={dept.name}
+                    width={400}
+                    height={128}
                     className="w-full h-32 object-cover rounded-xl mb-4 border-2 border-blue-300"
                   />
                   <h3 className="text-2xl font-semibold mb-2 text-blue-900">
@@ -331,9 +334,11 @@ export default function DepartmentsPage() {
               key={center.shortName}
               className="bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg p-8 flex flex-col hover:scale-[1.02] hover:shadow-2xl transition-all border border-teal-200"
             >
-              <img
+              <Image
                 src={center.image}
                 alt={center.name}
+                width={400}
+                height={128}
                 className="w-full h-32 object-cover rounded-xl mb-4 border-2 border-blue-300"
               />
               <h3 className="text-2xl font-semibold mb-2 text-blue-900">

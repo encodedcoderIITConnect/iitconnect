@@ -12,7 +12,7 @@ export default function GamesPage() {
   const [onlineCount, setOnlineCount] = useState(127);
   const [gamesPlayed, setGamesPlayed] = useState(2543);
   const [topPlayer, setTopPlayer] = useState("Loading...");
-  const [gameOfDay, setGameOfDay] = useState("Snake");
+  const [gameOfDay] = useState("Snake");
   const [totalScore, setTotalScore] = useState(45670);
 
   // Live updates simulation

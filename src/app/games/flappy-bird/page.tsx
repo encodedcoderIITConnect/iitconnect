@@ -103,6 +103,15 @@ export default function FlappyBirdGame() {
     };
   }, [gameState, gameLoop]);
 
+  // End game function
+  const endGame = useCallback(() => {
+    setGameState("gameOver");
+    if (score > highScore) {
+      setHighScore(score);
+      localStorage.setItem("flappybird-highscore", score.toString());
+    }
+  }, [score, highScore]);
+
   // Collision detection
   useEffect(() => {
     if (gameState !== "playing") return;
@@ -129,7 +138,7 @@ export default function FlappyBirdGame() {
         setScore((prev) => prev + 1);
       }
     });
-  }, [bird, pipes, gameState]);
+  }, [bird, pipes, gameState, endGame]);
 
   // Draw game
   useEffect(() => {
@@ -209,7 +218,7 @@ export default function FlappyBirdGame() {
     } else if (gameState === "gameOver") {
       resetGame();
     }
-  }, [gameState]);
+  }, [gameState, JUMP_FORCE]);
 
   // Keyboard controls
   useEffect(() => {
@@ -229,14 +238,6 @@ export default function FlappyBirdGame() {
     setScore(0);
     setBird({ x: 50, y: 150, velocity: 0 });
     setPipes([]);
-  };
-
-  const endGame = () => {
-    setGameState("gameOver");
-    if (score > highScore) {
-      setHighScore(score);
-      localStorage.setItem("flappybird-highscore", score.toString());
-    }
   };
 
   const resetGame = () => {

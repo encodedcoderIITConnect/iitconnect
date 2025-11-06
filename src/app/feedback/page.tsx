@@ -28,7 +28,7 @@ export default function FeedbackPage() {
           <p className="text-blue-100 text-lg md:text-xl max-w-2xl mx-auto">
             We value your input! Your suggestions help us improve IIT Connect
             for everyone. Please share your thoughts, ideas, or any issues
-            you've encountered.
+            you&apos;ve encountered.
           </p>
         </div>
 

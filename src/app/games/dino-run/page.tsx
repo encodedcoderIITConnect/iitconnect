@@ -136,6 +136,15 @@ export default function DinoRunGame() {
     };
   }, [gameState, gameLoop]);
 
+  // End game function
+  const endGame = useCallback(() => {
+    setGameState("gameOver");
+    if (score > highScore) {
+      setHighScore(score);
+      localStorage.setItem("dinorun-highscore", score.toString());
+    }
+  }, [score, highScore]);
+
   // Collision detection
   useEffect(() => {
     if (gameState !== "playing") return;
@@ -150,7 +159,7 @@ export default function DinoRunGame() {
         endGame();
       }
     });
-  }, [dino, obstacles, gameState]);
+  }, [dino, obstacles, gameState, endGame]);
 
   // Draw game
   useEffect(() => {
@@ -247,7 +256,7 @@ export default function DinoRunGame() {
     } else if (gameState === "gameOver") {
       resetGame();
     }
-  }, [gameState, dino.isJumping]);
+  }, [gameState, dino.isJumping, JUMP_FORCE]);
 
   // Keyboard and touch controls
   useEffect(() => {
@@ -268,14 +277,6 @@ export default function DinoRunGame() {
     setGameSpeed(4);
     setDino({ x: 50, y: GROUND_Y, velocity: 0, isJumping: false });
     setObstacles([]);
-  };
-
-  const endGame = () => {
-    setGameState("gameOver");
-    if (score > highScore) {
-      setHighScore(score);
-      localStorage.setItem("dinorun-highscore", score.toString());
-    }
   };
 
   const resetGame = () => {
