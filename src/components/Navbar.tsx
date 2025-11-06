@@ -35,6 +35,7 @@ import {
   Calendar,
   Bus,
   CalendarDays,
+  MessageSquare,
 } from "lucide-react";
 
 // Navigation item type
@@ -73,6 +74,7 @@ const moreMenuItems = [
   { name: "HelpDesk", href: "/helpdesk", icon: HelpCircle },
   { name: "Contact Us", href: "/contact", icon: Mail },
   { name: "About Us", href: "/about", icon: Info },
+  { name: "Feedback", href: "/feedback", icon: MessageSquare },
 ];
 
 export default function Navbar() {
