@@ -608,10 +608,7 @@ export default function TetrisGame() {
                         </Button>
                       )}
                       <Link href="/games" className="w-full">
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                        >
+                        <Button variant="outline" className="w-full">
                           Back to Games
                         </Button>
                       </Link>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Princess_Sofia } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
@@ -24,8 +24,13 @@ export const metadata: Metadata = {
   title: "IIT Connect - Campus Community Platform",
   description:
     "Connect with your IIT Ropar community - discussions, rides, games, and more",
-  viewport:
-    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
