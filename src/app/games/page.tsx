@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Gamepad2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function GamesPage() {
   const { data: session } = useSession();
@@ -106,12 +107,11 @@ export default function GamesPage() {
               </p>
 
               {/* Play Game Button */}
-              <Button
-                className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
-                onClick={() => (window.location.href = "/games/snake")}
-              >
-                🎮 Play Game
-              </Button>
+              <Link href="/games/snake" className="block w-full">
+                <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm">
+                  🎮 Play Game
+                </Button>
+              </Link>
 
               {/* Divider */}
               <div className="border-t border-gray-200 my-6"></div>
@@ -163,12 +163,11 @@ export default function GamesPage() {
               </p>
 
               {/* Play Game Button */}
-              <Button
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
-                onClick={() => (window.location.href = "/games/flappy-bird")}
-              >
-                🎮 Play Game
-              </Button>
+              <Link href="/games/flappy-bird" className="block w-full">
+                <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm">
+                  🎮 Play Game
+                </Button>
+              </Link>
 
               {/* Divider */}
               <div className="border-t border-gray-200 my-6"></div>
@@ -220,12 +219,11 @@ export default function GamesPage() {
               </p>
 
               {/* Play Game Button */}
-              <Button
-                className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
-                onClick={() => (window.location.href = "/games/dino-run")}
-              >
-                🎮 Play Game
-              </Button>
+              <Link href="/games/dino-run" className="block w-full">
+                <Button className="w-full bg-gradient-to-r from-green-500 to-blue-600 hover:from-green-600 hover:to-blue-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm">
+                  🎮 Play Game
+                </Button>
+              </Link>
 
               {/* Divider */}
               <div className="border-t border-gray-200 my-6"></div>
@@ -277,12 +275,11 @@ export default function GamesPage() {
               </p>
 
               {/* Play Game Button */}
-              <Button
-                className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
-                onClick={() => (window.location.href = "/games/tetris")}
-              >
-                🎮 Play Game
-              </Button>
+              <Link href="/games/tetris" className="block w-full">
+                <Button className="w-full bg-gradient-to-r from-teal-500 to-cyan-600 hover:from-teal-600 hover:to-cyan-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm">
+                  🎮 Play Game
+                </Button>
+              </Link>
 
               {/* Divider */}
               <div className="border-t border-gray-200 my-6"></div>
@@ -334,12 +331,11 @@ export default function GamesPage() {
               </p>
 
               {/* Play Game Button */}
-              <Button
-                className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
-                onClick={() => (window.location.href = "/games/pong")}
-              >
-                🎮 Play Game
-              </Button>
+              <Link href="/games/pong" className="block w-full">
+                <Button className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm">
+                  🎮 Play Game
+                </Button>
+              </Link>
 
               {/* Divider */}
               <div className="border-t border-gray-200 my-6"></div>
@@ -391,12 +387,11 @@ export default function GamesPage() {
               </p>
 
               {/* Play Game Button */}
-              <Button
-                className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm"
-                onClick={() => (window.location.href = "/games/2048")}
-              >
-                🎮 Play Game
-              </Button>
+              <Link href="/games/2048" className="block w-full">
+                <Button className="w-full bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white py-3 text-lg font-semibold rounded-xl mb-6 transition-all duration-300 hover:shadow-lg shadow-sm">
+                  🎮 Play Game
+                </Button>
+              </Link>
 
               {/* Divider */}
               <div className="border-t border-gray-200 my-6"></div>

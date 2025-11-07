@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { ArrowLeft, RotateCcw, Trophy, Star } from "lucide-react";
 
 interface Bird {
@@ -272,14 +273,15 @@ export default function FlappyBirdGame() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <Button
-            onClick={() => (window.location.href = "/games")}
-            variant="outline"
-            className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Games
-          </Button>
+          <Link href="/games">
+            <Button
+              variant="outline"
+              className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Games
+            </Button>
+          </Link>
 
           <div className="text-center">
             <h1 className="text-3xl font-bold text-white flex items-center justify-center">
@@ -361,13 +363,14 @@ export default function FlappyBirdGame() {
                         <RotateCcw className="h-4 w-4 mr-2" />
                         Play Again
                       </Button>
-                      <Button
-                        onClick={() => (window.location.href = "/games")}
-                        variant="outline"
-                        className="bg-white/20 border-white/30 text-white hover:bg-white/30 w-full"
-                      >
-                        Back to Games
-                      </Button>
+                      <Link href="/games" className="w-full">
+                        <Button
+                          variant="outline"
+                          className="bg-white/20 border-white/30 text-white hover:bg-white/30 w-full"
+                        >
+                          Back to Games
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>

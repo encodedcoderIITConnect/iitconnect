@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { RotateCcw, Home, Trophy, Gamepad2, Pause, Play } from "lucide-react";
 
 interface Piece {
@@ -481,15 +482,16 @@ export default function TetrisGame() {
             {/* Left Panel - Stats */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Button
-                  onClick={() => (window.location.href = "/games")}
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-600 hover:text-indigo-600"
-                >
-                  <Home className="h-4 w-4 mr-2" />
-                  Games
-                </Button>
+                <Link href="/games">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-gray-600 hover:text-indigo-600"
+                  >
+                    <Home className="h-4 w-4 mr-2" />
+                    Games
+                  </Button>
+                </Link>
                 <Button
                   onClick={startGame}
                   variant="ghost"
@@ -605,13 +607,14 @@ export default function TetrisGame() {
                           Play Again
                         </Button>
                       )}
-                      <Button
-                        onClick={() => (window.location.href = "/games")}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        Back to Games
-                      </Button>
+                      <Link href="/games" className="w-full">
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                        >
+                          Back to Games
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>

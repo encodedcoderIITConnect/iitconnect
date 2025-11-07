@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { ChevronLeft, RotateCcw, Trophy, Star, ArrowLeft } from "lucide-react";
 
 // Game types
@@ -505,15 +506,16 @@ export default function Game2048() {
       <div className="max-w-6xl mx-auto">
         {/* Mobile Header */}
         <div className="flex items-center justify-between mb-6 md:hidden">
-          <Button
-            onClick={() => (window.location.href = "/games")}
-            variant="ghost"
-            size="sm"
-            className="text-white hover:bg-white/20 p-2 flex items-center"
-          >
-            <ChevronLeft className="h-6 w-6 mr-1" />
-            <span className="text-2xl font-bold">2048</span>
-          </Button>
+          <Link href="/games">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:bg-white/20 p-2 flex items-center"
+            >
+              <ChevronLeft className="h-6 w-6 mr-1" />
+              <span className="text-2xl font-bold">2048</span>
+            </Button>
+          </Link>
 
           <div className="flex items-center space-x-3 text-white text-sm">
             <div className="text-center bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2 border border-white/20">
@@ -535,14 +537,15 @@ export default function Game2048() {
 
         {/* Desktop Header */}
         <div className="hidden md:flex items-center justify-between mb-6">
-          <Button
-            onClick={() => (window.location.href = "/games")}
-            variant="outline"
-            className="bg-white/20 border-white/30 text-white hover:bg-white/30"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Games
-          </Button>
+          <Link href="/games">
+            <Button
+              variant="outline"
+              className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Games
+            </Button>
+          </Link>
 
           <div className="text-center">
             <h1 className="text-3xl font-bold text-white flex items-center justify-center">
@@ -722,14 +725,15 @@ export default function Game2048() {
                         <RotateCcw className="h-4 w-4 mr-2" />
                         Try Again
                       </Button>
-                      <Button
-                        onClick={() => (window.location.href = "/games")}
-                        variant="outline"
-                        className="bg-white/20 border-white/30 text-white hover:bg-white/30 w-full rounded-lg"
-                      >
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Back to Games
-                      </Button>
+                      <Link href="/games" className="w-full block">
+                        <Button
+                          variant="outline"
+                          className="bg-white/20 border-white/30 text-white hover:bg-white/30 w-full rounded-lg"
+                        >
+                          <ArrowLeft className="h-4 w-4 mr-2" />
+                          Back to Games
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>

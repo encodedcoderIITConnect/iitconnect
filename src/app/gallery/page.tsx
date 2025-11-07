@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Camera, Download, Heart, Eye, Search, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -189,13 +190,12 @@ export default function Gallery() {
 
           {/* Share Your Moment Button */}
           <div className="text-center">
-            <Button
-              onClick={() => (window.location.href = "/gallery/submit")}
-              className="bg-white text-blue-600 hover:bg-blue-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              Share Your Moment
-            </Button>
+            <Link href="/gallery/submit">
+              <Button className="bg-white text-blue-600 hover:bg-blue-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300">
+                <Upload className="w-4 h-4 mr-2" />
+                Share Your Moment
+              </Button>
+            </Link>
           </div>
         </div>
 

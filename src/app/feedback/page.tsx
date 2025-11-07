@@ -2,8 +2,41 @@
 
 import { ArrowLeft, MessageSquare, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 export default function FeedbackPage() {
+  const [iframeHeight, setIframeHeight] = useState(1200);
+
+  useEffect(() => {
+    const updateHeight = () => {
+      const width = window.innerWidth;
+
+      // Adjust height based on screen width
+      if (width < 640) {
+        // Mobile: smaller screens need more vertical space
+        setIframeHeight(1400);
+      } else if (width < 768) {
+        // Small tablets
+        setIframeHeight(1300);
+      } else if (width < 1024) {
+        // Tablets
+        setIframeHeight(1300);
+      } else {
+        // Desktop and larger
+        setIframeHeight(1200);
+      }
+    };
+
+    // Set initial height
+    updateHeight();
+
+    // Update on window resize
+    window.addEventListener("resize", updateHeight);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-teal-500 p-4">
       <div className="max-w-5xl mx-auto">
@@ -33,12 +66,12 @@ export default function FeedbackPage() {
         </div>
 
         {/* Embedded Google Form */}
-        <div className="bg-white/20 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white/50">
+        <div className="bg-white/20 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-white/50 pt-7 mb-10">
           <iframe
             src="https://docs.google.com/forms/d/e/1FAIpQLSfUqnhijgxWOf0YzthOPY43o-msTmyi9HauPsxZuiOlsjt6DQ/viewform?embedded=true"
             width="100%"
-            height="1200"
-            className="w-full"
+            height={iframeHeight}
+            className="w-full border-0 rounded-lg shadow-2xl"
           >
             Loading…
           </iframe>

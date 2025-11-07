@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
   ChevronLeft,
   RotateCcw,
@@ -443,13 +444,12 @@ export default function SnakePage() {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Button
-            onClick={() => (window.location.href = "/games")}
-            className="bg-white/20 backdrop-blur-xl border border-white/40 text-white hover:bg-white/30"
-          >
-            <ChevronLeft className="h-5 w-5 mr-2" />
-            Back to Games
-          </Button>
+          <Link href="/games">
+            <Button className="bg-white/20 backdrop-blur-xl border border-white/40 text-white hover:bg-white/30">
+              <ChevronLeft className="h-5 w-5 mr-2" />
+              Back to Games
+            </Button>
+          </Link>
 
           <div className="text-center">
             <h1 className="text-3xl md:text-4xl font-bold text-white flex items-center justify-center">
