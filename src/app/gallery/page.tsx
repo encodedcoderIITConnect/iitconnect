@@ -34,7 +34,7 @@ const galleryImages: GalleryImage[] = [
   {
     id: "1",
     src: "https://ik.imagekit.io/rzomyrznq/SAB.png",
-    title: "Student Academic Block",
+    title: "Super Academic Block (SAB)",
     description:
       "The iconic SAB building - heart of academic activities at IIT Ropar",
     category: "Architecture",
@@ -707,7 +707,7 @@ export default function Gallery() {
 
           {/* Main Image Container */}
           <div
-            className="relative w-full h-full flex items-center justify-center p-4 sm:p-12 md:p-16 lg:p-20"
+            className="relative w-full h-full flex items-center justify-center p-4 sm:p-8"
             onClick={(e) => e.stopPropagation()}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -731,7 +731,7 @@ export default function Gallery() {
                 alt={selectedImage.title}
                 width={1920}
                 height={1080}
-                className="max-w-full max-h-[calc(100vh-160px)] w-auto h-auto object-contain select-none"
+                className="max-w-full max-h-[calc(100vh-12rem)] sm:max-h-[calc(100vh-14rem)] w-auto h-auto object-contain select-none"
                 draggable={false}
                 priority
               />
@@ -756,12 +756,16 @@ export default function Gallery() {
                   <div className="flex items-center gap-3 sm:gap-6 text-gray-300 text-xs sm:text-sm">
                     <span className="flex items-center gap-1 sm:gap-2">
                       <Heart className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span className="hidden xs:inline">{selectedImage.likes} likes</span>
+                      <span className="hidden xs:inline">
+                        {selectedImage.likes} likes
+                      </span>
                       <span className="xs:hidden">{selectedImage.likes}</span>
                     </span>
                     <span className="flex items-center gap-1 sm:gap-2">
                       <Eye className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span className="hidden xs:inline">{selectedImage.views} views</span>
+                      <span className="hidden xs:inline">
+                        {selectedImage.views} views
+                      </span>
                       <span className="xs:hidden">{selectedImage.views}</span>
                     </span>
                     <span className="bg-white/10 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm border border-white/20">
