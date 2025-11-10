@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -332,11 +332,7 @@ const galleryImages: GalleryImage[] = [
   })(),
 ];
 
-const categories = ["All", "Architecture", "Nature", "Photography"];
-
 export default function Gallery() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [searchTerm, setSearchTerm] = useState("");
   const [filteredImages, setFilteredImages] = useState(galleryImages);
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
@@ -347,27 +343,9 @@ export default function Gallery() {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    let filtered = galleryImages;
-
-    // Filter by category
-    if (selectedCategory !== "All") {
-      filtered = filtered.filter((img) => img.category === selectedCategory);
-    }
-
-    // Filter by search term
-    if (searchTerm) {
-      filtered = filtered.filter(
-        (img) =>
-          img.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          img.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          img.tags.some((tag) =>
-            tag.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-      );
-    }
-
-    setFilteredImages(filtered);
-  }, [selectedCategory, searchTerm]);
+    // Simply set all images since filtering features are removed
+    setFilteredImages(galleryImages);
+  }, []);
 
   const handleLike = (imageId: string) => {
     const newLikedImages = new Set(likedImages);
@@ -393,22 +371,22 @@ export default function Gallery() {
     setImagePosition({ x: 0, y: 0 });
   };
 
-  const goToNextImage = () => {
+  const goToNextImage = useCallback(() => {
     const nextIndex = (currentImageIndex + 1) % filteredImages.length;
     setCurrentImageIndex(nextIndex);
     setSelectedImage(filteredImages[nextIndex]);
     setZoomLevel(1);
     setImagePosition({ x: 0, y: 0 });
-  };
+  }, [currentImageIndex, filteredImages]);
 
-  const goToPreviousImage = () => {
+  const goToPreviousImage = useCallback(() => {
     const prevIndex =
       (currentImageIndex - 1 + filteredImages.length) % filteredImages.length;
     setCurrentImageIndex(prevIndex);
     setSelectedImage(filteredImages[prevIndex]);
     setZoomLevel(1);
     setImagePosition({ x: 0, y: 0 });
-  };
+  }, [currentImageIndex, filteredImages]);
 
   const handleZoomIn = () => {
     setZoomLevel((prev) => Math.min(prev + 0.25, 3));
@@ -490,7 +468,7 @@ export default function Gallery() {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedImage, currentImageIndex, filteredImages]);
+  }, [selectedImage, currentImageIndex, filteredImages, goToNextImage, goToPreviousImage]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-teal-500 p-4">
