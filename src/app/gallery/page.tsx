@@ -504,9 +504,9 @@ export default function Gallery() {
         </div>
 
         {/* Search and Filter Controls */}
-        <div className="mb-8 space-y-4">
-          {/* Search Bar */}
-          <div className="relative max-w-md mx-auto">
+        {/* <div className="mb-8 space-y-4"> */}
+        {/* Search Bar */}
+        {/* <div className="relative max-w-md mx-auto">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
@@ -515,10 +515,10 @@ export default function Gallery() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-white/20 backdrop-blur-xl border border-white/30 rounded-xl text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50"
             />
-          </div>
+          </div> */}
 
-          {/* Category Filter */}
-          <div className="flex flex-wrap justify-center gap-3">
+        {/* Category Filter */}
+        {/* <div className="flex flex-wrap justify-center gap-3">
             {categories.map((category) => (
               <button
                 key={category}
@@ -532,18 +532,18 @@ export default function Gallery() {
                 {category}
               </button>
             ))}
-          </div>
+          </div> */}
 
-          {/* Share Your Moment Button */}
-          <div className="text-center">
-            <Link href="/gallery/submit">
-              <Button className="bg-white text-blue-600 hover:bg-blue-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 hover:cursor-pointer">
-                <Upload className="w-4 h-4 mr-2" />
-                Share Your Moment
-              </Button>
-            </Link>
-          </div>
+        {/* Share Your Moment Button */}
+        <div className="text-center mb-7">
+          <Link href="/gallery/submit">
+            <Button className="bg-white text-blue-600 hover:bg-blue-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 hover:cursor-pointer">
+              <Upload className="w-4 h-4 mr-2" />
+              Share Your Moment
+            </Button>
+          </Link>
         </div>
+        {/* </div> */}
 
         {/* Gallery Grid - Pinterest Style */}
         <div className="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
