@@ -46,14 +46,15 @@ interface NavigationItem {
   isSpecial?: boolean;
 }
 
-const navigation: NavigationItem[] = [
+// Fixed items - always visible in sidebar
+const fixedTopItems: NavigationItem[] = [
   { name: "Home", href: "/", icon: Home },
   { name: "Library", href: "/library", icon: BookOpen },
+  { name: "Gallery", href: "/gallery", icon: Camera },
   { name: "Messages", href: "/chat", icon: MessageCircle },
-  { name: "Events", href: "/events", icon: Calendar },
-  { name: "Clubs", href: "/clubs", icon: Trophy },
-  { name: "Departments", href: "/departments", icon: GraduationCap },
-  { name: "Lost & Found", href: "/lost-found", icon: Search },
+];
+
+const fixedBottomItems: NavigationItem[] = [
   {
     name: "Join Team",
     href: "/join-dev-team",
@@ -62,15 +63,24 @@ const navigation: NavigationItem[] = [
   },
 ];
 
-const moreMenuItems = [
+// Dynamic items - shown in sidebar if space available, otherwise in More menu
+// Order represents priority (higher priority items shown first)
+const dynamicItems: NavigationItem[] = [
+  { name: "Clubs", href: "/clubs", icon: Trophy },
+  { name: "Events", href: "/events", icon: Calendar },
+  { name: "Games", href: "/games", icon: Gamepad2 },
   { name: "Discussions", href: "/discussions", icon: Users },
-  { name: "Gallery", href: "/gallery", icon: Camera },
   { name: "Download Forms", href: "/download-forms", icon: Download },
   { name: "Holidays", href: "/holidays", icon: CalendarDays },
   { name: "Bus Timing", href: "/bus-timing", icon: Bus },
   { name: "Auto Drivers", href: "/drivers", icon: Car },
-  { name: "Games", href: "/games", icon: Gamepad2 },
+  { name: "Departments", href: "/departments", icon: GraduationCap },
+];
+
+// Items that always stay in More menu
+const alwaysInMoreMenu: NavigationItem[] = [
   { name: "Hostels & Guest House", href: "/hostels", icon: Building },
+  { name: "Lost & Found", href: "/lost-found", icon: Search },
   { name: "HelpDesk", href: "/helpdesk", icon: HelpCircle },
   { name: "Contact Us", href: "/contact", icon: Mail },
   { name: "About Us", href: "/about", icon: Info },
@@ -85,12 +95,55 @@ export default function Navbar() {
   const [showSignOutDialog, setShowSignOutDialog] = useState(false);
   const adminMenuRef = useRef<HTMLDivElement>(null);
   const moreMenuRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const { totalUnreadCount } = useUnreadCount();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [textVisible, setTextVisible] = useState(!isCollapsed);
+  const [visibleDynamicItems, setVisibleDynamicItems] = useState<NavigationItem[]>([]);
+  const [overflowDynamicItems, setOverflowDynamicItems] = useState<NavigationItem[]>([]);
 
   // Check if current user is admin (simple client-side check)
   const isAdminUser = session?.user?.email === "iitconnect22@gmail.com";
+
+  // Calculate visible items on mount
+  useEffect(() => {
+    const calculateVisibleItems = () => {
+      if (!sidebarRef.current) return;
+
+      const ITEM_HEIGHT = 48; // px - height of each nav item
+      const HEADER_HEIGHT = 96; // px - logo + toggle button area
+      const PROFILE_HEIGHT = 48; // px - profile/admin button
+      const MORE_BUTTON_HEIGHT = 48; // px - more menu button
+      const SPACING = 16; // px - space-y-2 between items
+
+      const sidebarHeight = sidebarRef.current.clientHeight;
+      
+      // Calculate space used by fixed items
+      const fixedItemsCount = fixedTopItems.length + fixedBottomItems.length;
+      const fixedItemsHeight = fixedItemsCount * ITEM_HEIGHT + (fixedItemsCount - 1) * SPACING;
+      
+      // Total used space
+      const usedSpace = HEADER_HEIGHT + fixedItemsHeight + PROFILE_HEIGHT + MORE_BUTTON_HEIGHT;
+      
+      // Available space for dynamic items
+      const availableSpace = sidebarHeight - usedSpace;
+      
+      // Calculate how many dynamic items can fit (accounting for spacing)
+      const maxDynamicItems = Math.max(0, Math.floor((availableSpace + SPACING) / (ITEM_HEIGHT + SPACING)));
+      
+      // Split dynamic items into visible and overflow
+      const visible = dynamicItems.slice(0, maxDynamicItems);
+      const overflow = dynamicItems.slice(maxDynamicItems);
+      
+      setVisibleDynamicItems(visible);
+      setOverflowDynamicItems(overflow);
+    };
+
+    // Calculate after component mounts and layout is ready
+    const timer = setTimeout(calculateVisibleItems, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -188,6 +241,7 @@ export default function Navbar() {
       )}
 
       <div
+        ref={sidebarRef}
         className={`fixed left-0 top-0 h-full transition-all duration-300 bg-gradient-to-b from-blue-600 to-teal-500 border-r border-white/30 z-40 hidden lg:block ${
           isCollapsed ? "w-16 sidebar-collapsed" : "w-64"
         }`}
@@ -223,7 +277,72 @@ export default function Navbar() {
           </div>
 
           <nav className="space-y-2">
-            {navigation.map((item) => (
+            {/* Fixed Top Items */}
+            {fixedTopItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`relative flex items-center ${
+                  isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
+                } rounded-lg text-sm font-medium transition-colors ${
+                  pathname === item.href
+                    ? "bg-white/30 text-white backdrop-blur-sm"
+                    : "text-white/90 hover:bg-white/20 hover:text-white"
+                }`}
+                title={isCollapsed ? item.name : undefined}
+              >
+                <item.icon
+                  className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}
+                />
+                {textVisible && (
+                  <>
+                    <span className="flex-1">
+                      {item.name}
+                    </span>
+                    {item.name === "Messages" && totalUnreadCount > 0 && (
+                      <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
+                        {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
+                      </span>
+                    )}
+                  </>
+                )}
+                {isCollapsed &&
+                  item.name === "Messages" &&
+                  totalUnreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-medium shadow-lg">
+                      {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
+                    </span>
+                  )}
+              </Link>
+            ))}
+
+            {/* Dynamic Items - shown if space available */}
+            {visibleDynamicItems.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`relative flex items-center ${
+                  isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
+                } rounded-lg text-sm font-medium transition-colors ${
+                  pathname === item.href
+                    ? "bg-white/30 text-white backdrop-blur-sm"
+                    : "text-white/90 hover:bg-white/20 hover:text-white"
+                }`}
+                title={isCollapsed ? item.name : undefined}
+              >
+                <item.icon
+                  className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}
+                />
+                {textVisible && (
+                  <span className="flex-1">
+                    {item.name}
+                  </span>
+                )}
+              </Link>
+            ))}
+
+            {/* Fixed Bottom Items (Join Team) */}
+            {fixedBottomItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
@@ -244,25 +363,18 @@ export default function Navbar() {
                   }`}
                 />
                 {textVisible && (
-                  <>
-                    <span
-                      className={`flex-1 ${
-                        item.isSpecial ? "font-semibold" : ""
-                      }`}
-                    >
-                      {item.name}
-                      {item.isSpecial && (
-                        <span className="ml-2 text-xs bg-yellow-400 text-red-900 px-2 py-1 rounded-full font-bold animate-pulse">
-                          NEW!
-                        </span>
-                      )}
-                    </span>
-                    {item.name === "Messages" && totalUnreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
-                        {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
+                  <span
+                    className={`flex-1 ${
+                      item.isSpecial ? "font-semibold" : ""
+                    }`}
+                  >
+                    {item.name}
+                    {item.isSpecial && (
+                      <span className="ml-2 text-xs bg-yellow-400 text-red-900 px-2 py-1 rounded-full font-bold animate-pulse">
+                        NEW!
                       </span>
                     )}
-                  </>
+                  </span>
                 )}
                 {/* Special badge for Join Team in collapsed state */}
                 {isCollapsed && item.isSpecial && (
@@ -270,13 +382,6 @@ export default function Navbar() {
                     !
                   </span>
                 )}
-                {isCollapsed &&
-                  item.name === "Messages" &&
-                  totalUnreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full min-w-[16px] h-[16px] flex items-center justify-center font-medium shadow-lg">
-                      {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
-                    </span>
-                  )}
               </Link>
             ))}
 
@@ -385,7 +490,7 @@ export default function Navbar() {
                 className={`w-full flex items-center relative ${
                   isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
                 } rounded-lg text-sm font-medium transition-colors text-left ${
-                  moreMenuItems.some((item) => pathname === item.href)
+                  [...overflowDynamicItems, ...alwaysInMoreMenu].some((item) => pathname === item.href)
                     ? "bg-white/30 text-white backdrop-blur-sm"
                     : "text-white/90 hover:bg-white/20 hover:text-white"
                 }`}
@@ -413,7 +518,28 @@ export default function Navbar() {
                       : "bottom-full left-0 right-0 mb-2"
                   }`}
                 >
-                  {moreMenuItems.map((item) => (
+                  {/* Overflow Dynamic Items */}
+                  {overflowDynamicItems.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setShowMoreMenu(false)}
+                      className={`flex items-center px-4 py-2 text-sm transition-colors ${
+                        pathname === item.href
+                          ? "bg-white/30 text-white"
+                          : "text-white/90 hover:bg-white/20 hover:text-white"
+                      }`}
+                    >
+                      <item.icon className="h-4 w-4 mr-3" />
+                      {item.name}
+                    </Link>
+                  ))}
+                  {/* Separator if there are overflow items */}
+                  {overflowDynamicItems.length > 0 && (
+                    <div className="border-t border-white/20 my-1"></div>
+                  )}
+                  {/* Always in More Menu Items */}
+                  {alwaysInMoreMenu.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
@@ -656,7 +782,7 @@ export function MobileBottomNav() {
               </div>
 
               <nav className="space-y-2 flex-1">
-                {navigation.map((item, index) => (
+                {[...fixedTopItems, ...dynamicItems, ...fixedBottomItems].map((item, index) => (
                   <Link
                     key={item.name}
                     href={item.href}
@@ -705,7 +831,7 @@ export function MobileBottomNav() {
                   <h3 className="text-white/60 text-sm font-medium px-4 mb-2">
                     More
                   </h3>
-                  {moreMenuItems.map((item, index) => (
+                  {alwaysInMoreMenu.map((item, index) => (
                     <Link
                       key={item.name}
                       href={item.href}
@@ -716,7 +842,7 @@ export function MobileBottomNav() {
                           : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
                       }`}
                       style={{
-                        animationDelay: `${(navigation.length + index) * 50}ms`,
+                        animationDelay: `${(fixedTopItems.length + dynamicItems.length + fixedBottomItems.length + index) * 50}ms`,
                         animation: showMobileMenu
                           ? "slideInRight 0.3s ease-out forwards"
                           : "none",
@@ -740,7 +866,7 @@ export function MobileBottomNav() {
                     className="w-full flex items-center px-4 py-4 rounded-xl text-base font-medium text-white bg-red-500/20 hover:bg-red-500/30 transition-all duration-200 hover:scale-105 border border-red-400/30"
                     style={{
                       animationDelay: `${
-                        (navigation.length + moreMenuItems.length) * 50
+                        (fixedTopItems.length + dynamicItems.length + fixedBottomItems.length + alwaysInMoreMenu.length) * 50
                       }ms`,
                       animation: showMobileMenu
                         ? "slideInRight 0.3s ease-out forwards"
