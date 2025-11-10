@@ -20,7 +20,7 @@ interface GalleryImage {
 const galleryImages: GalleryImage[] = [
   {
     id: "1",
-    src: "/campus/SAB.png",
+    src: "https://ik.imagekit.io/rzomyrznq/SAB.png",
     title: "Student Academic Block",
     description:
       "The iconic SAB building - heart of academic activities at IIT Ropar",
@@ -31,7 +31,7 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: "2",
-    src: "/campus/spiral.jpg",
+    src: "https://ik.imagekit.io/rzomyrznq/spiral.jpg",
     title: "Spiral Architecture",
     description:
       "Beautiful spiral design showcasing modern architectural excellence",
@@ -42,7 +42,7 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: "3",
-    src: "/campus/lights-on.jpg",
+    src: "https://ik.imagekit.io/rzomyrznq/lights-on.jpg",
     title: "Campus at Night",
     description: "Campus illuminated under the night sky - a mesmerizing view",
     category: "Nature",
@@ -52,7 +52,7 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: "4",
-    src: "/campus/Sunset.jpg",
+    src: "https://ik.imagekit.io/rzomyrznq/Sunset.jpg",
     title: "Golden Hour",
     description:
       "Breathtaking sunset view from campus - nature's daily masterpiece",
@@ -63,7 +63,7 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: "5",
-    src: "/campus/Sunset_2.jpg",
+    src: "https://ik.imagekit.io/rzomyrznq/Sunset_2.jpg",
     title: "Evening Serenity",
     description:
       "Another stunning sunset capturing the peaceful campus atmosphere",
@@ -74,7 +74,7 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: "6",
-    src: "/campus/Leaves.jpg",
+    src: "https://ik.imagekit.io/rzomyrznq/Leaves.jpg",
     title: "Campus Greenery",
     description:
       "Lush green foliage showcasing the natural beauty of our campus",
@@ -85,7 +85,7 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: "7",
-    src: "/campus/Academics.jpg",
+    src: "https://ik.imagekit.io/rzomyrznq/Academics.jpg",
     title: "Academic Excellence",
     description:
       "Academic buildings representing the pursuit of knowledge and innovation",
@@ -96,7 +96,6 @@ const galleryImages: GalleryImage[] = [
   },
   ...(() => {
     const urls = [
-      "https://ik.imagekit.io/rzomyrznq/Academics.jpg",
       "https://ik.imagekit.io/rzomyrznq/IMG_2025111010525114.JPG",
       "https://ik.imagekit.io/rzomyrznq/IMG_2025111010525117.JPG",
       "https://ik.imagekit.io/rzomyrznq/IMG_202511101052517.JPG",
@@ -282,12 +281,6 @@ const galleryImages: GalleryImage[] = [
       "https://ik.imagekit.io/rzomyrznq/IMG_9405.jpg",
       "https://ik.imagekit.io/rzomyrznq/IMG_9413.jpg",
       "https://ik.imagekit.io/rzomyrznq/IMG_9541.JPG",
-      "https://ik.imagekit.io/rzomyrznq/Leaves.jpg",
-      "https://ik.imagekit.io/rzomyrznq/lights-on.jpg",
-      "https://ik.imagekit.io/rzomyrznq/SAB.png",
-      "https://ik.imagekit.io/rzomyrznq/spiral.jpg",
-      "https://ik.imagekit.io/rzomyrznq/Sunset.jpg",
-      "https://ik.imagekit.io/rzomyrznq/Sunset_2.jpg",
     ];
 
     const startId = 8;
