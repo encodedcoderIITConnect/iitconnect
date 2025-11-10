@@ -36,6 +36,8 @@ import {
   Bus,
   CalendarDays,
   MessageSquare,
+  ChevronsLeft,
+  ChevronsRight,
 } from "lucide-react";
 
 // Navigation item type
@@ -278,10 +280,15 @@ export default function Navbar() {
             )}
             <button
               onClick={toggleSidebar}
-              className="flex items-center text-white/90 hover:text-white hover:bg-white/20 px-3 py-3 rounded-lg transition-colors"
+              className="flex items-center text-white/90 hover:text-white hover:bg-white/20 px-3 py-3 rounded-lg transition-colors group relative"
               title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
-              <Sidebar className="h-6 w-6" />
+              <Sidebar className="h-6 w-6 group-hover:opacity-0 transition-opacity" />
+              {isCollapsed ? (
+                <ChevronsRight className="h-6 w-6 absolute opacity-0 group-hover:opacity-100 transition-opacity" />
+              ) : (
+                <ChevronsLeft className="h-6 w-6 absolute opacity-0 group-hover:opacity-100 transition-opacity" />
+              )}
             </button>
           </div>
 
