@@ -8,7 +8,7 @@ import {
   Download,
   Heart,
   Eye,
-  Search,
+  // Search,
   Upload,
   X,
   ChevronLeft,

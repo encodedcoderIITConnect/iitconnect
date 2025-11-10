@@ -456,6 +456,14 @@ export default function Navbar() {
                           <Settings className="h-4 w-4 mr-3" />
                           Admin Panel
                         </Link>
+                        <Link
+                          href="/admin/users"
+                          onClick={() => setShowAdminDropdown(false)}
+                          className="flex items-center px-4 py-2 text-sm text-white hover:bg-white/20 whitespace-nowrap"
+                        >
+                          <Users className="h-4 w-4 mr-3" />
+                          Users
+                        </Link>
                       </div>
                     )}
                   </>

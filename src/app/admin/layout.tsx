@@ -1,9 +1,36 @@
+"use client";
+
 import { ReactNode } from "react";
 import Link from "next/link";
+import { Toaster } from "react-hot-toast";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-600 to-teal-500">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "rgba(255, 255, 255, 0.1)",
+            backdropFilter: "blur(12px)",
+            color: "#fff",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+          },
+          success: {
+            iconTheme: {
+              primary: "#10b981",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-xl border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,8 +60,3 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
-
-export const metadata = {
-  title: "Admin Panel - IIT Connect",
-  description: "Administrative panel for IIT Connect",
-};
