@@ -191,7 +191,7 @@ export default function Gallery() {
           {/* Share Your Moment Button */}
           <div className="text-center">
             <Link href="/gallery/submit">
-              <Button className="bg-white text-blue-600 hover:bg-blue-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300">
+              <Button className="bg-white text-blue-600 hover:bg-blue-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 hover:cursor-pointer">
                 <Upload className="w-4 h-4 mr-2" />
                 Share Your Moment
               </Button>
