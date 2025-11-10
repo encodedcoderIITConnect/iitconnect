@@ -99,8 +99,12 @@ export default function Navbar() {
   const { totalUnreadCount } = useUnreadCount();
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [textVisible, setTextVisible] = useState(!isCollapsed);
-  const [visibleDynamicItems, setVisibleDynamicItems] = useState<NavigationItem[]>([]);
-  const [overflowDynamicItems, setOverflowDynamicItems] = useState<NavigationItem[]>([]);
+  const [visibleDynamicItems, setVisibleDynamicItems] = useState<
+    NavigationItem[]
+  >([]);
+  const [overflowDynamicItems, setOverflowDynamicItems] = useState<
+    NavigationItem[]
+  >([]);
 
   // Check if current user is admin (simple client-side check)
   const isAdminUser = session?.user?.email === "iitconnect22@gmail.com";
@@ -117,24 +121,29 @@ export default function Navbar() {
       const SPACING = 16; // px - space-y-2 between items
 
       const sidebarHeight = sidebarRef.current.clientHeight;
-      
+
       // Calculate space used by fixed items
       const fixedItemsCount = fixedTopItems.length + fixedBottomItems.length;
-      const fixedItemsHeight = fixedItemsCount * ITEM_HEIGHT + (fixedItemsCount - 1) * SPACING;
-      
+      const fixedItemsHeight =
+        fixedItemsCount * ITEM_HEIGHT + (fixedItemsCount - 1) * SPACING;
+
       // Total used space
-      const usedSpace = HEADER_HEIGHT + fixedItemsHeight + PROFILE_HEIGHT + MORE_BUTTON_HEIGHT;
-      
+      const usedSpace =
+        HEADER_HEIGHT + fixedItemsHeight + PROFILE_HEIGHT + MORE_BUTTON_HEIGHT;
+
       // Available space for dynamic items
       const availableSpace = sidebarHeight - usedSpace;
-      
+
       // Calculate how many dynamic items can fit (accounting for spacing)
-      const maxDynamicItems = Math.max(0, Math.floor((availableSpace + SPACING) / (ITEM_HEIGHT + SPACING)));
-      
+      const maxDynamicItems = Math.max(
+        0,
+        Math.floor((availableSpace + SPACING) / (ITEM_HEIGHT + SPACING))
+      );
+
       // Split dynamic items into visible and overflow
       const visible = dynamicItems.slice(0, maxDynamicItems);
       const overflow = dynamicItems.slice(maxDynamicItems);
-      
+
       setVisibleDynamicItems(visible);
       setOverflowDynamicItems(overflow);
     };
@@ -296,9 +305,7 @@ export default function Navbar() {
                 />
                 {textVisible && (
                   <>
-                    <span className="flex-1">
-                      {item.name}
-                    </span>
+                    <span className="flex-1">{item.name}</span>
                     {item.name === "Messages" && totalUnreadCount > 0 && (
                       <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
                         {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
@@ -333,11 +340,7 @@ export default function Navbar() {
                 <item.icon
                   className={`h-6 w-6 ${!isCollapsed ? "mr-4" : ""}`}
                 />
-                {textVisible && (
-                  <span className="flex-1">
-                    {item.name}
-                  </span>
-                )}
+                {textVisible && <span className="flex-1">{item.name}</span>}
               </Link>
             ))}
 
@@ -490,7 +493,9 @@ export default function Navbar() {
                 className={`w-full flex items-center relative ${
                   isCollapsed ? "justify-center px-3 py-3" : "px-3 py-3"
                 } rounded-lg text-sm font-medium transition-colors text-left ${
-                  [...overflowDynamicItems, ...alwaysInMoreMenu].some((item) => pathname === item.href)
+                  [...overflowDynamicItems, ...alwaysInMoreMenu].some(
+                    (item) => pathname === item.href
+                  )
                     ? "bg-white/30 text-white backdrop-blur-sm"
                     : "text-white/90 hover:bg-white/20 hover:text-white"
                 }`}
@@ -782,49 +787,51 @@ export function MobileBottomNav() {
               </div>
 
               <nav className="space-y-2 flex-1">
-                {[...fixedTopItems, ...dynamicItems, ...fixedBottomItems].map((item, index) => (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setShowMobileMenu(false)}
-                    className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 transform ${
-                      item.isSpecial
-                        ? "bg-red-600 hover:bg-red-700 text-white shadow-lg scale-105"
-                        : pathname === item.href
-                        ? "bg-white/30 text-white backdrop-blur-sm scale-105 shadow-lg"
-                        : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
-                    }`}
-                    style={{
-                      animationDelay: `${index * 50}ms`,
-                      animation: showMobileMenu
-                        ? "slideInRight 0.3s ease-out forwards"
-                        : "none",
-                    }}
-                  >
-                    <item.icon
-                      className={`h-6 w-6 mr-4 flex-shrink-0 ${
-                        item.isSpecial ? "animate-pulse" : ""
+                {[...fixedTopItems, ...dynamicItems, ...fixedBottomItems].map(
+                  (item, index) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setShowMobileMenu(false)}
+                      className={`flex items-center px-4 py-3 rounded-xl text-base font-medium transition-all duration-200 transform ${
+                        item.isSpecial
+                          ? "bg-red-600 hover:bg-red-700 text-white shadow-lg scale-105"
+                          : pathname === item.href
+                          ? "bg-white/30 text-white backdrop-blur-sm scale-105 shadow-lg"
+                          : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
                       }`}
-                    />
-                    <span
-                      className={`truncate flex-1 ${
-                        item.isSpecial ? "font-semibold" : ""
-                      }`}
+                      style={{
+                        animationDelay: `${index * 50}ms`,
+                        animation: showMobileMenu
+                          ? "slideInRight 0.3s ease-out forwards"
+                          : "none",
+                      }}
                     >
-                      {item.name}
-                      {item.isSpecial && (
-                        <span className="ml-2 text-xs bg-yellow-400 text-red-900 px-2 py-1 rounded-full font-bold animate-pulse">
-                          NEW!
+                      <item.icon
+                        className={`h-6 w-6 mr-4 flex-shrink-0 ${
+                          item.isSpecial ? "animate-pulse" : ""
+                        }`}
+                      />
+                      <span
+                        className={`truncate flex-1 ${
+                          item.isSpecial ? "font-semibold" : ""
+                        }`}
+                      >
+                        {item.name}
+                        {item.isSpecial && (
+                          <span className="ml-2 text-xs bg-yellow-400 text-red-900 px-2 py-1 rounded-full font-bold animate-pulse">
+                            NEW!
+                          </span>
+                        )}
+                      </span>
+                      {item.name === "Messages" && totalUnreadCount > 0 && (
+                        <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
+                          {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
                         </span>
                       )}
-                    </span>
-                    {item.name === "Messages" && totalUnreadCount > 0 && (
-                      <span className="bg-red-500 text-white text-xs rounded-full min-w-[18px] h-[18px] flex items-center justify-center font-medium shadow-lg ml-2">
-                        {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
-                      </span>
-                    )}
-                  </Link>
-                ))}
+                    </Link>
+                  )
+                )}
 
                 {/* More Menu Items */}
                 <div className="border-t border-white/20 pt-4 mt-4">
@@ -842,7 +849,13 @@ export function MobileBottomNav() {
                           : "text-white/90 hover:bg-white/20 hover:text-white hover:scale-105"
                       }`}
                       style={{
-                        animationDelay: `${(fixedTopItems.length + dynamicItems.length + fixedBottomItems.length + index) * 50}ms`,
+                        animationDelay: `${
+                          (fixedTopItems.length +
+                            dynamicItems.length +
+                            fixedBottomItems.length +
+                            index) *
+                          50
+                        }ms`,
                         animation: showMobileMenu
                           ? "slideInRight 0.3s ease-out forwards"
                           : "none",
@@ -866,7 +879,11 @@ export function MobileBottomNav() {
                     className="w-full flex items-center px-4 py-4 rounded-xl text-base font-medium text-white bg-red-500/20 hover:bg-red-500/30 transition-all duration-200 hover:scale-105 border border-red-400/30"
                     style={{
                       animationDelay: `${
-                        (fixedTopItems.length + dynamicItems.length + fixedBottomItems.length + alwaysInMoreMenu.length) * 50
+                        (fixedTopItems.length +
+                          dynamicItems.length +
+                          fixedBottomItems.length +
+                          alwaysInMoreMenu.length) *
+                        50
                       }ms`,
                       animation: showMobileMenu
                         ? "slideInRight 0.3s ease-out forwards"
