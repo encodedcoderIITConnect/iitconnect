@@ -77,6 +77,22 @@ export default function FeedbackPage() {
           </iframe>
         </div>
 
+        {/* Open in New Page Button */}
+        <div className="text-center mb-6 ">
+          <button
+            onClick={() =>
+              window.open(
+                "https://docs.google.com/forms/d/e/1FAIpQLSfUqnhijgxWOf0YzthOPY43o-msTmyi9HauPsxZuiOlsjt6DQ/viewform",
+                "_blank"
+              )
+            }
+            className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-white hover:cursor-pointer"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Open Form in New Page
+          </button>
+        </div>
+
         {/* Footer Note */}
         <div className="mt-6 text-center">
           <p className="text-blue-100 text-sm">
